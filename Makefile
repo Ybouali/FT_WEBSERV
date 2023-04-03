@@ -5,7 +5,7 @@ CC = clang++
 
 FLAGS = --std=c++98 -Wall -Wextra -Werror -fsanitize=address 
 
-SRCS = main.cpp
+SRCS = webserv.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
