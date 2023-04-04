@@ -1,5 +1,7 @@
 #pragma once
 
+# define CLIENT_MAX_BODY_SIZE 3000000
+
 # include <iostream>
 # include <fstream>
 # include <fcntl.h>
