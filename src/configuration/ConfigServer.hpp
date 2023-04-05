@@ -5,19 +5,19 @@
 class ConfigServer {
     private :
         uint16_t						Port;
-	    in_addr_t						Host;
+	    in_addr_t						Host; 
 		std::string						serverName;
 		std::string						Root;
 		unsigned long					clientMaxBodySize;
 		std::string						Index;
 		bool							autoIndex;
 		std::map<short, std::string>    errorPages;
+        int     						listenFd;
+        struct sockaddr_in 				serverAddress;
 
 		// std::vector<??> 			    locations;
-        // struct sockaddr_in 				serverAddress;
-        // int     						listenFd;
     public : 
-        ConfigServer(size_t numberServer);
+        ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
 
         ~ConfigServer();
 
@@ -44,11 +44,13 @@ class ConfigServer {
 
         std::map<short, std::string>        getErrorPages() const;
 
+        int                                 getListenFd() const;
+
         //! ----------------------------- setters -----------------------------------
 
         void                                setPort(uint16_t);
         
-        void                                setHost(in_addr_t);
+        void                                setHost(std::string);
 
         void                                setServerName(std::string);
 
@@ -61,4 +63,6 @@ class ConfigServer {
         void                                setAutoIndex(bool);
 
         void                                setErrorPages(std::map<short, std::string>);
+
+        void                                setListenFd();
 };

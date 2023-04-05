@@ -1,17 +1,18 @@
 #include "ConfigServer.hpp"
 
-ConfigServer::ConfigServer(size_t numberServer)
-    : Port(0), Host(0), serverName(), Root(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), Index(), autoIndex(false), errorPages()
+ConfigServer::ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex)
+    : Port(0), Host(), serverName(), Root(""), clientMaxBodySize(0), Index(""), autoIndex(false), errorPages()
 {
-
-    if (numberServer)
-    {
-        for (size_t i = 0; i < numberServer; i++)
-        {
-            
-        }
-        this->initErrorPages();
-    }
+    this->setPort(port);
+    this->setHost(host);
+    this->setServerName(ServerName);
+    this->setRoot(root);
+    this->setClientMaxBodySize(ClientMaxBodySize);
+    this->setIndex(index);
+    this->setAutoIndex(AutoIndex);
+    this->initErrorPages();
+    this->setListenFd();
+    std::cout << "LISTEN FD :: [" << this->getListenFd() << "]" << std::endl;
 }
 
 
@@ -68,11 +69,13 @@ bool                                ConfigServer::getAutoIndex() const { return 
 
 std::map<short, std::string>        ConfigServer::getErrorPages() const { return this->errorPages; }
 
+int                                 ConfigServer::getListenFd() const { return this->listenFd; }
+
 //! ----------------------------- setters -----------------------------------
 
 void                ConfigServer::setPort(uint16_t port) { this->Port = port; }
 
-void                ConfigServer::setHost(in_addr_t host) { this->Host = host; }
+void                ConfigServer::setHost(std::string host) { this->Host = inet_addr(host.c_str());/* ! If host == INADDR_NONE so this is an error (Failed to get the host for localhost) .*/ }
 
 void                ConfigServer::setServerName(std::string ServerName) { this->serverName = ServerName; }
 
@@ -85,3 +88,17 @@ void                ConfigServer::setIndex(std::string index) { this->Index = in
 void                ConfigServer::setAutoIndex(bool AutoIndex) { this->autoIndex = AutoIndex; }
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
+
+void                ConfigServer::setListenFd()
+{
+    this->listenFd = socket(AF_INET, SOCK_STREAM, 0); // ! check if the listen fd is not equal to -1 . exit EXIT_FAILURE
+
+    int option_value = 1;
+    setsockopt(this->listenFd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
+    memset(&this->serverAddress, 0, sizeof(this->serverAddress));
+    this->serverAddress.sin_family = AF_INET;
+    this->serverAddress.sin_addr.s_addr = this->getHost();
+    this->serverAddress.sin_port = htons(this->getPort());
+    // ! bind the socket
+    bind(this->listenFd, (struct sockaddr *) &this->serverAddress, sizeof(this->serverAddress)); // ! check if the listen fd is not equal to -1 . exit EXIT_FAILURE
+}
