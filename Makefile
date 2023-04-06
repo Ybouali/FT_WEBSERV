@@ -7,6 +7,8 @@ FLAGS = --std=c++98 -Wall -Wextra -Werror -fsanitize=address
 
 SRCS = src/webserv.cpp \
 	   src/configuration/ConfigServer.cpp \
+	   src/networking/ManageServers.cpp \
+	   src/networking/Client.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
