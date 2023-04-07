@@ -42,3 +42,8 @@
 # include "./networking/ManageServers.hpp"
 # include "./networking/Client.hpp"
 # include "./configuration/ConfigServer.hpp"
+
+// ? UTILS FUNCTIONS
+
+std::string skipWhitespaceBeginAnd(std::string );
+

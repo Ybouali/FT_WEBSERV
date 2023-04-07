@@ -6,9 +6,11 @@ CC = clang++
 FLAGS = --std=c++98 -Wall -Wextra -Werror -fsanitize=address 
 
 SRCS = src/webserv.cpp \
+	   src/utils.cpp \
 	   src/configuration/ConfigServer.cpp \
 	   src/networking/ManageServers.cpp \
 	   src/networking/Client.cpp \
+	   src/request/Request.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

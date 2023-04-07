@@ -40,6 +40,7 @@ int main(int ac, char **av)
    vecServers.push_back(server1);
    vecServers.push_back(server2);
    vecServers.push_back(server3);
+    
 
    for (size_t i = 0; i < vecServers.size(); i++)
     std::cout << vecServers[i].getPort() << std::endl;
