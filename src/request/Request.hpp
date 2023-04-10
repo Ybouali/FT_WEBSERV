@@ -9,6 +9,8 @@ class Request {
         std::map<std::string, std::string>      requestHeaders;
         std::vector<u_int8_t>                   Body;
         std::string                             bodyString;
+        std::string                             Boundary;
+        Methods                                 Method;
 
     public :
         
@@ -20,15 +22,21 @@ class Request {
 
         // ? ----------------------------- getters -----------------------------------
 
-        std::string                                     getPath() const;
+        std::string &                                       getPath();
 
-        std::string                                     getQuery() const;
+        std::string  &                                      getQuery();
 
-        const std::map<std::string, std::string>&       getrequestHeaders() const;
+        const std::map<std::string, std::string>&           getrequestHeaders();
 
-        std::string                                     getHeader(std::string );
+        std::string   &                                     getHeader(std::string );
 
-        std::vector<u_int8_t>                           getBody() const;
+        std::string &                                       getBody();
+
+        std::string  &                                      getBoundary();
+
+        Methods &                                           getMethods();
+
+        // std::string &                                       getMethodString();
 
 
         // ? ----------------------------- setters -----------------------------------

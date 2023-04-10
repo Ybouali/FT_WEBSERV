@@ -2,6 +2,12 @@
 
 # define CLIENT_MAX_BODY_SIZE 3000000
 
+enum Methods {
+    GET,
+    POST,
+    DELETE
+};
+
 # include <iostream>
 # include <fstream>
 # include <fcntl.h>

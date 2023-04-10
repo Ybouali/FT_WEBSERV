@@ -1,11 +1,13 @@
 # include "Request.hpp"
 
 Request::Request() 
-    : Path(), Query(), requestHeaders(), Body(), bodyString()
+    : Path(), Query(), requestHeaders(), Body(), bodyString(), Boundary()
 { }
 
 Request::~Request()
-{ }
+{ 
+    this->clear();
+}
 
 void            Request::clear()
 {
@@ -14,19 +16,25 @@ void            Request::clear()
     this->requestHeaders.clear();
     this->Body.clear();
     this->bodyString.clear();
+    this->Boundary.clear();
+    
 }
 
 // ? ----------------------------- getters -----------------------------------
 
-std::string                                     Request::getPath() const { return this->Path; }
+std::string &                                       Request::getPath() { return this->Path; }
 
-std::string                                     Request::getQuery() const { return this->Query; }
+std::string  &                                      Request::getQuery() { return this->Query; }
 
-const std::map<std::string, std::string>&       Request::getrequestHeaders() const { return this->requestHeaders; }
+const std::map<std::string, std::string>&           Request::getrequestHeaders() { return this->requestHeaders; }
 
-std::string                                     Request::getHeader(std::string key) { return this->requestHeaders[key]; }
+std::string &                                       Request::getHeader(std::string key) { return this->requestHeaders[key]; }
 
-std::vector<u_int8_t>                           Request::getBody() const { return this->Body; }
+std::string &                                       Request::getBody() { return this->bodyString; }
+
+std::string &                                       Request::getBoundary() { return this->Boundary; }
+
+Methods &                                           Request::getMethods() { return this->Method; }
 
 // ? ----------------------------- setters -----------------------------------
 
