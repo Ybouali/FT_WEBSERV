@@ -11,6 +11,24 @@ class Request {
         std::string                             bodyString;
         std::string                             Boundary;
         Methods                                 Method;
+        std::map<u_int8_t, std::string>         methodsString;
+        state                                   State;
+        size_t                                  maxBodySize;
+        size_t                                  bodySize;
+        size_t                                  errorCode;
+        size_t                                  chunkedLength;
+        std::string                             Storage;
+        std::string                             keyStorage;
+        short                                   methodIndex;
+        u_int8_t                                verMajor;
+        u_int8_t                                verMinor;
+        std::string                             serverName;
+        bool                                    fieldsDoneFlag;
+        bool                                    bodyFlag;
+        bool                                    bodyDoneFlag;
+        bool                                    completeFlag;
+        bool                                    chunkedFlag;
+        bool                                    multiformFlag;
 
     public :
         
@@ -34,9 +52,13 @@ class Request {
 
         std::string  &                                      getBoundary();
 
-        Methods &                                           getMethods();
+        Methods &                                           getMethod();
 
-        // std::string &                                       getMethodString();
+        std::string                                         getMethodsString();
+
+        short                                               getCodeError();
+
+        std::string &                                       getServerName();
 
 
         // ? ----------------------------- setters -----------------------------------
@@ -44,6 +66,10 @@ class Request {
         void        setHeader(std::string &, std::string &);
 
         void        setBody(std::string body);
+
+        void        setMethod(Methods &);
+
+        void        setMaxBodySize(size_t);
 
 
         // ? Methods ---------------------------------------------------------------- 
