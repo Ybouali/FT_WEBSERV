@@ -106,6 +106,87 @@ void                                            Request::setMethod(Methods & met
 
 void                                            Request::setMaxBodySize(size_t size) { this->maxBodySize = size; }
 
-// ? Methods ---------------------------------------------------------------- 
+// ? Public methods ---------------------------------------------------------------- 
 
 void                                            Request::substrRequestBodyString(int bytes) { this->bodyString = this->bodyString.substr(bytes); }
+
+// ? Private methods ---------------------------------------------------------------- 
+
+void                                   Request::handleHeaders()
+{
+    std::stringstream ss;
+
+    if (this->requestHeaders.count("content-length"))
+    {
+        this->bodyFlag = true;
+        ss << this->requestHeaders["content-length"];
+        ss >> this->bodySize;
+        std::cout << "content-length :::::::::::::::[" << ss << "]" << std::endl;
+    }
+    if (this->requestHeaders.count("transfer-encoding"))
+    {
+        if (this->requestHeaders["transfer-encoding"].find_first_of("chunked") != std::string::npos)
+        {
+            this->chunkedFlag = true;
+            std::cout << "chunked ::::::::::::::::::[" << this->chunkedFlag << "]" << std::endl;
+        }
+        this->bodyFlag = true;
+        std::cout << "transfer-encoding ::::::::::::[" << (this->bodyFlag ? "body existe" : "body is not existe") << "]" << std::endl;
+    }
+    if (this->requestHeaders.count("host"))
+    {
+        size_t position = this->requestHeaders["host"].find_first_of(':');
+        this->serverName = this->requestHeaders["host"].substr(0, position);
+        std::cout << "server name ::::::::::::::::::[" << (this->serverName.empty() ? "there is no server name" : this->serverName) << std::endl;
+    }
+    if (this->requestHeaders.count("content-type") && this->requestHeaders["content-type"].find("multipart/form-data") != std::string::npos)
+    {
+        size_t position = this->requestHeaders["content-type"].find("boundary", 0);
+        if (position == std::string::npos)
+            this->Boundary = this->requestHeaders["content-type"].substr(position + 9, this->requestHeaders["content-type"].size());
+        this->multiformFlag = true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    // if (_request_headers.count("content-type") && _request_headers["content-type"].find("multipart/form-data") != std::string::npos)
+    // {
+    //     size_t pos = _request_headers["content-type"].find("boundary=", 0);
+    //     if (pos != std::string::npos)
+    //         this->_boundary = _request_headers["content-type"].substr(pos + 9, _request_headers["content-type"].size());
+    //     this->_multiform_flag = true;
+    // }
+}

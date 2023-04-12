@@ -13,8 +13,8 @@ class Request {
         Methods                                 Method;
         std::map<u_int8_t, std::string>         methodsString;
         state                                   State;
-        size_t                                  maxBodySize;
         size_t                                  bodySize;
+        size_t                                  maxBodySize;
         size_t                                  errorCode;
         size_t                                  chunkedLength;
         std::string                             Storage;
@@ -29,6 +29,8 @@ class Request {
         bool                                    completeFlag;
         bool                                    chunkedFlag;
         bool                                    multiformFlag;
+
+        void                                   handleHeaders();
 
     public :
         
