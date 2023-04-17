@@ -49,6 +49,5 @@ int main(int ac, char **av)
    for (size_t i = 0; i < vecServers.size(); i++)
     close(vecServers[i].getListenFd());
    
-   
     return 0;
 }

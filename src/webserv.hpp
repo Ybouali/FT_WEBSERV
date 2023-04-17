@@ -2,6 +2,8 @@
 
 # define CLIENT_MAX_BODY_SIZE 3000000
 
+# define MAX_URI_LENGTH 4000
+
 enum Methods {
     GET,
     POST,
@@ -11,8 +13,6 @@ enum Methods {
 enum state
 {
     Request_Line,
-    Request_Line_Post_Put,
-    Request_Line_Method,
     Request_Line_First_Space,
     Request_Line_URI_Path_Slash,
     Request_Line_URI_Path,
@@ -29,7 +29,7 @@ enum state
     Request_Line_CR,
     Request_Line_LF,
     Field_Name_Start,
-    Fields_End,
+    Field_End,
     Field_Name,
     Field_Value,
     Field_Value_End,
@@ -90,5 +90,8 @@ enum state
 
 // ? UTILS FUNCTIONS
 
-std::string skipWhitespaceBeginAnd(std::string );
+std::string     skipWhitespaceBeginAnd(std::string );
+bool            errorPath(std::string );
+bool            checkUriCharacters(u_int8_t );
+bool            checkIsToken(u_int8_t );
 
