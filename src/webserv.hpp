@@ -2,7 +2,7 @@
 
 # define CLIENT_MAX_BODY_SIZE 3000000
 
-# define MAX_URI_LENGTH 4000
+# define MAX_URI_LENGTH 4096
 
 enum Methods {
     GET,
@@ -84,9 +84,8 @@ enum state
 # include <sys/select.h>
 # include <arpa/inet.h>
 
-# include "./networking/ManageServers.hpp"
-# include "./networking/Client.hpp"
-# include "./configuration/ConfigServer.hpp"
+# include "configuration/ConfigServer.hpp"
+# include "request/Request.hpp"
 
 // ? UTILS FUNCTIONS
 

@@ -1,9 +1,8 @@
 # pragma once
 
 # include "../webserv.hpp"
-
-class ConfigServer;
-class Client;
+# include "../configuration/ConfigServer.hpp"
+# include "../networking/Client.hpp"
 
 class ManageServers {
     private :
@@ -44,4 +43,10 @@ class ManageServers {
         void                            setWriteFd(fd_set);
 
         void                            setClient(std::map<int, Client>);
+
+        //! Methods  ----------------------------------------------------------------
+        
+        void                            acceptClientConnection(ConfigServer& );
+
+        void                            addToSet(const int , fd_set &);
 };

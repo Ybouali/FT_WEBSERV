@@ -1,11 +1,19 @@
 # include "Client.hpp"
 
 Client::Client() 
-    : clientSocket(), lastMsgTime(time(NULL)), clientAddress()
-{ }
+    : clientSocket(), lastMsgTime(time(NULL)), clientAddress(), request(), server()
+{
+}
 
 Client::~Client()
 { }
+
+Client::Client(const ConfigServer& other) { 
+    // here we need to make sure that the server is initialized
+    this->server = other;
+    this->request.setMaxBodySize(server.getClientMaxBodySize());
+    this->lastMsgTime = time(NULL);
+ }
 
 //! ----------------------------- getters -----------------------------------
 

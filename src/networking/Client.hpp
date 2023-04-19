@@ -1,6 +1,8 @@
 # pragma once
 
 # include "../webserv.hpp"
+# include "../request/Request.hpp"
+# include "../configuration/ConfigServer.hpp"
 
 class Client
 {
@@ -10,8 +12,13 @@ class Client
         struct sockaddr_in          clientAddress;
     public:
         Client();
+
+        Client(const ConfigServer &);
         
         ~Client();
+        
+        Request         request;
+        ConfigServer    server;
 
         // ? ----------------------------- getters -----------------------------------
 

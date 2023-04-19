@@ -17,11 +17,15 @@ class ConfigServer {
 
 		// std::vector<??> 			    locations;
     public : 
+        ConfigServer();
+        
         ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
 
         ~ConfigServer();
 
         void        clear();
+
+        void        initDefaultServer();
 
         // ! INITIALIZATION OF ERROR PAGES
         void                                initErrorPages();

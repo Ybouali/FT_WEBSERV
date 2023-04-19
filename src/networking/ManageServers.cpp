@@ -52,3 +52,33 @@ void                            ManageServers::setRecvFd(fd_set Recv) { this->re
 void                            ManageServers::setWriteFd(fd_set Write) { this->writeFd = Write; }
 
 void                            ManageServers::setClient(std::map<int, Client> Clients) { this->clientsMap = Clients; }
+
+//! Methods ----------------------------------------------------------------
+
+
+void                            ManageServers::acceptClientConnection(ConfigServer& server)
+{
+    struct  sockaddr_in         clientAddress;
+    long                        clientAddressSize = sizeof(clientAddress);
+    int                         clientSock;
+    Client                      client(server);
+    char                        buf[INET_ADDRSTRLEN];
+
+    (void)buf;
+
+    clientSock = accept(server.getListenFd(), (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
+    if (clientSock == -1)
+    {
+        std::cerr << "Failed to accept" << std::endl;
+        return;
+    }
+    this->addToSet(clientSock, this->recvFd);
+    // TODO: finish the accept connection client ?
+ }
+
+void                            ManageServers::addToSet(const int i, fd_set & set)
+{
+    FD_SET(i, &set);
+    if (i > this->biggestFd)
+        biggestFd = i;
+}
