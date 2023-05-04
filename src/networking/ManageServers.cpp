@@ -62,9 +62,6 @@ void                            ManageServers::acceptClientConnection(ConfigServ
     long                        clientAddressSize = sizeof(clientAddress);
     int                         clientSock;
     Client                      client(server);
-    char                        buf[INET_ADDRSTRLEN];
-
-    (void)buf;
 
     clientSock = accept(server.getListenFd(), (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
     if (clientSock == -1)
@@ -72,9 +69,82 @@ void                            ManageServers::acceptClientConnection(ConfigServ
         std::cerr << "Failed to accept" << std::endl;
         return;
     }
+    
     this->addToSet(clientSock, this->recvFd);
-    // TODO: finish the accept connection client ?
- }
+    
+    if (fcntl(clientSock, F_SETFL, O_NONBLOCK) < 0)
+    {
+        std::cerr << "webserver: fcntl error [" << strerror(errno) << "]" << std::endl;
+        removeFromSet(clientSock, this->recvFd);
+        close(clientSock);
+        return ;
+    }
+
+    client.setClientSocket(clientSock);
+    if (this->clientsMap.count(clientSock) != 0)
+        this->clientsMap.erase(clientSock);
+    this->clientsMap.insert(std::make_pair(clientSock, client));
+}
+
+void                            ManageServers::readRequest(const int &, Client &)
+{
+    // TODO: implement read request method
+    
+}
+
+void                            ManageServers::initializeSets()
+{
+    FD_ZERO(&this->recvFd);
+    FD_ZERO(&this->writeFd);
+
+    for(std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
+    {
+        //Now it calles listen() twice on even if two servers have the same host:port
+        if (listen(it->getListenFd(), 512) == -1)
+        {
+            std::cerr << "webserv: listen error: [" << strerror(errno) << "] Closing" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        if (fcntl(it->getListenFd(), F_SETFL, O_NONBLOCK) < 0)
+        {
+            std::cerr << "webserv: fcntl error: [" << strerror(errno) << "] Closing" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        addToSet(it->getListenFd(), this->recvFd);
+        this->serversMap.insert(std::make_pair(it->getListenFd(), *it));
+    }
+    this->biggestFd = this->Servers.back().getListenFd();
+}
+
+void                            ManageServers::timeoutCheck()
+{
+    for(std::map<int, Client>::iterator it = this->clientsMap.begin() ; it != this->clientsMap.end(); ++it)
+    {
+        if (time(NULL) - it->second.getLastMsgTime() > TIMEOUT_CONNECTION)
+        {
+            std::cerr << "Client [" << it->first << "] Timeout Connection, Closing ..." << std::endl;
+            this->closeConnectionClient(it->first);
+            return ;
+        }
+    }
+}
+
+void                            ManageServers::closeConnectionClient(const int i)
+{
+    if (FD_ISSET(i, &this->writeFd))
+        this->removeFromSet(i, this->writeFd);
+    if (FD_ISSET(i, &this->recvFd))
+        removeFromSet(i, this->recvFd);
+    close(i);
+    this->clientsMap.erase(i);
+}
+
+void                            ManageServers::removeFromSet(const int i, fd_set & set)
+{
+    FD_CLR(i, &set);
+    if (i == this->biggestFd)
+        this->biggestFd--;
+}
 
 void                            ManageServers::addToSet(const int i, fd_set & set)
 {

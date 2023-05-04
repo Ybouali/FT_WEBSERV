@@ -4,6 +4,8 @@
 
 # define MAX_URI_LENGTH 4096
 
+# define TIMEOUT_CONNECTION 60
+
 enum Methods {
     GET,
     POST,

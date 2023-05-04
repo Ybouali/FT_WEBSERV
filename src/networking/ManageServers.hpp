@@ -48,5 +48,19 @@ class ManageServers {
         
         void                            acceptClientConnection(ConfigServer& );
 
+        void                            timeoutCheck();
+
+        void                            initializeSets();
+
+        void                            readRequest(const int &, Client &);
+
+        void                            closeConnectionClient(const int );
+
         void                            addToSet(const int , fd_set &);
+
+        void                            removeFromSet(const int , fd_set &);
+
+
+
+
 };
