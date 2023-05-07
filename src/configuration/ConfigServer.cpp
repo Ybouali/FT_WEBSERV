@@ -5,6 +5,14 @@ ConfigServer::ConfigServer()
 {
     this->setHost("127.0.0.1");
 }
+
+ConfigServer::ConfigServer(ConfigServer & other) { *this = other; }
+
+ConfigServer & ConfigServer::operator=(ConfigServer & other)
+{
+    return *this;
+}
+
 ConfigServer::ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex)
     : Port(0), Host(), serverName(), Root(""), clientMaxBodySize(0), Index(""), autoIndex(false), errorPages()
 {
@@ -33,11 +41,6 @@ void        ConfigServer::clear()
     this->Index.clear();
     this->autoIndex = false;
     this->errorPages.clear();
-}
-
-void                                ConfigServer::initDefaultServer()
-{
-    *this = ConfigServer();
 }
 
 // ! initialization of error pages

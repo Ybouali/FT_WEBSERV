@@ -59,8 +59,6 @@ class ManageServers {
         void                            addToSet(const int , fd_set &);
 
         void                            removeFromSet(const int , fd_set &);
-
-
-
-
+        
+        void                            assignServerToClient(Client &);
 };

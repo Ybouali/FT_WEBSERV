@@ -6,6 +6,8 @@
 
 # define TIMEOUT_CONNECTION 60
 
+# define MSG_BUF 40000
+
 enum Methods {
     GET,
     POST,

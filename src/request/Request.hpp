@@ -65,6 +65,7 @@ class Request {
 
         bool                                                getMultiformFlag();
 
+        state                                               getState();
 
         // ? ----------------------------- setters -----------------------------------
 
@@ -80,6 +81,8 @@ class Request {
         // ? Methods ---------------------------------------------------------------- 
 
         void        substrRequestBodyString(int );
+
         bool        keepAlive();
+        
         void        readBufferFromReq(char *, std::size_t);
 };

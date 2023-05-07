@@ -86,10 +86,54 @@ void                            ManageServers::acceptClientConnection(ConfigServ
     this->clientsMap.insert(std::make_pair(clientSock, client));
 }
 
-void                            ManageServers::readRequest(const int &, Client &)
+void                            ManageServers::readRequest(const int & i, Client & client)
 {
-    // TODO: implement read request method
-    
+    char    buf[MSG_BUF];
+    int     r_read = 0;
+
+    r_read = read(i, buf, MSG_BUF);
+    if (r_read == 0)
+    {
+        std::cerr << "webserv: Client " << i << " Closed Connection" << std::endl;
+        this->closeConnectionClient(i);
+        return ;
+    }
+    else if (r_read < 0)
+    {
+        std::cerr << "webserv: Fd " << i << " read error " << strerror(errno) << std::endl;
+        this->closeConnectionClient(i);
+        return ;
+    }
+    else if (r_read != 0)
+    {
+        client.updateTime();
+        client.request.readBufferFromReq(buf, r_read);
+        memset(buf, 0, sizeof(buf));
+    }
+    if (client.request.getState() == Parsing_Done || client.request.getCodeError())
+    {
+        this->assignServerToClient(client);
+
+        // TODO: need a build Response for the client based on the request object
+        // ! and also handle the the cgi if exists
+        
+
+        // move fd from recv fd and add it to the write fd
+        this->removeFromSet(i, this->recvFd);
+        this->addToSet(i, this->writeFd);
+    }
+}
+
+void                            ManageServers::assignServerToClient(Client & client)
+{
+    for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
+    {
+        if (client.server.getHost() == it->getHost() && client.server.getPort() == it->getPort() && client.request.getServerName() == it->getServerName())
+        {
+            client.server = *it;
+            return ;
+        }
+    }
 }
 
 void                            ManageServers::initializeSets()

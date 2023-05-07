@@ -21,11 +21,13 @@ class ConfigServer {
         
         ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
 
+        ConfigServer(ConfigServer &);
+
+        ConfigServer & operator=(ConfigServer &);
+
         ~ConfigServer();
 
         void        clear();
-
-        void        initDefaultServer();
 
         // ! INITIALIZATION OF ERROR PAGES
         void                                initErrorPages();
