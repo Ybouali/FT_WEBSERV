@@ -1,7 +1,6 @@
 # pragma once
 
 # include "../webserv.hpp"
-# include "../configuration/ConfigServer.hpp"
 # include "../networking/Client.hpp"
 
 class ManageServers {
@@ -61,4 +60,10 @@ class ManageServers {
         void                            removeFromSet(const int , fd_set &);
         
         void                            assignServerToClient(Client &);
+
+        void                            setupServers(std::vector<ConfigServer>);
+
+        void                            startServers();
+
+        void                            sendRes(const int &, Client &);
 };

@@ -35,3 +35,9 @@ void                    Client::setClientAddress(struct sockaddr_in ClientAddres
 
 void                    Client::updateTime() { this->setLastMsgTime(time(NULL)); }
 
+void                    Client::clear()
+{
+    this->request.clear();
+    // TODO: need to clear also the response 
+}
+

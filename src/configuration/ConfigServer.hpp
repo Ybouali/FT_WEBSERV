@@ -21,9 +21,9 @@ class ConfigServer {
         
         ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
 
-        ConfigServer(ConfigServer &);
+        ConfigServer(const ConfigServer &);
 
-        ConfigServer & operator=(ConfigServer &);
+        ConfigServer & operator=(const ConfigServer &);
 
         ~ConfigServer();
 
@@ -70,5 +70,9 @@ class ConfigServer {
 
         void                                setErrorPages(std::map<short, std::string>);
 
-        void                                setListenFd();
+        void                                setListenFd(int);
+
+        // ! Methods ----------------------------------------------------------------
+
+        void                                setupServer();
 };

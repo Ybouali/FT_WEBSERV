@@ -97,4 +97,5 @@ std::string     skipWhitespaceBeginAnd(std::string );
 bool            errorPath(std::string );
 bool            checkUriCharacters(u_int8_t );
 bool            checkIsToken(u_int8_t );
+std::string     getPageError(short );
 

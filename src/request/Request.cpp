@@ -127,33 +127,25 @@ void                                   Request::handleHeaders()
         this->bodyFlag = true;
         ss << this->requestHeaders["content-length"];
         ss >> this->bodySize;
-        // std::cout << "content-length :::::::::::::::[" << ss << "]" << std::endl;
     }
     if (this->requestHeaders.count("transfer-encoding"))
     {
         if (this->requestHeaders["transfer-encoding"].find_first_of("chunked") != std::string::npos)
         {
             this->chunkedFlag = true;
-            // std::cout << "chunked ::::::::::::::::::[ chunkedFlag ]" << std::endl;
         }
         this->bodyFlag = true;
-        // std::cout << "transfer-encoding ::::::::::::[ body existe ]" << std::endl;
     }
     if (this->requestHeaders.count("host"))
     {
         size_t position = this->requestHeaders["host"].find_first_of(':');
         this->serverName = this->requestHeaders["host"].substr(0, position);
-        // std::cout << "server name ::::::::::::::::::[" << (!this->serverName.empty() ? "there is no server name" : this->serverName) << std::endl;
     }
     if (this->requestHeaders.count("content-type") && this->requestHeaders["content-type"].find("multipart/form-data") != std::string::npos)
     {
         size_t position = this->requestHeaders["content-type"].find("boundary", 0);
         if (position != std::string::npos)
-        {
             this->Boundary = this->requestHeaders["content-type"].substr(position + 9, this->requestHeaders["content-type"].size());
-            // std::cout << "content-type ::::::::::::::::::[ multipart/form-data ]"  << std::endl;
-        }
-        // std::cout << "multi form flag :::::::::::::::[ true ]"  << std::endl;
         this->multiformFlag = true;
     }
 }

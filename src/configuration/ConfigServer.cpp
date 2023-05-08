@@ -6,13 +6,6 @@ ConfigServer::ConfigServer()
     this->setHost("127.0.0.1");
 }
 
-ConfigServer::ConfigServer(ConfigServer & other) { *this = other; }
-
-ConfigServer & ConfigServer::operator=(ConfigServer & other)
-{
-    return *this;
-}
-
 ConfigServer::ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex)
     : Port(0), Host(), serverName(), Root(""), clientMaxBodySize(0), Index(""), autoIndex(false), errorPages()
 {
@@ -24,9 +17,31 @@ ConfigServer::ConfigServer(uint16_t port, std::string host, std::string ServerNa
     this->setIndex(index);
     this->setAutoIndex(AutoIndex);
     this->initErrorPages();
-    this->setListenFd();
-    std::cout << "LISTEN FD :: [" << this->getListenFd() << "]" << std::endl;
+    this->setListenFd(0);
 }
+
+ConfigServer::ConfigServer(const ConfigServer & other) { *this = other; }
+
+
+ConfigServer & ConfigServer::operator=(const ConfigServer & other)
+{
+    if (this != &other)
+	{
+        this->Port = other.Port;
+        this->Host = other.Host;
+        this->serverName = other.serverName;
+        this->Root = other.Root;
+        this->clientMaxBodySize = other.clientMaxBodySize;
+        this->Index = other.Index;
+        this->autoIndex = other.autoIndex;
+        this->errorPages = other.errorPages;
+        this->listenFd = other.listenFd;
+        this->serverAddress = other.serverAddress;
+        // this->locations = other.locations;
+    }
+    return *this;
+}
+
 
 
 ConfigServer::~ConfigServer() { clear(); }
@@ -102,8 +117,11 @@ void                ConfigServer::setAutoIndex(bool AutoIndex) { this->autoIndex
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 
-void                ConfigServer::setListenFd()
+void                ConfigServer::setListenFd(int fd) { this->listenFd = fd; }
+
+void                                ConfigServer::setupServer()
 {
+
     this->listenFd = socket(AF_INET, SOCK_STREAM, 0); // ! check if the listen fd is not equal to -1 . exit EXIT_FAILURE
 
     int option_value = 1;

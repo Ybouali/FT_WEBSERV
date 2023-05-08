@@ -2,7 +2,6 @@
 
 # include "../webserv.hpp"
 # include "../request/Request.hpp"
-# include "../configuration/ConfigServer.hpp"
 
 class Client
 {
@@ -39,4 +38,6 @@ class Client
         // ? Methodes ----------------------------------------------------------------
 
         void                    updateTime();
+
+        void                    clear();
 };

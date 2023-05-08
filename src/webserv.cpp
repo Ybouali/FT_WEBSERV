@@ -1,4 +1,5 @@
-#include "webserv.hpp"
+# include "webserv.hpp"
+# include "networking/ManageServers.hpp"
 
 int main(int ac, char **av)
 {
@@ -33,17 +34,21 @@ int main(int ac, char **av)
 
    std::cout << "WEBSERV....." << std::endl;
 
+    
+
    std::vector<ConfigServer> vecServers;
-   ConfigServer server1 = ConfigServer(80, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
-   ConfigServer server2 = ConfigServer(81, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", true);
-   ConfigServer server3 = ConfigServer(82, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
+   ConfigServer server1 = ConfigServer(8000, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
+   ConfigServer server2 = ConfigServer(8001, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", true);
+   ConfigServer server3 = ConfigServer(8002, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
    vecServers.push_back(server1);
    vecServers.push_back(server2);
    vecServers.push_back(server3);
-    
 
-   for (size_t i = 0; i < vecServers.size(); i++)
-    std::cout << vecServers[i].getPort() << std::endl;
+
+    ManageServers master;
+
+    master.setupServers(vecServers);
+    master.startServers();
    
 
    for (size_t i = 0; i < vecServers.size(); i++)
