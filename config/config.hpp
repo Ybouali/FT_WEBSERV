@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   config.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: zezzine <zezzine@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/30 13:34:46 by zezzine           #+#    #+#             */
-/*   Updated: 2023/05/01 16:22:30 by zezzine          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
@@ -50,7 +38,12 @@ class config
         int remvoe_all_spaces(char *av);
         void init_data2(char *av);
         void print_values(config & c);
-        void fill_attributes(config & c, std::map<std::string, std::string> configMap);
+        void fill_server_attributes(config & c, std::map<std::string, std::string> configMap);
+        bool isNumber(const std::string & str);
+        void check_int_attributes(config & c, std::map<std::string, std::string> configMap);
+        bool isBraceFound(char *av, char c1, char c2);
+        int check_number_server_element(std::string keys[6]);
+        int check_number_location_element(std::string keys[6]);
 };
 
-#endif
+#endif 
