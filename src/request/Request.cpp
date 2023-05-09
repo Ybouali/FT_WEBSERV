@@ -4,7 +4,6 @@ Request::Request()
     : Path(),
       Query(),
       requestHeaders(),
-      Fragment(),
       Body(),
       bodyString(),
       Boundary(),
@@ -29,7 +28,7 @@ Request::Request()
 {
     this->methodsString[::GET] = "GET";
     this->methodsString[::POST] = "POST";
-    this->methodsString[::POST] = "DELETE";
+    this->methodsString[::DELETE] = "DELETE";
 }
 
 Request::~Request()
@@ -42,7 +41,6 @@ void            Request::clear()
     this->Path.clear();
     this->Query.clear();
     this->requestHeaders.clear();
-    this->Fragment.clear();
     this->Body.clear();
     this->bodyString.clear();
     this->Boundary.clear();
@@ -112,6 +110,8 @@ void                                            Request::setMethod(Methods & met
 
 void                                            Request::setMaxBodySize(size_t size) { this->maxBodySize = size; }
 
+void                                            Request::setCodeError(short code) { this->errorCode = code; }
+
 // ? Public methods ---------------------------------------------------------------- 
 
 void                                            Request::substrRequestBodyString(int bytes) { this->bodyString = this->bodyString.substr(bytes); }
@@ -160,12 +160,14 @@ bool                                   Request::keepAlive()
     return true;
 }
 
-
-
 void                                   Request::readBufferFromReq(char * buffer, std::size_t readBytes)
 {
     u_int8_t                        c;
     static std::stringstream        str;
+
+    // std::cout << "::::::::::::::::::::::::::::::::::::::: BUFFER :::::::::::::::::::::::::::::::::::::::" << std::endl;
+    // std::cout << buffer << std::endl;
+    // std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {
@@ -177,7 +179,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c == 'G')
                     this->Method = GET;
                 else if (c == 'P')
-                    this->Method = POST, this->methodIndex++;
+                    this->Method = POST;
                 else if (c == 'D')
                     this->Method = DELETE;
                 else 
@@ -186,7 +188,22 @@ void                                   Request::readBufferFromReq(char * buffer,
                     std::cerr << "error code status (" << this->errorCode << ") unseported method"  << std::endl;
                     return;
                 }
+                this->State = Request_Line_Method;
                 break;
+            }
+            case Request_Line_Method: 
+            {
+                if (c == this->methodsString[this->Method][this->methodIndex])
+                    this->methodIndex++;
+                else
+                {
+                    this->errorCode = 501;
+                    std::cerr << "error code status (" << this->errorCode << ") unseported method"  << std::endl;
+                    return ;
+                }
+                if ((size_t) this->methodIndex == this->methodsString[this->Method].length())
+                    this->State = Request_Line_First_Space;
+                break ;
             }
             case Request_Line_First_Space:
             {
@@ -230,36 +247,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->Storage.clear();
                     continue ;
                 }
-                else if (c == '#')
-                {
-                    this->State = Request_Line_URI_Fragment;
-                    this->Path.append(this->Storage);
-                    this->Storage.clear();
-                    continue ;
-                }
-                else if (!checkUriCharacters(c))
-                {
-                    this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
-                    return ;
-                }
-                else if ( i > MAX_URI_LENGTH)
-                {
-                    this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
-                    return ;
-                }
-                break ;
-            }
-            case Request_Line_URI_Fragment:
-            {
-                if (c == ' ')
-                {
-                    this->State = Request_Line_Ver;
-                    this->Fragment.append(this->Storage);
-                    this->Storage.clear();
-                    continue ;
-                }
                 else if (!checkUriCharacters(c))
                 {
                     this->errorCode = 400;
@@ -269,7 +256,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else if ( i > MAX_URI_LENGTH)
                 {
                     this->errorCode = 414;
-                    std::cout << "URI Too Long" << std::endl;
+                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 break ;
@@ -279,13 +266,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c == ' ')
                 {
                     this->State = Request_Line_Ver;
-                    this->Query.append(this->Storage);
-                    this->Storage.clear();
-                    continue ;
-                }
-                else if (c == '#')
-                {
-                    this->State = Request_Line_URI_Fragment;
                     this->Query.append(this->Storage);
                     this->Storage.clear();
                     continue ;
@@ -411,6 +391,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     return ;
                 }
                 this->State = Request_Line_LF;
+                break;
             }
             case Request_Line_LF:
             {
@@ -651,5 +632,29 @@ void                                   Request::readBufferFromReq(char * buffer,
                 return ;
             }
         }
+        this->Storage += c;
     }
+    if (this->State == Parsing_Done)
+        this->bodyString.append((char*)this->Body.data(), this->Body.size());
+}
+
+void                                   Request::printRequest()
+{
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  START PRINTING THE REQUEST  ::::::::::::" << "\n\n";
+    std::cout << "METHOD    [" << this->methodsString[this->getMethod()] << "]" << std::endl;
+    std::cout << "PATH      [" << this->getPath() << "]" << std::endl;
+    std::cout << "QUERY    ?[" << this->getQuery() << "]" << std::endl;
+    std::cout << "VERSION   [" << "HTTP/" << this->verMajor << "." << this->verMinor << "]" << "\n\n";
+    std::cout << "------------------------------ HEADERS ---------------------------------" << "\n";
+    for (std::map<std::string, std::string>::iterator it = this->requestHeaders.begin(); it != this->requestHeaders.end(); ++it)
+        std::cout << "[" << it->first << "]:[" << it->second << "]" << std::endl;
+    std::cout << "------------------------------------------------------------------------" << "\n\n";
+    std::cout << "------------------------------ BODY ------------------------------------" << "\n";
+    for (std::vector<u_int8_t>::iterator it = this->Body.begin(); it != this->Body.end(); ++it)
+        std::cout << *it;
+    std::cout << "------------------------------------------------------------------------" << "\n\n";
+    std::cout << "BODY FLAG      = (" << this->bodyFlag << ")\n";
+    std::cout << "BODY done flag = (" << this->bodyDoneFlag << ")\n";
+    std::cout << "FEIDLS FLAG    = (" << this->fieldsDoneFlag << ")\n";
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  :::::::::::::::::" << "\n\n";
 }

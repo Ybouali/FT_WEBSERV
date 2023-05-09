@@ -12,7 +12,7 @@ int main(int ac, char **av)
     // ! and it should be a vector of this class SO that means every servers will be a object of this class
     /*
         uint16_t						    Port;
-		in_addr_t						    Host;
+		std::string						    Host;
 		std::string						    Server_name;
 		std::string						    Root;
 		unsigned long					    clientMaxBodySize;
@@ -32,18 +32,17 @@ int main(int ac, char **av)
     // std::vector<std::string>	    cgi_extention;
     // unsigned long				clientMaxBodySize;
 
-   std::cout << "WEBSERV....." << std::endl;
-
     
 
    std::vector<ConfigServer> vecServers;
+
    ConfigServer server1 = ConfigServer(8000, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
    ConfigServer server2 = ConfigServer(8001, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", true);
    ConfigServer server3 = ConfigServer(8002, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
+   
    vecServers.push_back(server1);
    vecServers.push_back(server2);
    vecServers.push_back(server3);
-
 
     ManageServers master;
 

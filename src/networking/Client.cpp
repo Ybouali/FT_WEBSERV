@@ -8,9 +8,10 @@ Client::Client()
 Client::~Client()
 { }
 
-Client::Client(const ConfigServer& other) { 
-    // here we need to make sure that the server is initialized
-    this->server = other;
+Client::Client(const ConfigServer& server)
+    : clientSocket(), lastMsgTime(time(NULL)), clientAddress(), request(), server()
+{ 
+    this->server = server;
     this->request.setMaxBodySize(server.getClientMaxBodySize());
     this->lastMsgTime = time(NULL);
  }

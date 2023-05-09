@@ -7,7 +7,6 @@ class Request {
         std::string                             Path;
         std::string                             Query;
         std::map<std::string, std::string>      requestHeaders;
-        std::string                             Fragment;
         std::vector<u_int8_t>                   Body;
         std::string                             bodyString;
         std::string                             Boundary;
@@ -77,6 +76,8 @@ class Request {
 
         void        setMaxBodySize(size_t);
 
+        void        setCodeError(short );
+
 
         // ? Methods ---------------------------------------------------------------- 
 
@@ -85,4 +86,6 @@ class Request {
         bool        keepAlive();
         
         void        readBufferFromReq(char *, std::size_t);
+
+        void        printRequest();
 };

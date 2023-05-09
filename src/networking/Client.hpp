@@ -18,7 +18,8 @@ class Client
         
         Request         request;
         ConfigServer    server;
-
+        // TODO: here we should add the response class .
+        
         // ? ----------------------------- getters -----------------------------------
 
         int                     getClientSocket() const;

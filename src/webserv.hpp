@@ -17,11 +17,11 @@ enum Methods {
 enum state
 {
     Request_Line,
+    Request_Line_Method,
     Request_Line_First_Space,
     Request_Line_URI_Path_Slash,
     Request_Line_URI_Path,
     Request_Line_URI_Query,
-    Request_Line_URI_Fragment,
     Request_Line_Ver,
     Request_Line_HT,
     Request_Line_HTT,
@@ -98,4 +98,5 @@ bool            errorPath(std::string );
 bool            checkUriCharacters(u_int8_t );
 bool            checkIsToken(u_int8_t );
 std::string     getPageError(short );
+std::string     getIndexHomePageSmallNginx();
 

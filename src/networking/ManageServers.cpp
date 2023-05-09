@@ -143,7 +143,6 @@ void                            ManageServers::initializeSets()
 
     for(std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
-        //Now it calles listen() twice on even if two servers have the same host:port
         if (listen(it->getListenFd(), 512) == -1)
         {
             std::cerr << "webserv: listen error: [" << strerror(errno) << "] Closing" << std::endl;
@@ -245,7 +244,10 @@ void                            ManageServers::startServers()
             if (FD_ISSET(i, &recvCpy) && this->serversMap.count(i))
                 this->acceptClientConnection(this->serversMap.find(i)->second);
             else if (FD_ISSET(i, &recvCpy) && this->clientsMap.count(i))
+            {
                 this->readRequest(i, this->clientsMap[i]);
+                this->clientsMap[i].request.printRequest();
+            }
             else if (FD_ISSET(i, &writeCpy))
                 this->sendRes(i, this->clientsMap[i]);
         }
@@ -257,23 +259,31 @@ void                            ManageServers::sendRes(const int & i, Client & c
 {
     int sentBytes;
     std::string response = "";
-    if (client.request.getCodeError() == 501)
-    {
+    // TODO: here the headers is static it should be dynamic !! 
+    
         response = "HTTP/1.1 501 Not Implemented\r\n";
         response.append("Content-Type: text/html\r\n");
-        response.append("Content-Length: 113\r\n");
+        // response.append("Content-Length: 113\r\n");
         response.append("Server: small_nginx\r\n");
         response.append("Date: Sun, 07 May 2023 20:30:06 UTC\r\n\r\n");
-        response.append(getPageError(501));
-    }
+    
+    // ! FOR_TESTING:
+    if (client.request.getCodeError() == 0)
+        client.request.setCodeError(200);
+
+    std::string errorMessage = getPageError(client.request.getCodeError());
+    
+    if (!errorMessage.empty())
+        response.append(errorMessage);
+
     if (response.size() >= MSG_BUF)
         sentBytes = write(i, response.c_str(), MSG_BUF);
     else
         sentBytes = write(i, response.c_str(), response.length());
 
-    if (sentBytes < 0)
+    if (sentBytes < 0) 
     {
-        std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
+        std::cerr << "sendRes(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
     }
     else if (sentBytes == 0 || (size_t) sentBytes == response.length())
