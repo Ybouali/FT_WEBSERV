@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <cctype>
+#include <exception>
 #include <algorithm>
 
 class location
@@ -18,8 +19,9 @@ class location
         std::string root;
         std::string upload;
         std::string autoindex;
+        bool On_Off;
         std::string _default;
-        std::string _return;
+        std::string redirection;
         
     public:
         location(/* args */);
@@ -33,19 +35,33 @@ class location
         const std::string& getDefault() const;
         const std::string& getReturn() const;
         const std::string& getLocation() const;
+        const bool& getOnOff() const;
 
         //setters
-        void setMethod(std::vector<std::string>& value);
-        void setRoot(const std::string& value);
-        void setUpload(const std::string& value);
-        void setAutoindex(const std::string& value);
-        void setDefault(const std::string& value);
-        void setReturn(const std::string& value);
-        void setLocation(const std::string& value);
+        void setMethod(std::vector<std::string>& );
+        void setRoot(const std::string& );
+        void setUpload(const std::string& );
+        void setAutoindex(const std::string& );
+        void setDefault(const std::string& );
+        void setReturn(const std::string& );
+        void setLocation(const std::string& );
+        void setOnOff(const bool& );
 
         //functions
         void parse_location(location& loc, std::string line);
         void print_location_elements(void);
+
+        //execption
+        class MyException : public std::exception {
+            public:
+                MyException(const std::string& msg) : message(msg) {}
+                virtual ~MyException() throw() {}
+                virtual const char* what() const throw() {
+                    return message.c_str();
+                }
+            private:
+                std::string message;
+        };
     };
 
 #endif

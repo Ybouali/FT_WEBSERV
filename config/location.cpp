@@ -41,11 +41,11 @@ void location::setDefault(const std::string& value) {
 }
 
 const std::string& location::getReturn() const {
-    return _return;
+    return redirection;
 }
 
 void location::setReturn(const std::string& value) {
-    _return = value;
+    redirection = value;
 }
 
 const std::string& location::getLocation() const {
@@ -55,6 +55,15 @@ const std::string& location::getLocation() const {
 void location::setLocation(const std::string& value){
     location_path = value;
 }
+
+const bool& location::getOnOff() const {
+    return On_Off;
+}
+
+void location::setOnOff(const bool& value) {
+    On_Off = value;
+}
+
 
 location::location(){}
 location::~location(){}
