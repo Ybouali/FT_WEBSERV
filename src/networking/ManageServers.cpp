@@ -89,25 +89,25 @@ void                            ManageServers::acceptClientConnection(ConfigServ
 void                            ManageServers::readRequest(const int & i, Client & client)
 {
     char    buf[MSG_BUF];
-    int     r_read = 0;
+    int     r_recv = 0;
 
-    r_read = read(i, buf, MSG_BUF);
-    if (r_read == 0)
+    r_recv = recv(i, buf, MSG_BUF, 0);
+    if (r_recv == 0)
     {
         std::cerr << "webserv: Client " << i << " Closed Connection" << std::endl;
         this->closeConnectionClient(i);
         return ;
     }
-    else if (r_read < 0)
+    else if (r_recv < 0)
     {
         std::cerr << "webserv: Fd " << i << " read error " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
         return ;
     }
-    else if (r_read != 0)
+    else if (r_recv != 0)
     {
         client.updateTime();
-        client.request.readBufferFromReq(buf, r_read);
+        client.request.readBufferFromReq(buf, r_recv);
         memset(buf, 0, sizeof(buf));
     }
     if (client.request.getState() == Parsing_Done || client.request.getCodeError())
@@ -157,6 +157,7 @@ void                            ManageServers::initializeSets()
         this->serversMap.insert(std::make_pair(it->getListenFd(), *it));
     }
     this->biggestFd = this->Servers.back().getListenFd();
+    std::cout << "webserv: listening " << this->biggestFd << std::endl;
 }
 
 void                            ManageServers::setupServers(std::vector<ConfigServer> servers)
@@ -227,6 +228,7 @@ void                            ManageServers::startServers()
     this->biggestFd = 0;
     this->initializeSets();
     struct timeval timer;
+    std::cout << "--------------------------- STARTING --------------------------------" << std::endl;
     while (true)
     {
         timer.tv_sec = 1;
@@ -246,7 +248,7 @@ void                            ManageServers::startServers()
             else if (FD_ISSET(i, &recvCpy) && this->clientsMap.count(i))
             {
                 this->readRequest(i, this->clientsMap[i]);
-                this->clientsMap[i].request.printRequest();
+                this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
                 this->sendRes(i, this->clientsMap[i]);
@@ -279,7 +281,7 @@ void                            ManageServers::sendRes(const int & i, Client & c
     if (response.size() >= MSG_BUF)
         sentBytes = write(i, response.c_str(), MSG_BUF);
     else
-        sentBytes = write(i, response.c_str(), response.length());
+        sentBytes = write(i, response.c_str(), response.size());
 
     if (sentBytes < 0) 
     {

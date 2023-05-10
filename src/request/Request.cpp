@@ -68,7 +68,7 @@ void            Request::clear()
 
 std::string &                                       Request::getPath() { return this->Path; }
 
-std::string  &                                      Request::getQuery() { return this->Query; }
+std::string &                                       Request::getQuery() { return this->Query; }
 
 const std::map<std::string, std::string>&           Request::getrequestHeaders() { return this->requestHeaders; }
 
@@ -101,7 +101,7 @@ void                                            Request::setHeader(std::string &
 
 void                                            Request::setBody(std::string body)
 {
-    this->Body.clear();
+    // this->Body.clear();
     this->Body.insert(this->Body.begin(), body.begin(), body.end());
     this->bodyString = body;
 }
@@ -121,31 +121,33 @@ void                                            Request::substrRequestBodyString
 void                                   Request::handleHeaders()
 {
     std::stringstream ss;
-
-    if (this->requestHeaders.count("content-length"))
+    
+    if (this->requestHeaders.count("Content-Length"))
     {
         this->bodyFlag = true;
-        ss << this->requestHeaders["content-length"];
+        ss << this->requestHeaders["Content-Length"];
         ss >> this->bodySize;
-    }
-    if (this->requestHeaders.count("transfer-encoding"))
-    {
-        if (this->requestHeaders["transfer-encoding"].find_first_of("chunked") != std::string::npos)
+        if (this->bodySize == 0)
         {
-            this->chunkedFlag = true;
+            std::cout << "No Content-Length" << std::endl;
         }
+    }
+    if (this->requestHeaders.count("Transfer-Encoding"))
+    {
+        if (this->requestHeaders["Transfer-Encoding"].find_first_of("Chunked") != std::string::npos)
+            this->chunkedFlag = true;
         this->bodyFlag = true;
     }
-    if (this->requestHeaders.count("host"))
+    if (this->requestHeaders.count("Host"))
     {
-        size_t position = this->requestHeaders["host"].find_first_of(':');
-        this->serverName = this->requestHeaders["host"].substr(0, position);
+        size_t position = this->requestHeaders["Host"].find_first_of(':');
+        this->serverName = this->requestHeaders["Host"].substr(0, position);
     }
-    if (this->requestHeaders.count("content-type") && this->requestHeaders["content-type"].find("multipart/form-data") != std::string::npos)
+    if (this->requestHeaders.count("Content-Type") && this->requestHeaders["Content-Type"].find("multipart/form-data") != std::string::npos)
     {
-        size_t position = this->requestHeaders["content-type"].find("boundary", 0);
+        size_t position = this->requestHeaders["Content-Type"].find("boundary", 0);
         if (position != std::string::npos)
-            this->Boundary = this->requestHeaders["content-type"].substr(position + 9, this->requestHeaders["content-type"].size());
+            this->Boundary = this->requestHeaders["Content-Type"].substr(position + 9, this->requestHeaders["Content-Type"].size());
         this->multiformFlag = true;
     }
 }
@@ -165,9 +167,9 @@ void                                   Request::readBufferFromReq(char * buffer,
     u_int8_t                        c;
     static std::stringstream        str;
 
-    // std::cout << "::::::::::::::::::::::::::::::::::::::: BUFFER :::::::::::::::::::::::::::::::::::::::" << std::endl;
-    // std::cout << buffer << std::endl;
-    // std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
+    std::cout << "::::::::::::::::::::::::::::::::::::::: BUFFER [" << readBytes << "]" << std::endl;
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {
@@ -466,7 +468,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             {
                 if ( c == '\r' )
                 {
-                    setHeader(this->keyStorage, this->Storage);
+                    this->setHeader(this->keyStorage, this->Storage);
                     this->keyStorage.clear();
                     this->Storage.clear();
                     this->State = Field_Value_End;
@@ -491,6 +493,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_Length_Begin:
             {
+                std::cout << "Bad Chunk" << std::endl;
                 if (isxdigit(c) == 0)
                 {
                     this->errorCode = 400;
@@ -638,23 +641,27 @@ void                                   Request::readBufferFromReq(char * buffer,
         this->bodyString.append((char*)this->Body.data(), this->Body.size());
 }
 
-void                                   Request::printRequest()
+void                                   Request::printRequest(const int & i)
 {
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  START PRINTING THE REQUEST  ::::::::::::" << "\n\n";
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  Client (" << i << ") SEND A REQUEST ! :::::::::::::" << "\n\n";
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  START PRINTING THE REQUEST  :::::::::::::" << "\n\n";
     std::cout << "METHOD    [" << this->methodsString[this->getMethod()] << "]" << std::endl;
     std::cout << "PATH      [" << this->getPath() << "]" << std::endl;
-    std::cout << "QUERY    ?[" << this->getQuery() << "]" << std::endl;
-    std::cout << "VERSION   [" << "HTTP/" << this->verMajor << "." << this->verMinor << "]" << "\n\n";
+    std::cout << "VERSION   [" << "HTTP/" << this->verMajor << "." << this->verMinor << "]" << "\n";
+    std::cout << "QUERY     [" << this->getQuery() << "]" << std::endl;
     std::cout << "------------------------------ HEADERS ---------------------------------" << "\n";
     for (std::map<std::string, std::string>::iterator it = this->requestHeaders.begin(); it != this->requestHeaders.end(); ++it)
         std::cout << "[" << it->first << "]:[" << it->second << "]" << std::endl;
     std::cout << "------------------------------------------------------------------------" << "\n\n";
-    std::cout << "------------------------------ BODY ------------------------------------" << "\n";
-    for (std::vector<u_int8_t>::iterator it = this->Body.begin(); it != this->Body.end(); ++it)
-        std::cout << *it;
-    std::cout << "------------------------------------------------------------------------" << "\n\n";
-    std::cout << "BODY FLAG      = (" << this->bodyFlag << ")\n";
-    std::cout << "BODY done flag = (" << this->bodyDoneFlag << ")\n";
-    std::cout << "FEIDLS FLAG    = (" << this->fieldsDoneFlag << ")\n";
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  :::::::::::::::::" << "\n\n";
+    if (!this->Body.empty() && this->methodsString[this->getMethod()] == "POST")
+    {
+        std::cout << "------------------------------ BODY ------------------------------------" << "\n";
+        for (std::vector<u_int8_t>::iterator it = this->Body.begin(); it != this->Body.end(); ++it)
+            std::cout << *it;
+        std::cout << "\n------------------------------------------------------------------------" << "\n\n";
+        std::cout << "( There is a body in the request ?    :: " << (this->bodyFlag ? "TRUE" : "FALSE") << ")\n";
+        std::cout << "( The body will need more read ?      :: " << (!this->bodyDoneFlag ? "TRUE" : "FALSE") << ") \n";
+        std::cout << "( Done reading body ?                 :: " << (this->fieldsDoneFlag ? "TRUE" : "FALSE") << ")\n";
+    }
+    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  ::::::::::::::::::" << "\n\n";
 }
