@@ -34,11 +34,13 @@ bool is_digit_max(std::string str) {
     return true;
 }
 
+static int j;
+
 void server::parse_config_file_help(std::string key, std::string value, server& config)
 {
     if (key == "port") {
         if (is_digit_port(value) == true)
-            config.setPort(std::stoi(value));
+            config.setPort(std::stoi(value)), j++;
         else
             throw MyException("Error port value not valid !");
     } else if (key == "host") {
@@ -47,20 +49,20 @@ void server::parse_config_file_help(std::string key, std::string value, server& 
         else if (!is_ip_valid(value))
             throw MyException("Error host ip not valid !");
         else
-            config.setHost(value);
+            config.setHost(value), j++;
     } else if (key == "server_name") {
         if (value.empty())
             throw MyException("Error server name empty !");  
         else          
-            config.setServerName(value);
+            config.setServerName(value), j++;
     } else if (key == "error_page") {
         if (value.empty())
             throw MyException("Error Error_Page empty !");
         else
-            config.setErrorPages(value);
+            config.setErrorPages(value), j++;
     } else if (key == "client_max_body_size") {
         if (is_digit_max(value) == true)
-            config.setClientMaxBodySize(std::stoi(value));
+            config.setClientMaxBodySize(std::stoi(value)), j++;
         else
             throw MyException("Error Client Max Body Size not valid !");
     }
@@ -72,6 +74,8 @@ void server::parse_config_file(std::string filename, server& config, location& l
         std::cerr << "Error: could not open config file " << filename << std::endl;
         return;
     }
+    if (!loc.check_config_file(filename, '[', ']') || !loc.check_config_file(filename, '{', '}'))
+        throw MyException("Config File Not Valid !");
 
     std::string line;
     while (std::getline(infile, line)) {
@@ -89,7 +93,7 @@ void server::parse_config_file(std::string filename, server& config, location& l
             }
             if (i != 1)
                 throw MyException("Error Cgi empty !");
-            config.setCgiExtension(cgis);
+            config.setCgiExtension(cgis), j++;
         }
     }
 
@@ -108,6 +112,8 @@ void server::parse_config_file(std::string filename, server& config, location& l
 }
 
 void server::print_server_elements(){
+    if (j != 6)
+        throw MyException("The number of server Elements Not Valid !");
     std::cout << "*******   server elements   *******" << std::endl;
     std::cout << "port == " << port << std::endl;
     std::cout << "host == " << host << std::endl;

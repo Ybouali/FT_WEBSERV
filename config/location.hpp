@@ -50,7 +50,7 @@ class location
         //functions
         void parse_location(location& loc, std::string line);
         void print_location_elements(void);
-
+        bool check_config_file(const std::string& filename, char c1, char c2);
         //execption
         class MyException : public std::exception {
             public:

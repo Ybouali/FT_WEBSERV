@@ -57,3 +57,22 @@ void location::print_location_elements(void){
     std::cout << "redirection == " << redirection << std::endl;
     std::cout << "************************************" << std::endl;
 }
+
+bool location::check_config_file(const std::string& filename, char c1, char c2) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: cannot open file " << filename << std::endl;
+        return false;
+    }
+    int count_open = std::count(std::istreambuf_iterator<char>(file),
+                                std::istreambuf_iterator<char>(), c1);
+    file.clear();
+    file.seekg(0, std::ios::beg);
+    int count_close = std::count(std::istreambuf_iterator<char>(file),
+                                 std::istreambuf_iterator<char>(), c2);
+    if (count_open != count_close) {
+        std::cerr << "Error: unmatched number of opening and closing braces" << std::endl;
+        return false;
+    }
+    return true;
+}
