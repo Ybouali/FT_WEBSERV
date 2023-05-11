@@ -10,7 +10,6 @@ int main (int ac, char **av){
             c.parse_config_file(filename, c, loc);
             c.print_server_elements();
             loc.print_location_elements();
-            std::cout << "On Off == " << loc.getOnOff() << std::endl;
         } catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
         }

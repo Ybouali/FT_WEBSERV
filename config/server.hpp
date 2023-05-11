@@ -16,11 +16,11 @@ class server
 {
     private:
         /* data */
-        int port;
+        std::string port;
         std::string host;
         std::string server_name;
         std::string error_pages;
-        int client_max_body_size;
+        std::string client_max_body_size;
         std::vector<std::string> cgi_extension;
         std::vector<location> _location;
     public:
@@ -28,21 +28,21 @@ class server
         ~server();
 
         //getters
-        int getPort() const;
+        std::string getPort() const;
         const std::string& getHost() const;
         const std::string& getServerName() const;
         const std::string& getErrorPages() const;
-        int getClientMaxBodySize() const;
+        std::string getClientMaxBodySize() const;
         const std::vector<std::string>& getCgiExtension() const;
         std::vector<location> get_locations() const;
         
         //setters
-        void setPort(int value);
-        void setHost(const std::string& value);
-        void setServerName(const std::string& value);
-        void setErrorPages(const std::string& value);
-        void setClientMaxBodySize(int value);
-        void setCgiExtension(std::vector<std::string>& value);
+        void setPort(const std::string& );
+        void setHost(const std::string& );
+        void setServerName(const std::string& );
+        void setErrorPages(const std::string& );
+        void setClientMaxBodySize(const std::string& );
+        void setCgiExtension(std::vector<std::string>& );
         void set_locations(std::vector<location> new_locations);
 
         //functions

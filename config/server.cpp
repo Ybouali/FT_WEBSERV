@@ -1,10 +1,10 @@
 #include "server.hpp"
 
-int server::getPort() const {
+std::string server::getPort() const {
     return port;
 }
 
-void server::setPort(int value) {
+void server::setPort(const std::string& value) {
     port = value;
 }
 
@@ -32,11 +32,11 @@ void server::setErrorPages(const std::string& value) {
     error_pages = value;
 }
 
-int server::getClientMaxBodySize() const {
+std::string server::getClientMaxBodySize() const {
     return client_max_body_size;
 }
 
-void server::setClientMaxBodySize(int value) {
+void server::setClientMaxBodySize(const std::string& value) {
     client_max_body_size = value;
 }
 

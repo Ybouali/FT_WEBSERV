@@ -1,5 +1,7 @@
 #include "location.hpp"
 
+static int j = 0;
+
 void location::parse_location(location& loc, std::string line) {
     std::istringstream iss2(line);
     std::string key, value;
@@ -15,31 +17,33 @@ void location::parse_location(location& loc, std::string line) {
         while (iss2 >> key){
             x.push_back(key);
         }
-        loc.setMethod(x);
-    } else if (key == "root"){
+        loc.setMethod(x), j++;
+    } else if (key == "root" && loc.getRoot().empty()){
         if (value.empty())
             throw MyException("Error root is Empty !");
-        loc.setRoot(value);
-    } else if (key == "upload"){
+        loc.setRoot(value), j++;
+    } else if (key == "upload" && loc.getUpload().empty()){
         if (value.empty())
             throw MyException("Error upload is Empty !");
-        loc.setUpload(value);
-    } else if (key == "autoindex"){
+        loc.setUpload(value), j++;
+    } else if (key == "autoindex" && loc.getAutoindex().empty()){
         if (value.empty())
             throw MyException("Error autoindex is Empty !");
-        loc.setAutoindex(value);
-    } else if (key == "default"){
+        loc.setAutoindex(value), j++;
+    } else if (key == "index" && loc.getIndex().empty()){
         if (value.empty())
-            throw MyException("Error default is Empty !");
-        loc.setDefault(value);
-    } else if (key == "redirection"){
+            throw MyException("Error index is Empty !");
+        loc.setIndex(value), j++;
+    } else if (key == "redirection" && loc.getReturn().empty()){
         if (value.empty())
             throw MyException("Error redirection is Empty !");
-        loc.setReturn(value);
+        loc.setReturn(value), j++;
     }
 }
 
 void location::print_location_elements(void){
+    if (j != 7)
+        throw MyException("Location need more items !");
     std::cout << "******* location elements *********" << std::endl;
     std::cout << "location path == " << location_path << std::endl;
     
@@ -53,7 +57,7 @@ void location::print_location_elements(void){
     std::cout << "root == " << root << std::endl;
     std::cout << "upload == " << upload << std::endl;
     std::cout << "auto index == " << autoindex << std::endl;
-    std::cout << "default == " << _default << std::endl;
+    std::cout << "index == " << index << std::endl;
     std::cout << "redirection == " << redirection << std::endl;
     std::cout << "************************************" << std::endl;
 }

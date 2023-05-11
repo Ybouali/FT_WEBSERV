@@ -19,8 +19,7 @@ class location
         std::string root;
         std::string upload;
         std::string autoindex;
-        bool On_Off;
-        std::string _default;
+        std::string index;
         std::string redirection;
         
     public:
@@ -32,20 +31,18 @@ class location
         const std::string& getRoot() const;
         const std::string& getUpload() const;
         const std::string& getAutoindex() const;
-        const std::string& getDefault() const;
+        const std::string& getIndex() const;
         const std::string& getReturn() const;
         const std::string& getLocation() const;
-        const bool& getOnOff() const;
 
         //setters
         void setMethod(std::vector<std::string>& );
         void setRoot(const std::string& );
         void setUpload(const std::string& );
         void setAutoindex(const std::string& );
-        void setDefault(const std::string& );
+        void setIndex(const std::string& );
         void setReturn(const std::string& );
         void setLocation(const std::string& );
-        void setOnOff(const bool& );
 
         //functions
         void parse_location(location& loc, std::string line);

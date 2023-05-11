@@ -32,12 +32,12 @@ void location::setAutoindex(const std::string& value) {
     autoindex = value;
 }
 
-const std::string& location::getDefault() const {
-    return _default;
+const std::string& location::getIndex() const {
+    return index;
 }
 
-void location::setDefault(const std::string& value) {
-    _default = value;
+void location::setIndex(const std::string& value) {
+    index = value;
 }
 
 const std::string& location::getReturn() const {
@@ -55,15 +55,6 @@ const std::string& location::getLocation() const {
 void location::setLocation(const std::string& value){
     location_path = value;
 }
-
-const bool& location::getOnOff() const {
-    return On_Off;
-}
-
-void location::setOnOff(const bool& value) {
-    On_Off = value;
-}
-
 
 location::location(){}
 location::~location(){}
