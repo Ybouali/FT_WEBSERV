@@ -30,7 +30,4 @@ fclean: clean
 
 re: fclean all
 
-run: 
-	@make fclean && make && make clean && ./webserv 2>/dev/null
-
 .PHONY: all clean fclean re run

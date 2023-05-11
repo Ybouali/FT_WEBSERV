@@ -166,11 +166,6 @@ void                                   Request::readBufferFromReq(char * buffer,
 {
     u_int8_t                        c;
     static std::stringstream        str;
-
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
-    std::cout << "::::::::::::::::::::::::::::::::::::::: BUFFER [" << readBytes << "]" << std::endl;
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
-
     for (size_t i = 0; i < readBytes; i++)
     {
         c = buffer[i];

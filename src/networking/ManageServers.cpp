@@ -14,13 +14,13 @@ void ManageServers::clear()
     if (!this->Servers.empty())
     {
         for (size_t i = 0; i < Servers.size(); i++)
-            close(Servers[i].getListenFd());
+            close(Servers[i].getFd());
         this->Servers.clear();
     }
     if (!this->serversMap.empty())
     {
         for (std::map<int, ConfigServer>::iterator it = this->serversMap.begin(); it != this->serversMap.end(); ++it)
-            close (it->second.getListenFd());
+            close (it->second.getFd());
         this->serversMap.clear();
     }
 
@@ -63,7 +63,7 @@ void                            ManageServers::acceptClientConnection(ConfigServ
     int                         clientSock;
     Client                      client(server);
 
-    clientSock = accept(server.getListenFd(), (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
+    clientSock = accept(server.getFd(), (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
     if (clientSock == -1)
     {
         std::cerr << "Failed to accept" << std::endl;
@@ -136,34 +136,39 @@ void                            ManageServers::assignServerToClient(Client & cli
     }
 }
 
-void                            ManageServers::initializeSets()
+void                            ManageServers::initSets()
 {
     FD_ZERO(&this->recvFd);
     FD_ZERO(&this->writeFd);
 
     for(std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
-        if (listen(it->getListenFd(), 512) == -1)
+        if (listen(it->getFd(), 512) == -1)
         {
             std::cerr << "webserv: listen error: [" << strerror(errno) << "] Closing" << std::endl;
             exit(EXIT_FAILURE);
         }
-        if (fcntl(it->getListenFd(), F_SETFL, O_NONBLOCK) < 0)
+        if (fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
         {
             std::cerr << "webserv: fcntl error: [" << strerror(errno) << "] Closing" << std::endl;
             exit(EXIT_FAILURE);
         }
-        addToSet(it->getListenFd(), this->recvFd);
-        this->serversMap.insert(std::make_pair(it->getListenFd(), *it));
+        addToSet(it->getFd(), this->recvFd);
+        this->serversMap.insert(std::make_pair(it->getFd(), *it));
     }
-    this->biggestFd = this->Servers.back().getListenFd();
-    std::cout << "webserv: listening " << this->biggestFd << std::endl;
+    this->biggestFd = this->Servers.back().getFd();
 }
 
 void                            ManageServers::setupServers(std::vector<ConfigServer> servers)
 {
     bool            checkDoubleServers;
+
     this->Servers = servers;
+    if (this->Servers.empty())
+    {
+        std::cout << "[INFO]: There is no server in the config file " << std::endl;
+        this->Servers.push_back(ConfigServer(8000, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false));
+    }
 
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
@@ -172,14 +177,13 @@ void                            ManageServers::setupServers(std::vector<ConfigSe
         {
             if (it2->getHost() == it->getHost() && it2->getPort() == it->getPort())
             {
-                it->setListenFd(it2->getListenFd());
+                it->setFd(it2->getFd());
                 checkDoubleServers = true;
             }
         }
         if (!checkDoubleServers)
             it->setupServer();
     }
-
 }
 
 void                            ManageServers::timeoutCheck()
@@ -200,7 +204,7 @@ void                            ManageServers::closeConnectionClient(const int i
     if (FD_ISSET(i, &this->writeFd))
         this->removeFromSet(i, this->writeFd);
     if (FD_ISSET(i, &this->recvFd))
-        removeFromSet(i, this->recvFd);
+        this->removeFromSet(i, this->recvFd);
     close(i);
     this->clientsMap.erase(i);
 }
@@ -226,9 +230,11 @@ void                            ManageServers::startServers()
     int     r_select;
 
     this->biggestFd = 0;
-    this->initializeSets();
+    this->initSets();
     struct timeval timer;
+
     std::cout << "--------------------------- STARTING --------------------------------" << std::endl;
+    
     while (true)
     {
         timer.tv_sec = 1;
@@ -238,7 +244,7 @@ void                            ManageServers::startServers()
 
         if ( (r_select = select(this->biggestFd + 1, &recvCpy, &writeCpy, NULL, &timer)) < 0 )
         {
-            std::cerr << "Webserv error :: select " << strerror(errno) << " Closing !" << std::endl;
+            std::cerr << "Webserv error :: select [" << strerror(errno) << "] Closing !" << std::endl;
             exit(1);
         }
         for (int i = 0; i <= this->biggestFd; ++i)
@@ -279,9 +285,9 @@ void                            ManageServers::sendRes(const int & i, Client & c
         response.append(errorMessage);
 
     if (response.size() >= MSG_BUF)
-        sentBytes = write(i, response.c_str(), MSG_BUF);
+        sentBytes = send(i, response.c_str(), MSG_BUF, 0);
     else
-        sentBytes = write(i, response.c_str(), response.size());
+        sentBytes = send(i, response.c_str(), response.size(), 0);
 
     if (sentBytes < 0) 
     {

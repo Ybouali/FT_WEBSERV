@@ -12,7 +12,7 @@ class ConfigServer {
 		std::string						Index;
 		bool							autoIndex;
 		std::map<short, std::string>    errorPages;
-        int     						listenFd;
+        int     						Fd;
         struct sockaddr_in 				serverAddress;
 
 		// std::vector<??> 			    locations;
@@ -50,7 +50,7 @@ class ConfigServer {
 
         std::map<short, std::string>        getErrorPages() const;
 
-        int                                 getListenFd() const;
+        int                                 getFd() const;
 
         //! ----------------------------- setters -----------------------------------
 
@@ -70,7 +70,7 @@ class ConfigServer {
 
         void                                setErrorPages(std::map<short, std::string>);
 
-        void                                setListenFd(int);
+        void                                setFd(int);
 
         // ! Methods ----------------------------------------------------------------
 

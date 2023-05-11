@@ -9,7 +9,7 @@ class ManageServers {
         std::map<int, ConfigServer>         serversMap;
         fd_set                              recvFd;
         fd_set                              writeFd;
-        int                                 biggestFd; // ? manage client connections,
+        int                                 biggestFd;
         std::map<int, Client>               clientsMap;
 
     public : 
@@ -49,7 +49,7 @@ class ManageServers {
 
         void                            timeoutCheck();
 
-        void                            initializeSets();
+        void                            initSets();
 
         void                            readRequest(const int &, Client &);
 

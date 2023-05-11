@@ -7,9 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <cctype>
-#include <exception>
 #include <algorithm>
-#include <regex>
 #include "location.hpp"
 
 class server
@@ -49,18 +47,6 @@ class server
         void parse_config_file(std::string filename, server& config, location& loc);
         void parse_config_file_help(std::string key, std::string value, server& config);
         void print_server_elements(void);
-
-        //exception
-        class MyException : public std::exception {
-            public:
-                MyException(const std::string& msg) : message(msg) {}
-                virtual ~MyException() throw() {}
-                virtual const char* what() const throw() {
-                    return message.c_str();
-                }
-            private:
-                std::string message;
-        };
 };
 
 #endif

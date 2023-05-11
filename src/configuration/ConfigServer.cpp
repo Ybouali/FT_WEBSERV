@@ -17,7 +17,7 @@ ConfigServer::ConfigServer(uint16_t port, std::string host, std::string ServerNa
     this->setIndex(index);
     this->setAutoIndex(AutoIndex);
     this->initErrorPages();
-    this->setListenFd(0);
+    this->setFd(0);
 }
 
 ConfigServer::ConfigServer(const ConfigServer & other) { *this = other; }
@@ -35,7 +35,7 @@ ConfigServer & ConfigServer::operator=(const ConfigServer & other)
         this->Index = other.Index;
         this->autoIndex = other.autoIndex;
         this->errorPages = other.errorPages;
-        this->listenFd = other.listenFd;
+        this->Fd = other.Fd;
         this->serverAddress = other.serverAddress;
         // this->locations = other.locations;
     }
@@ -97,7 +97,7 @@ bool                                ConfigServer::getAutoIndex() const { return 
 
 std::map<short, std::string>        ConfigServer::getErrorPages() const { return this->errorPages; }
 
-int                                 ConfigServer::getListenFd() const { return this->listenFd; }
+int                                 ConfigServer::getFd() const { return this->Fd; }
 
 //! ----------------------------- setters -----------------------------------
 
@@ -117,19 +117,37 @@ void                ConfigServer::setAutoIndex(bool AutoIndex) { this->autoIndex
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 
-void                ConfigServer::setListenFd(int fd) { this->listenFd = fd; }
+void                ConfigServer::setFd(int fd) { this->Fd = fd; }
 
 void                                ConfigServer::setupServer()
 {
-
-    this->listenFd = socket(AF_INET, SOCK_STREAM, 0); // ! check if the listen fd is not equal to -1 . exit EXIT_FAILURE
+    this->Fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->Fd < 0)
+    {
+        std::cerr << "PORT [" << this->getPort() << "] SERVER NAME [" << this->getServerName() << "]" << std::endl;
+        std::cerr << "webserver: socket error [" << strerror(errno) << "]" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     int option_value = 1;
-    setsockopt(this->listenFd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
+    
+    if (setsockopt(this->Fd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int)) == -1)
+    {
+        std::cerr << "PORT [" << this->getPort() << "] SERVER NAME [" << this->getServerName() << "]" << std::endl;
+        std::cerr << "webserver: setsockopt error [" << strerror(errno) << "]" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     memset(&this->serverAddress, 0, sizeof(this->serverAddress));
+    
     this->serverAddress.sin_family = AF_INET;
     this->serverAddress.sin_addr.s_addr = this->getHost();
     this->serverAddress.sin_port = htons(this->getPort());
-    // ! bind the socket
-    bind(this->listenFd, (struct sockaddr *) &this->serverAddress, sizeof(this->serverAddress)); // ! check if the listen fd is not equal to -1 . exit EXIT_FAILURE
+    
+    if (bind(this->Fd, (struct sockaddr *) &this->serverAddress, sizeof(this->serverAddress)) < 0)
+    {
+        std::cerr << "PORT [" << this->getPort() << "] SERVER NAME [" << this->getServerName() << "]" << std::endl;
+        std::cerr << "webserver: bind error [" << strerror(errno) << "]" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }

@@ -155,16 +155,13 @@ std::string statusCodeString(short statusCode)
 
 std::string getPageError(short statusCode)
 {
-    std::string page = "<!DOCTYPE html>\r\n<html>\r\n<head><title>";
+    std::string page = "";
     std::string s_code = std::to_string(statusCode);
     std::string s_code_string = statusCodeString(statusCode);
+    page.append("<!DOCTYPE html>\r\n<html>\r\n<head><title> small nginx </title> \r\n <style>\r\nbody { \r\n width: 35em;\r\nmargin: 0 auto; \r\n color: #272727; background-color: #3366CC; \r\nfont-family: new century, schoolbook;\r\n }\r\n</style></head>\r\n <body>\r\n <center> \r\n <h1> WELCOM TO THE SMALL NGINX </h1> \r\n <h2>");
     page.append(s_code);
-    page.append(" ");
+    page.append(" status code and the message is [");
     page.append(s_code_string);
-    page.append(" </title> \r\n <style>\r\nbody { \r\n width: 35em;\r\nmargin: 0 auto; \r\nfont-family: Tahoma, Verdana, Arial, sans-serif;\r\n }\r\n</style></head>\r\n <body>\r\n <center> \r\n <h1> WELCOM TO THE SMALL NGINX </h1> \r\n <h2>");
-    page.append(s_code);
-    page.append(" ");
-    page.append(s_code_string);
-    page.append("</h2> </center>\r\n</body>\r\n </html>");
+    page.append("]</h2> </center>\r\n</body>\r\n </html>");
     return page;
 }
