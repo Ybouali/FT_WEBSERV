@@ -7,7 +7,7 @@ class ManageServers {
     private :
         std::vector<ConfigServer>           Servers;
         std::map<int, ConfigServer>         serversMap;
-        fd_set                              recvFd;
+        fd_set                              readFd;
         fd_set                              writeFd;
         int                                 biggestFd;
         std::map<int, Client>               clientsMap;
@@ -25,7 +25,7 @@ class ManageServers {
 
         std::map<int, ConfigServer>         getServersMap() const;
 
-        fd_set                              getRecvFd() const;
+        fd_set                              getreadFd() const;
 
         fd_set                              getWriteFd() const;
 
@@ -37,7 +37,7 @@ class ManageServers {
 
         void                            setServersMap(std::map<int, ConfigServer>);
 
-        void                            setRecvFd(fd_set);
+        void                            setreadFd(fd_set);
 
         void                            setWriteFd(fd_set);
 

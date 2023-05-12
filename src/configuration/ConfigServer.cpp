@@ -1,12 +1,13 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer()
-    : Port(80), serverName("exempl.com"), Root("www/"), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), Index("index.html"), autoIndex(false), errorPages()
+    : Port(), serverName("exempl.com"), Root("www/"), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), Index("index.html"), autoIndex(false), errorPages()
 {
+    this->setPort("8080");
     this->setHost("127.0.0.1");
 }
 
-ConfigServer::ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex)
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex)
     : Port(0), Host(), serverName(), Root(""), clientMaxBodySize(0), Index(""), autoIndex(false), errorPages()
 {
     this->setPort(port);
@@ -58,8 +59,6 @@ void        ConfigServer::clear()
     this->errorPages.clear();
 }
 
-// ! initialization of error pages
-
 void                                ConfigServer::initErrorPages()
 {
     this->errorPages[301] = "";
@@ -101,7 +100,7 @@ int                                 ConfigServer::getFd() const { return this->F
 
 //! ----------------------------- setters -----------------------------------
 
-void                ConfigServer::setPort(uint16_t port) { this->Port = port; }
+void                ConfigServer::setPort(std::string port) { this->Port = static_cast<uint16_t>(std::stoul(port)); }
 
 void                ConfigServer::setHost(std::string host) { this->Host = inet_addr(host.c_str());/* ! If host == INADDR_NONE so this is an error (Failed to get the host for localhost) .*/ }
 

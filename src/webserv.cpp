@@ -8,15 +8,16 @@ int main(int ac, char **av)
 
     std::vector<ConfigServer> vecServers;
 
-   ConfigServer server1 = ConfigServer(8000, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
-   ConfigServer server2 = ConfigServer(8001, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", true);
-   ConfigServer server3 = ConfigServer(8002, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
+    ManageServers master;
+
+   ConfigServer server1 = ConfigServer("8000", "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
+   ConfigServer server2 = ConfigServer("8001", "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", true);
+   ConfigServer server3 = ConfigServer("8002", "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false);
    
    vecServers.push_back(server1);
    vecServers.push_back(server2);
    vecServers.push_back(server3);
 
-    ManageServers master;
 
     master.setupServers(vecServers);
     master.startServers();

@@ -1,7 +1,7 @@
 # include "ManageServers.hpp"
 
 ManageServers::ManageServers()
-    : Servers(), serversMap(), recvFd(), writeFd(), biggestFd(), clientsMap()
+    : Servers(), serversMap(), readFd(), writeFd(), biggestFd(), clientsMap()
 { }
         
 ManageServers::~ManageServers()
@@ -35,7 +35,7 @@ std::vector<ConfigServer>       ManageServers::getServers() const { return this-
 
 std::map<int, ConfigServer>     ManageServers::getServersMap() const { return this->serversMap; }
 
-fd_set                          ManageServers::getRecvFd() const { return this->recvFd; }
+fd_set                          ManageServers::getreadFd() const { return this->readFd; }
 
 fd_set                          ManageServers::getWriteFd() const { return this->writeFd; }
 
@@ -47,7 +47,7 @@ void                            ManageServers::setServers(std::vector<ConfigServ
 
 void                            ManageServers::setServersMap(std::map<int, ConfigServer> ServersMap) { this->serversMap = ServersMap; }
 
-void                            ManageServers::setRecvFd(fd_set Recv) { this->recvFd = Recv; }
+void                            ManageServers::setreadFd(fd_set Recv) { this->readFd = Recv; }
 
 void                            ManageServers::setWriteFd(fd_set Write) { this->writeFd = Write; }
 
@@ -70,12 +70,12 @@ void                            ManageServers::acceptClientConnection(ConfigServ
         return;
     }
     
-    this->addToSet(clientSock, this->recvFd);
+    this->addToSet(clientSock, this->readFd);
     
     if (fcntl(clientSock, F_SETFL, O_NONBLOCK) < 0)
     {
         std::cerr << "webserver: fcntl error [" << strerror(errno) << "]" << std::endl;
-        removeFromSet(clientSock, this->recvFd);
+        removeFromSet(clientSock, this->readFd);
         close(clientSock);
         return ;
     }
@@ -119,7 +119,7 @@ void                            ManageServers::readRequest(const int & i, Client
         
 
         // move fd from recv fd and add it to the write fd
-        this->removeFromSet(i, this->recvFd);
+        this->removeFromSet(i, this->readFd);
         this->addToSet(i, this->writeFd);
     }
 }
@@ -138,7 +138,7 @@ void                            ManageServers::assignServerToClient(Client & cli
 
 void                            ManageServers::initSets()
 {
-    FD_ZERO(&this->recvFd);
+    FD_ZERO(&this->readFd);
     FD_ZERO(&this->writeFd);
 
     for(std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
@@ -153,7 +153,7 @@ void                            ManageServers::initSets()
             std::cerr << "webserv: fcntl error: [" << strerror(errno) << "] Closing" << std::endl;
             exit(EXIT_FAILURE);
         }
-        addToSet(it->getFd(), this->recvFd);
+        addToSet(it->getFd(), this->readFd);
         this->serversMap.insert(std::make_pair(it->getFd(), *it));
     }
     this->biggestFd = this->Servers.back().getFd();
@@ -164,10 +164,13 @@ void                            ManageServers::setupServers(std::vector<ConfigSe
     bool            checkDoubleServers;
 
     this->Servers = servers;
+    // ! for testing
+    this->Servers.clear();
     if (this->Servers.empty())
     {
+        this->Servers.push_back(ConfigServer());
         std::cout << "[INFO]: There is no server in the config file " << std::endl;
-        this->Servers.push_back(ConfigServer(8000, "127.0.0.1", "exemple.com", "www/", CLIENT_MAX_BODY_SIZE, "index.html", false));
+        std::cout << "[INFO]: So the Host [localhost] and the post will be [" << this->Servers.at(0).getPort() << "]" << std::endl;
     }
 
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
@@ -203,8 +206,8 @@ void                            ManageServers::closeConnectionClient(const int i
 {
     if (FD_ISSET(i, &this->writeFd))
         this->removeFromSet(i, this->writeFd);
-    if (FD_ISSET(i, &this->recvFd))
-        this->removeFromSet(i, this->recvFd);
+    if (FD_ISSET(i, &this->readFd))
+        this->removeFromSet(i, this->readFd);
     close(i);
     this->clientsMap.erase(i);
 }
@@ -225,7 +228,7 @@ void                            ManageServers::addToSet(const int i, fd_set & se
 
 void                            ManageServers::startServers()
 {
-    fd_set  recvCpy;
+    fd_set  readCpy;
     fd_set  writeCpy;
     int     r_select;
 
@@ -239,19 +242,19 @@ void                            ManageServers::startServers()
     {
         timer.tv_sec = 1;
         timer.tv_usec = 0;
-        recvCpy = this->recvFd;
+        readCpy = this->readFd;
         writeCpy = this->writeFd;
 
-        if ( (r_select = select(this->biggestFd + 1, &recvCpy, &writeCpy, NULL, &timer)) < 0 )
+        if ( (r_select = select(this->biggestFd + 1, &readCpy, &writeCpy, NULL, &timer)) < 0 )
         {
             std::cerr << "Webserv error :: select [" << strerror(errno) << "] Closing !" << std::endl;
             exit(1);
         }
         for (int i = 0; i <= this->biggestFd; ++i)
         {
-            if (FD_ISSET(i, &recvCpy) && this->serversMap.count(i))
+            if (FD_ISSET(i, &readCpy) && this->serversMap.count(i))
                 this->acceptClientConnection(this->serversMap.find(i)->second);
-            else if (FD_ISSET(i, &recvCpy) && this->clientsMap.count(i))
+            else if (FD_ISSET(i, &readCpy) && this->clientsMap.count(i))
             {
                 this->readRequest(i, this->clientsMap[i]);
                 this->clientsMap[i].request.printRequest(i);
@@ -305,7 +308,7 @@ void                            ManageServers::sendRes(const int & i, Client & c
         else
         {
             this->removeFromSet(i, this->writeFd);
-            this->addToSet(i, this->recvFd);
+            this->addToSet(i, this->readFd);
             client.clear();
         }
     }

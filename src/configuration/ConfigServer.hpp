@@ -19,7 +19,7 @@ class ConfigServer {
     public : 
         ConfigServer();
         
-        ConfigServer(uint16_t port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
+        ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
 
         ConfigServer(const ConfigServer &);
 
@@ -54,7 +54,7 @@ class ConfigServer {
 
         //! ----------------------------- setters -----------------------------------
 
-        void                                setPort(uint16_t);
+        void                                setPort(std::string);
         
         void                                setHost(std::string);
 
