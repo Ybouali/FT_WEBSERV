@@ -42,7 +42,7 @@ void location::parse_location(location& loc, std::string line) {
 }
 
 void location::print_location_elements(void){
-    if (j != 7)
+    if (j != 6)
         throw MyException("Location need more items !");
     std::cout << "******* location elements *********" << std::endl;
     std::cout << "location path == " << location_path << std::endl;

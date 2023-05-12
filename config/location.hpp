@@ -25,6 +25,8 @@ class location
     public:
         location(/* args */);
         ~location();
+        location (const location& other);
+        location& operator=(const location& other);
 
         //getters
         const std::vector<std::string>& getMethod() const;

@@ -20,18 +20,25 @@ class server
         std::string host;
         std::string server_name;
         std::string error_pages;
+        std::string root;
+        std::string index;
         std::string client_max_body_size;
         std::vector<std::string> cgi_extension;
         std::vector<location> _location;
     public:
+        //constructors
         server(/* args */);
         ~server();
+        server(const server& other);
+        server& operator=(const server& other);
 
         //getters
         std::string getPort() const;
         const std::string& getHost() const;
         const std::string& getServerName() const;
         const std::string& getErrorPages() const;
+        const std::string& getRoot() const;
+        const std::string& getIndex() const;
         std::string getClientMaxBodySize() const;
         const std::vector<std::string>& getCgiExtension() const;
         std::vector<location> get_locations() const;
@@ -41,6 +48,8 @@ class server
         void setHost(const std::string& );
         void setServerName(const std::string& );
         void setErrorPages(const std::string& );
+        void setIndex(const std::string& );
+        void setRoot(const std::string& );
         void setClientMaxBodySize(const std::string& );
         void setCgiExtension(std::vector<std::string>& );
         void set_locations(std::vector<location> new_locations);

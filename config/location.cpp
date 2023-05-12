@@ -56,5 +56,23 @@ void location::setLocation(const std::string& value){
     location_path = value;
 }
 
+location::location(const location& other): location_path(other.location_path)
+        , method(other.method), root(other.root), upload(other.upload)
+        , autoindex(other.autoindex), index(other.index), redirection(other.redirection)
+{}
+
+location& location::operator=(const location& other) {
+    if (this != &other) {
+        location_path = other.location_path;
+        method = other.method;
+        root = other.root;
+        upload = other.upload;
+        autoindex = other.autoindex;
+        index = other.index;
+        redirection = other.redirection;
+    }
+    return *this;
+}
+
 location::location(){}
 location::~location(){}

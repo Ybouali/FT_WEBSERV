@@ -65,6 +65,16 @@ void server::parse_config_file_help(std::string key, std::string value, server& 
             config.setClientMaxBodySize(value), j++;
         else
             throw MyException("Error Client Max Body Size not valid !");
+    } else if (key == "root" && config.getRoot().empty()){
+        if (value.empty())
+            throw MyException("Error root value empty !");
+        else
+            config.setRoot(value), j++;
+    } else if (key == "index" && config.getIndex().empty()){
+        if (value.empty())
+            throw MyException("Error index value empty !");
+        else
+            config.setIndex(value), j++;
     }
 }
 
@@ -108,7 +118,7 @@ void server::parse_config_file(std::string filename, server& config, location& l
 }
 
 void server::print_server_elements(){
-    if (j != 6)
+    if (j != 8)
         throw MyException("The number of server Elements Not Valid !");
     std::cout << "*******   server elements   *******" << std::endl;
     std::cout << "port == " << port << std::endl;
@@ -116,7 +126,9 @@ void server::print_server_elements(){
     std::cout << "server == " << server_name << std::endl;
     std::cout << "error page == " << error_pages << std::endl;
     std::cout << "max body size == " << client_max_body_size << std::endl;
-
+    std::cout << "root == " << root << std::endl;
+    std::cout << "index == " << index << std::endl;
+    
     std::vector<std::string>::iterator it;
     int i = 1;
     for(it = cgi_extension.begin(); it != cgi_extension.end(); ++it){

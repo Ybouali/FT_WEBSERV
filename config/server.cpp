@@ -1,5 +1,22 @@
 #include "server.hpp"
 
+
+const std::string& server::getRoot() const{
+    return root;
+}
+
+void server::setRoot(const std::string& value){
+    root = value;
+}
+
+const std::string& server::getIndex() const{
+    return index;
+}
+
+void server::setIndex(const std::string& value){
+    index = value;
+}
+
 std::string server::getPort() const {
     return port;
 }
@@ -54,6 +71,27 @@ std::vector<location> server::get_locations() const {
 
 void server::set_locations(std::vector<location> new_locations) {
     _location = new_locations;
+}
+
+server::server(const server& other): port(other.port), host(other.host)
+    , server_name(other.server_name), error_pages(other.error_pages)
+    , root(other.root), index(other.index), client_max_body_size(other.client_max_body_size)
+    , cgi_extension(other.cgi_extension), _location(other._location)
+{}
+
+server& server::operator=(const server& other) {
+    if (this != &other) {
+        port = other.port;
+        host = other.host;
+        server_name = other.server_name;
+        error_pages = other.error_pages;
+        root = other.root;
+        index = other.index;
+        client_max_body_size = other.client_max_body_size;
+        cgi_extension = other.cgi_extension;
+        _location = other._location;
+    }
+    return *this;
 }
 
 server::server(){}
