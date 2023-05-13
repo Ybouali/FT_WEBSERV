@@ -6,6 +6,8 @@ ManageServers::ManageServers()
         
 ManageServers::~ManageServers()
 {
+    for (size_t i = 0; i < this->Servers.size(); i++)
+        close(this->Servers[i].getFd());
     this->clear();
 }
 
@@ -63,14 +65,17 @@ void                            ManageServers::acceptClientConnection(ConfigServ
     int                         clientSock;
     Client                      client(server);
 
+    // ! Accept the connection
     clientSock = accept(server.getFd(), (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
     if (clientSock == -1)
     {
         std::cerr << "Failed to accept " << std::endl;
         return;
     }
+    // ! Adding the client Socket to the readable list of Sets
     this->addToSet(clientSock, this->readFd);
     
+    // ! Here like before the fcntl function will help us to be able to read and write from the socket
     if (fcntl(clientSock, F_SETFL, O_NONBLOCK) < 0)
     {
         std::cerr << "webserver: fcntl error [" << strerror(errno) << "]" << std::endl;
@@ -111,14 +116,17 @@ void                            ManageServers::readRequest(const int & i, Client
     }
     if (client.request.getState() == Parsing_Done || client.request.getCodeError())
     {
+        // ! Here if the the parsing is done successfully
+        // ! We should assign the Server to the client
         this->assignServerToClient(client);
 
         // TODO: need a build Response for the client based on the request object
         // ! and also handle the the cgi if exists
         
 
-        // move fd from recv fd and add it to the write fd
+        // ! Remove fd from recv fd
         this->removeFromSet(i, this->readFd);
+        // ! And add it to the write fd to send response
         this->addToSet(i, this->writeFd);
     }
 }
@@ -142,19 +150,24 @@ void                            ManageServers::initSets()
 
     for(std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
-        if (listen(it->getFd(), 512) == -1)
+        // ! Here the listen function is responsible for setting the fd to be accepting incoming connections
+        // ! The maximum number of connections that can be set for macOS in the listen function is 128
+        if (listen(it->getFd(), 128) == -1)
         {
             std::cerr << "webserv: listen error: [" << strerror(errno) << "] Closing" << std::endl;
             exit(EXIT_FAILURE);
         }
+        // ! Fcntl functionality is used for the fd socket fd to able to be readable and writable
         if (fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
         {
             std::cerr << "webserv: fcntl error: [" << strerror(errno) << "] Closing" << std::endl;
             exit(EXIT_FAILURE);
         }
+        // ! add the socket fd to the read file descriptor
         addToSet(it->getFd(), this->readFd);
         this->serversMap.insert(std::make_pair(it->getFd(), *it));
     }
+    // ! Gitting the max of file discriptor
     this->biggestFd = this->Servers.back().getFd();
 }
 
@@ -165,11 +178,13 @@ void                            ManageServers::setupServers(std::vector<ConfigSe
     this->Servers = servers;
     if (this->Servers.empty())
     {
+        // ! Here if there is no server the program will start immediately with a default server 
         this->Servers.push_back(ConfigServer());
         std::cout << "[INFO]: There is no server in the config file or there is no config file " << std::endl;
         std::cout << "[INFO]: So the Host [127.0.0.1] and the post will be [" << this->Servers.at(0).getPort() << "]" << std::endl;
     }
-
+    // ! If there is a server or server with the same port and the same host.
+    // ! The program will use the first fd socket for the both theme
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
         checkDoubleServers = false;
@@ -230,6 +245,7 @@ void                            ManageServers::startServers()
     int     r_select;
 
     this->biggestFd = 0;
+    // ! initialized the sets for all the fd's
     this->initSets();
     struct timeval timer;
 
@@ -242,6 +258,8 @@ void                            ManageServers::startServers()
         readCpy = this->readFd;
         writeCpy = this->writeFd;
 
+        // ! Here select will help us with the fd's that are ready to be read and write
+        // ! The last parameter is for the how much the select will wait for every fd
         if ( (r_select = select(this->biggestFd + 1, &readCpy, &writeCpy, NULL, &timer)) < 0 )
         {
             std::cerr << "Webserv error :: select [" << strerror(errno) << "] Closing !" << std::endl;
@@ -249,16 +267,25 @@ void                            ManageServers::startServers()
         }
         for (int i = 0; i <= this->biggestFd; ++i)
         {
+            // ! Here checking if the fd is already accepted or not 
             if (FD_ISSET(i, &readCpy) && this->serversMap.count(i))
                 this->acceptClientConnection(this->serversMap.find(i)->second);
             else if (FD_ISSET(i, &readCpy) && this->clientsMap.count(i))
             {
+                // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
+                // ! Here printing the request for the start working in the response
                 // this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
+            {
+                // ! Here sending the response
                 this->sendRes(i, this->clientsMap[i]);
+            }
         }
+        // ! Here we check the time if the client write a request with more than one minute 
+        // ! The connection will be closed 
+        // [Info] One minute is used by nginx you can update the time out the webserv header 
         this->timeoutCheck();
     }
 }

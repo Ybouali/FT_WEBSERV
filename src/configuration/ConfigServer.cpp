@@ -113,6 +113,9 @@ void                ConfigServer::setFd(int fd) { this->Fd = fd; }
 
 void                                ConfigServer::setupServer()
 {
+    // ! Create a fd socket 
+    // ! The AF_INET is responsible for IPv4 connection 
+    // ! And SOCK_STREAM is responsible for TCP connection
     this->Fd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->Fd < 0)
     {
@@ -123,6 +126,7 @@ void                                ConfigServer::setupServer()
 
     int option_value = 1;
     
+    // ! Here set the address local to reusable
     if (setsockopt(this->Fd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int)) == -1)
     {
         std::cerr << "PORT [" << this->getPort() << "] SERVER NAME [" << this->getServerName() << "]" << std::endl;
@@ -136,6 +140,7 @@ void                                ConfigServer::setupServer()
     this->serverAddress.sin_addr.s_addr = this->getHost();
     this->serverAddress.sin_port = htons(this->getPort());
     
+    // ! Here bind address with the port 
     if (bind(this->Fd, (struct sockaddr *) &this->serverAddress, sizeof(this->serverAddress)) < 0)
     {
         std::cerr << "PORT [" << this->getPort() << "] SERVER NAME [" << this->getServerName() << "]" << std::endl;

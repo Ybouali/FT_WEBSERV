@@ -19,12 +19,9 @@ int main(int ac, char **av)
    vecServers.push_back(server3);
 
 
+    // ! To setup the servers the program will need a vector of ConfigServer
     master.setupServers(vecServers);
     master.startServers();
-   
-
-    for (size_t i = 0; i < vecServers.size(); i++)
-        close(vecServers[i].getFd());
    
     return 0;
 }
