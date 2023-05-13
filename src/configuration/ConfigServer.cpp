@@ -1,14 +1,14 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer()
-    : Port(), serverName("exempl.com"), Root("www/"), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), Index("index.html"), autoIndex(false), errorPages()
+    : Port(), serverName("exempl.com"), Root("www/"), Index("index.html"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE)
 {
     this->setPort("8080");
     this->setHost("127.0.0.1");
 }
 
-ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex)
-    : Port(0), Host(), serverName(), Root(""), clientMaxBodySize(0), Index(""), autoIndex(false), errorPages()
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index)
+    : Port(0), Host(), serverName(), Root(""),  Index(""), errorPages(), clientMaxBodySize(0)
 {
     this->setPort(port);
     this->setHost(host);
@@ -16,7 +16,6 @@ ConfigServer::ConfigServer(std::string port, std::string host, std::string Serve
     this->setRoot(root);
     this->setClientMaxBodySize(ClientMaxBodySize);
     this->setIndex(index);
-    this->setAutoIndex(AutoIndex);
     this->initErrorPages();
     this->setFd(0);
 }
@@ -34,7 +33,6 @@ ConfigServer & ConfigServer::operator=(const ConfigServer & other)
         this->Root = other.Root;
         this->clientMaxBodySize = other.clientMaxBodySize;
         this->Index = other.Index;
-        this->autoIndex = other.autoIndex;
         this->errorPages = other.errorPages;
         this->Fd = other.Fd;
         this->serverAddress = other.serverAddress;
@@ -55,7 +53,6 @@ void        ConfigServer::clear()
     this->Root.clear();
     this->clientMaxBodySize = 0;
     this->Index.clear();
-    this->autoIndex = false;
     this->errorPages.clear();
 }
 
@@ -92,8 +89,6 @@ unsigned long                       ConfigServer::getClientMaxBodySize() const {
 
 std::string                         ConfigServer::getIndex() const { return this->Index; }
 
-bool                                ConfigServer::getAutoIndex() const { return this->autoIndex; }
-
 std::map<short, std::string>        ConfigServer::getErrorPages() const { return this->errorPages; }
 
 int                                 ConfigServer::getFd() const { return this->Fd; }
@@ -111,8 +106,6 @@ void                ConfigServer::setRoot(std::string root) { this->Root = root;
 void                ConfigServer::setClientMaxBodySize(unsigned long size) { this->clientMaxBodySize = size; }
 
 void                ConfigServer::setIndex(std::string index) { this->Index = index; }
-
-void                ConfigServer::setAutoIndex(bool AutoIndex) { this->autoIndex = AutoIndex; }
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 

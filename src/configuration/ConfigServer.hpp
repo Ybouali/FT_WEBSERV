@@ -8,18 +8,16 @@ class ConfigServer {
 	    in_addr_t						Host; 
 		std::string						serverName;
 		std::string						Root;
-		unsigned long					clientMaxBodySize;
 		std::string						Index;
-		bool							autoIndex;
 		std::map<short, std::string>    errorPages;
+		unsigned long					clientMaxBodySize;
         int     						Fd;
         struct sockaddr_in 				serverAddress;
 
-		// std::vector<??> 			    locations;
     public : 
         ConfigServer();
         
-        ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index, bool AutoIndex);
+        ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index);
 
         ConfigServer(const ConfigServer &);
 
@@ -46,8 +44,6 @@ class ConfigServer {
 
         std::string                         getIndex() const;
 
-        bool                                getAutoIndex() const;
-
         std::map<short, std::string>        getErrorPages() const;
 
         int                                 getFd() const;
@@ -65,8 +61,6 @@ class ConfigServer {
         void                                setClientMaxBodySize(unsigned long);
 
         void                                setIndex(std::string);
-
-        void                                setAutoIndex(bool);
 
         void                                setErrorPages(std::map<short, std::string>);
 

@@ -130,6 +130,7 @@ void                                   Request::handleHeaders()
         if (this->bodySize == 0)
         {
             std::cout << "No Content-Length" << std::endl;
+            // this->setCodeError()
         }
     }
     if (this->requestHeaders.count("Transfer-Encoding"))
@@ -166,6 +167,7 @@ void                                   Request::readBufferFromReq(char * buffer,
 {
     u_int8_t                        c;
     static std::stringstream        str;
+    std::cout << "Read " << readBytes << std::endl;
     for (size_t i = 0; i < readBytes; i++)
     {
         c = buffer[i];
