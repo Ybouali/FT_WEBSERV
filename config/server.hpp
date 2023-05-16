@@ -16,6 +16,7 @@ class server
 {
     private:
         /* data */
+        bool        error;
         std::string port;
         std::string host;
         std::string server_name;
@@ -24,10 +25,10 @@ class server
         std::string index;
         std::string client_max_body_size;
         std::vector<std::string> cgi_extension;
-        std::vector<location> _location;
+        std::vector<location *> _location;
     public:
         //constructors
-        server(/* args */);
+        server();
         ~server();
         server(const server& other);
         server& operator=(const server& other);
@@ -41,7 +42,7 @@ class server
         const std::string& getIndex() const;
         std::string getClientMaxBodySize() const;
         const std::vector<std::string>& getCgiExtension() const;
-        std::vector<location> get_locations() const;
+        std::vector<location*> get_locations() const;
         
         //setters
         void setPort(const std::string& );
@@ -52,10 +53,10 @@ class server
         void setRoot(const std::string& );
         void setClientMaxBodySize(const std::string& );
         void setCgiExtension(std::vector<std::string>& );
-        void set_locations(std::vector<location> new_locations);
+        void set_locations(location* new_locations);
 
         //functions
-        server get_server(std::string filename);
+        std::vector<server*> get_server(std::string filename);
 
         void parse_config_file(std::string filename, server& config, location& loc);
         void parse_config_file_help(std::string key, std::string value, server& config);

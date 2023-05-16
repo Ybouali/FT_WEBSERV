@@ -14,6 +14,7 @@ class location
 {
     private:
         /* data */
+        bool        error;
         std::string location_path;
         std::vector<std::string> method;
         std::string root;
@@ -23,7 +24,7 @@ class location
         std::string redirection;
         
     public:
-        location(/* args */);
+        location();
         ~location();
         location (const location& other);
         location& operator=(const location& other);
@@ -36,6 +37,7 @@ class location
         const std::string& getIndex() const;
         const std::string& getReturn() const;
         const std::string& getLocation() const;
+        bool  getError() const;
 
         //setters
         void setMethod(std::vector<std::string>& );
