@@ -1,6 +1,6 @@
 Name=webserv
 
-src=main.cpp location.cpp server.cpp parse_location.cpp parse_server.cpp
+src=main.cpp location.cpp server.cpp
 
 Flags= -Wall -Wextra -Werror -std=c++98
 

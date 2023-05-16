@@ -48,8 +48,9 @@ class location
 
         //functions
         void parse_location(location& loc, std::string line);
-        void print_location_elements(void);
+        void print_location_elements(location& loc);
         bool check_config_file(const std::string& filename, char c1, char c2);
+        location& loca(std::string filename, location& loc);
         //execption
         class MyException : public std::exception {
             public:
