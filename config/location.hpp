@@ -35,7 +35,7 @@ class location
         const std::string& getUpload() const;
         const std::string& getAutoindex() const;
         const std::string& getIndex() const;
-        const std::string& getReturn() const;
+        const std::string& getRedirection() const;
         const std::string& getLocation() const;
         bool  getError() const;
 
@@ -45,25 +45,30 @@ class location
         void setUpload(const std::string& );
         void setAutoindex(const std::string& );
         void setIndex(const std::string& );
-        void setReturn(const std::string& );
+        void setRedirection(const std::string& );
         void setLocation(const std::string& );
 
+        void    clear();
+
         //functions
-        void parse_location(location& loc, std::string line);
-        void print_location_elements(location& loc);
-        bool check_config_file(const std::string& filename, char c1, char c2);
-        location& loca(std::string filename, location& loc);
+
+        void printLocationInfo();
+
+        // void parse_location(location& loc, std::string line);
+        // void print_location_elements(location& loc);
+        // bool check_config_file(const std::string& filename, char c1, char c2);
+        // location& loca(std::string filename, location& loc);
         //execption
-        class MyException : public std::exception {
-            public:
-                MyException(const std::string& msg) : message(msg) {}
-                virtual ~MyException() throw() {}
-                virtual const char* what() const throw() {
-                    return message.c_str();
-                }
-            private:
-                std::string message;
-        };
+        // class MyException : public std::exception {
+        //     public:
+        //         MyException(const std::string& msg) : message(msg) {}
+        //         virtual ~MyException() throw() {}
+        //         virtual const char* what() const throw() {
+        //             return message.c_str();
+        //         }
+        //     private:
+        //         std::string message;
+        // };
     };
 
 #endif

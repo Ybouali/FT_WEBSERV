@@ -5,6 +5,7 @@ const std::vector<std::string>& location::getMethod() const {
 }
 
 void location::setMethod(std::vector<std::string>& value) {
+    value.erase(value.begin());
     method = value;
 }
 
@@ -29,7 +30,11 @@ const std::string& location::getAutoindex() const {
 }
 
 void location::setAutoindex(const std::string& value) {
-    autoindex = value;
+    if (value == "on" || value == "off"){
+        autoindex = value;
+    }
+    else
+        error = true;
 }
 
 const std::string& location::getIndex() const {
@@ -40,11 +45,22 @@ void location::setIndex(const std::string& value) {
     index = value;
 }
 
-const std::string& location::getReturn() const {
+void    location::clear()
+{
+    this->location_path.clear();
+    this->method.clear();
+    this->root.clear();
+    this->upload.clear();
+    this->autoindex.clear();
+    this->index.clear();
+    this->redirection.clear();
+}
+
+const std::string& location::getRedirection() const {
     return redirection;
 }
 
-void location::setReturn(const std::string& value) {
+void location::setRedirection(const std::string& value) {
     redirection = value;
 }
 
@@ -83,4 +99,20 @@ location::location()
 
 }
 
-location::~location(){}
+location::~location(){
+    this->clear();
+}
+
+void location::printLocationInfo(){
+    std::cout << "LOCATION        (" << this->getLocation() << ") \n";
+
+    std::cout << "METHOD          (" << this->getMethod()[0] << ") \n";
+    std::cout << "METHOD          (" << this->getMethod()[1] << ") \n";
+    std::cout << "METHOD          (" << this->getMethod()[2] << ") \n";
+    
+    std::cout << "ROOT            (" << this->getRoot() << ") \n";
+    std::cout << "UPLOAD          (" << this->getUpload() << ")\n";
+    std::cout << "AUTOINDEX       (" << this->getAutoindex() << ") \n";
+    std::cout << "INDEX           (" << this->getIndex() << ") \n";
+    std::cout << "REDIRECTION     (" << this->getRedirection() << ") \n";
+}

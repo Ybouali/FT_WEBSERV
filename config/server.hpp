@@ -56,12 +56,15 @@ class server
         void set_locations(location* new_locations);
 
         //functions
+        void        printTheServerInfo();
         std::vector<server*> get_server(std::string filename);
 
         void parse_config_file(std::string filename, server& config, location& loc);
         void parse_config_file_help(std::string key, std::string value, server& config);
         void print_server_elements(location & loc);
         void fill_vec_location(location& loc);
+
+        void        clear();
 
         //exception
         class MyException : public std::exception {

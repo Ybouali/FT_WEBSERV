@@ -115,6 +115,20 @@ server& server::operator=(const server& other) {
     return *this;
 }
 
+void        server::clear()
+{
+    this->error = false;
+    this->port.clear();
+    this->host.clear();
+    this->server_name.clear();
+    this->error_pages.clear();
+    this->root.clear();
+    this->index.clear();
+    this->client_max_body_size.clear();
+    this->cgi_extension.clear();
+    this->_location.clear();
+}
+
 server::server()
     : error(false), port(), host() , server_name(), error_pages() , root(), index(), client_max_body_size() , cgi_extension(), _location()
 {
@@ -157,49 +171,42 @@ std::vector<server*> server::get_server(std::string filename){
                 }  
                 else if (key == "port" && !value.empty())
                 {
-                    std::cout << "Port                  {" << value << "}" << std::endl;
                     s->setPort(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "host" && !value.empty())
                 {
-                    std::cout << "Host                  {" << value << "}" << std::endl;
                     s->setHost(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "server_name" && !value.empty())
                 {
-                    std::cout << "Server_name           {" << value << "}" << std::endl;
                     s->setServerName(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "error_page" && !value.empty())
                 {
-                    std::cout << "Error_page           {" << value << "}" << std::endl;
                     s->setErrorPages(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "client_max_body_size" && !value.empty())
                 {
-                    std::cout << "Client_max_body_size  {" << value << "}" << std::endl;
                     s->setClientMaxBodySize(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "index" && !value.empty())
                 {
-                    std::cout << "Index                 {" << value << "}" << std::endl;
                     s->setIndex(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "root" && !value.empty())
                 {
-                    std::cout << "Root                  {" << value << "}" << std::endl;
                     s->setRoot(value);
                     key.clear();
                     value.clear();
@@ -211,12 +218,8 @@ std::vector<server*> server::get_server(std::string filename){
                     std::vector<std::string> vecCgi;
                     while (std::getline(iss_cgi, token, ' ')) {
                         if (!token.empty())
-                        {
                             vecCgi.push_back(token);
-                            std::cout << "[" << token << "] ";
-                        }
                     }
-                    std::cout << "\n";
                     s->setCgiExtension(vecCgi);
                     vecCgi.clear();
                     key.clear();
@@ -232,8 +235,8 @@ std::vector<server*> server::get_server(std::string filename){
                 }
                 else if (key == "location" && !value.empty() && line[line.length() - 1] == '[')
                 {
-                    std::cout << "|||||||||||||||||||||| Location              [" << value << "] ||||||||||||||||||||||" << std::endl;
                     loc = new location();
+                    loc->setLocation(value);
                     while (std::getline(infile, line))
                     {
                         std::istringstream iss_loc_key_val(line);
@@ -242,39 +245,42 @@ std::vector<server*> server::get_server(std::string filename){
                         {
                             std::istringstream iss_p10(line);
                             std::string token;
+                            std::vector<std::string> vecMethod;
                             while (std::getline(iss_p10, token, ' ')) {
                                 if (!token.empty())
-                                    std::cout << "[" << token << "] ";
+                                {
+                                    vecMethod.push_back(token);
+                                }
                             }
-                            std::cout << "\n";
+                            loc->setMethod(vecMethod);
                         }
                         else if (key == "root" && !value.empty())
                         {
-                            std::cout << "Root                  {" << value << "}" << std::endl;
+                            loc->setRoot(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "upload" && !value.empty())
                         {
-                            std::cout << "Upload               {" << value << "}" << std::endl;
+                            loc->setUpload(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "autoindex" && !value.empty())
                         {
-                            std::cout << "Autoindex               {" << value << "}" << std::endl;
+                            loc->setAutoindex(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "index" && !value.empty())
                         {
-                            std::cout << "Index               {" << value << "}" << std::endl;
+                            loc->setIndex(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "redirection" && !value.empty())
                         {
-                            std::cout << "Redirection               {" << value << "}" << std::endl;
+                            loc->setRedirection(value);
                             key.clear();
                             value.clear();
                         }
@@ -282,26 +288,60 @@ std::vector<server*> server::get_server(std::string filename){
                         {
                             if (!loc->getError())
                                 s->set_locations(loc);
+                            else 
+                            {
+                                loc->clear();
+                                delete loc;
+                            }
                             break;
                         }
                         else
                         {
                             std::cerr << "ERROR LOC {" << key << "} value {" << value << "}" << std::endl;
-                            exit (1);
+                            loc->clear();
+                            delete loc;
+                            break;
                         }
                     }
                     key.clear();
                     value.clear();
-                    std::cout << "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
                 }
                 else if (!key.empty())
                 {
                     std::cerr << "ERROR SER {" << key << "} value {" << value << "}" << std::endl;
-                    exit(1);
+                    s->clear();
+                    delete s;
+                    break;
                 }
             }
-            // Here need to push the server ?? 
+            
         }
     }
     return vecServers;
+}
+
+void    server::printTheServerInfo()
+{
+    std::cout << "HOST (" << this->getHost() << ") \n";
+    std::cout << "PORT (" << this->getPort() << ") \n";
+    std::cout << "SERVER NAME (" << this->getServerName() << ")\n";
+    std::cout << "THE PATH OF THE ROOT IS  (" << this->getRoot() << ") \n";
+    std::cout << "THE INDEX PAGE IS        (" << this->getIndex() << ") \n";
+    if (!this->getErrorPages().empty())
+        std::cout << "PATH TO THE ERROR PAGES  ("<< this->getErrorPages() << ") \n";
+    if (!this->getClientMaxBodySize().empty())
+        std::cout << "THE CLIENT MAX BODY SIZE (" << this->getClientMaxBodySize() << ") \n";
+    if (!this->getCgiExtension().empty())
+    {
+        std::cout << "THE CGI EXE IS           (" << this->getCgiExtension()[0] << ") \n";
+        std::cout << "THE CGI PATH IS          (" << this->getCgiExtension()[1] << ")";
+    }
+    std::cout << "\n\n";
+    for (size_t i = 0; i < this->get_locations().size(); i++)
+    {
+        std::cout << "|||||||||||||||| START PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||" << std::endl;
+        this->get_locations()[i]->printLocationInfo();
+        std::cout << "|||||||||||||||| END PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||||" << std::endl;
+    }
+    std::cout << "\n";   
 }
