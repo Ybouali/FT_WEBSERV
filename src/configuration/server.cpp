@@ -86,11 +86,11 @@ void server::setCgiExtension(std::vector<std::string>& value) {
         this->cgi_extension.push_back(value[i]);
 }
 
-std::vector<location*> server::get_locations() const {
+std::vector<Location*> server::get_locations() const {
     return _location;
 }
 
-void server::set_locations(location* new_locations) {
+void server::set_locations(Location* new_locations) {
     _location.push_back(new_locations);
 }
 
@@ -141,7 +141,7 @@ server::~server(){}
 
 std::vector<server*> server::get_server(std::string filename){
     server * s;
-    location *loc;
+    Location *loc;
 
     std::string key , value;
     std::vector<server*>    vecServers;
@@ -235,7 +235,7 @@ std::vector<server*> server::get_server(std::string filename){
                 }
                 else if (key == "location" && !value.empty() && line[line.length() - 1] == '[')
                 {
-                    loc = new location();
+                    loc = new Location();
                     loc->setLocation(value);
                     while (std::getline(infile, line))
                     {

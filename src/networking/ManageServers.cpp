@@ -342,3 +342,21 @@ void                            ManageServers::sendRes(const int & i, Client & c
         // TODO: here need to remove from the response the sentBytes that already sends [headers, body ]
     }
 }
+
+std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<server *> servers)
+{
+    std::vector<ConfigServer> vecServers;
+    ConfigServer              server;
+    for (size_t i = 0; i < servers.size(); i++)
+    {
+        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->getRoot(), servers[i]->getIndex(), servers[i]->get_locations());
+        server.setClientMaxBodySize(servers[i]->getClientMaxBodySize());
+
+        vecServers.push_back(server);
+        // std::cout << "|||||||||||||||||||||||||||||||||||||||| START PRINTING SRVER NUMBER [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
+        // servers[i]->printTheServerInfo();
+        // std::cout << "|||||||||||||||||||||||||||||||||||||||| END PRINTING SRVER NUMBER   [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
+    }
+
+    return vecServers;
+}

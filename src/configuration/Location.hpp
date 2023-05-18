@@ -1,16 +1,9 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
+ 
+#include "../webserv.hpp"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <cctype>
-#include <exception>
-#include <algorithm>
-
-class location
+class Location
 {
     private:
         /* data */
@@ -24,10 +17,10 @@ class location
         std::string redirection;
         
     public:
-        location();
-        ~location();
-        location (const location& other);
-        location& operator=(const location& other);
+        Location();
+        ~Location();
+        Location (const Location& other);
+        Location& operator=(const Location& other);
 
         //getters
         const std::vector<std::string>& getMethod() const;
@@ -50,25 +43,7 @@ class location
 
         void    clear();
 
-        //functions
-
         void printLocationInfo();
-
-        // void parse_location(location& loc, std::string line);
-        // void print_location_elements(location& loc);
-        // bool check_config_file(const std::string& filename, char c1, char c2);
-        // location& loca(std::string filename, location& loc);
-        //execption
-        // class MyException : public std::exception {
-        //     public:
-        //         MyException(const std::string& msg) : message(msg) {}
-        //         virtual ~MyException() throw() {}
-        //         virtual const char* what() const throw() {
-        //             return message.c_str();
-        //         }
-        //     private:
-        //         std::string message;
-        // };
     };
 
 #endif

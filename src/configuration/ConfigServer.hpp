@@ -2,6 +2,8 @@
 
 #include "../webserv.hpp"
 
+class Location;
+
 class ConfigServer {
     private :
         uint16_t						Port;
@@ -11,13 +13,14 @@ class ConfigServer {
 		std::string						Index;
 		std::map<short, std::string>    errorPages;
 		unsigned long					clientMaxBodySize;
+        std::vector<Location * >         locationList;
         int     						Fd;
         struct sockaddr_in 				serverAddress;
 
     public : 
         ConfigServer();
         
-        ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index);
+        ConfigServer(std::string , std::string , std::string , std::string , std::string , std::vector<Location * > );
 
         ConfigServer(const ConfigServer &);
 
@@ -58,7 +61,7 @@ class ConfigServer {
 
         void                                setRoot(std::string);
 
-        void                                setClientMaxBodySize(unsigned long);
+        void                                setClientMaxBodySize(std::string);
 
         void                                setIndex(std::string);
 

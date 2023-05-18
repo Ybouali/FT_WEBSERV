@@ -1,16 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <cctype>
-#include <exception>
-#include <algorithm>
-#include <regex>
-#include "location.hpp"
+#include "../webserv.hpp"
+
+class Location;
 
 class server
 {
@@ -25,7 +18,7 @@ class server
         std::string index;
         std::string client_max_body_size;
         std::vector<std::string> cgi_extension;
-        std::vector<location *> _location;
+        std::vector<Location *> _location;
     public:
         //constructors
         server();
@@ -42,7 +35,7 @@ class server
         const std::string& getIndex() const;
         std::string getClientMaxBodySize() const;
         const std::vector<std::string>& getCgiExtension() const;
-        std::vector<location*> get_locations() const;
+        std::vector<Location*> get_locations() const;
         
         //setters
         void setPort(const std::string& );
@@ -53,30 +46,18 @@ class server
         void setRoot(const std::string& );
         void setClientMaxBodySize(const std::string& );
         void setCgiExtension(std::vector<std::string>& );
-        void set_locations(location* new_locations);
+        void set_locations(Location* new_locations);
 
         //functions
         void        printTheServerInfo();
         std::vector<server*> get_server(std::string filename);
 
-        void parse_config_file(std::string filename, server& config, location& loc);
+        void parse_config_file(std::string filename, server& config, Location& loc);
         void parse_config_file_help(std::string key, std::string value, server& config);
-        void print_server_elements(location & loc);
-        void fill_vec_location(location& loc);
+        void print_server_elements(Location & loc);
+        void fill_vec_location(Location& loc);
 
         void        clear();
-
-        //exception
-        class MyException : public std::exception {
-            public:
-                MyException(const std::string& msg) : message(msg) {}
-                virtual ~MyException() throw() {}
-                virtual const char* what() const throw() {
-                    return message.c_str();
-                }
-            private:
-                std::string message;
-        };
 };
 
 #endif

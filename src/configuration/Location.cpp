@@ -1,35 +1,35 @@
-#include "location.hpp"
+#include "Location.hpp"
 
-const std::vector<std::string>& location::getMethod() const {
+const std::vector<std::string>& Location::getMethod() const {
     return method;
 }
 
-void location::setMethod(std::vector<std::string>& value) {
+void Location::setMethod(std::vector<std::string>& value) {
     value.erase(value.begin());
     method = value;
 }
 
-const std::string& location::getRoot() const {
+const std::string& Location::getRoot() const {
     return root;
 }
 
-void location::setRoot(const std::string& value) {
+void Location::setRoot(const std::string& value) {
     root = value;
 }
 
-const std::string& location::getUpload() const {
+const std::string& Location::getUpload() const {
     return upload;
 }
 
-void location::setUpload(const std::string& value) {
+void Location::setUpload(const std::string& value) {
     upload = value;
 }
 
-const std::string& location::getAutoindex() const {
+const std::string& Location::getAutoindex() const {
     return autoindex;
 }
 
-void location::setAutoindex(const std::string& value) {
+void Location::setAutoindex(const std::string& value) {
     if (value == "on" || value == "off"){
         autoindex = value;
     }
@@ -37,15 +37,15 @@ void location::setAutoindex(const std::string& value) {
         error = true;
 }
 
-const std::string& location::getIndex() const {
+const std::string& Location::getIndex() const {
     return index;
 }
 
-void location::setIndex(const std::string& value) {
+void Location::setIndex(const std::string& value) {
     index = value;
 }
 
-void    location::clear()
+void    Location::clear()
 {
     this->location_path.clear();
     this->method.clear();
@@ -56,30 +56,30 @@ void    location::clear()
     this->redirection.clear();
 }
 
-const std::string& location::getRedirection() const {
+const std::string& Location::getRedirection() const {
     return redirection;
 }
 
-void location::setRedirection(const std::string& value) {
+void Location::setRedirection(const std::string& value) {
     redirection = value;
 }
 
-const std::string& location::getLocation() const {
+const std::string& Location::getLocation() const {
     return location_path;
 }
 
-void location::setLocation(const std::string& value){
+void Location::setLocation(const std::string& value){
     location_path = value;
 }
 
-location::location(const location& other)
+Location::Location(const Location& other)
 {
     *this = other;
 }
 
-bool  location::getError() const { return this->error; }
+bool  Location::getError() const { return this->error; }
 
-location& location::operator=(const location& other) {
+Location& Location::operator=(const Location& other) {
     if (this != &other) {
         error = other.error;
         location_path = other.location_path;
@@ -93,17 +93,17 @@ location& location::operator=(const location& other) {
     return *this;
 }
 
-location::location()
+Location::Location()
     : error(false) , location_path(), method(), root(), upload(), autoindex(), index(), redirection()
 {
 
 }
 
-location::~location(){
+Location::~Location(){
     this->clear();
 }
 
-void location::printLocationInfo(){
+void Location::printLocationInfo(){
     std::cout << "LOCATION        (" << this->getLocation() << ") \n";
 
     std::cout << "METHOD          (" << this->getMethod()[0] << ") \n";

@@ -45,6 +45,10 @@
 # include <sys/select.h>
 # include <arpa/inet.h>
 
+#include <regex>
+
+# include "configuration/Location.hpp"
+# include "configuration/server.hpp"
 # include "configuration/ConfigServer.hpp"
 # include "request/Request.hpp"
 

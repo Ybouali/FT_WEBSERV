@@ -7,15 +7,15 @@ ConfigServer::ConfigServer()
     this->setHost("127.0.0.1");
 }
 
-ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, unsigned long ClientMaxBodySize, std::string index)
-    : Port(0), Host(), serverName(), Root(""),  Index(""), errorPages(), clientMaxBodySize(0)
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, std::string index, std::vector<Location * > _locationList)
+    : Port(0), Host(), serverName(), Root(""),  Index(""), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
 {
     this->setPort(port);
     this->setHost(host);
     this->setServerName(ServerName);
     this->setRoot(root);
-    this->setClientMaxBodySize(ClientMaxBodySize);
     this->setIndex(index);
+    this->locationList = _locationList;
     this->initErrorPages();
     this->setFd(0);
 }
@@ -36,12 +36,10 @@ ConfigServer & ConfigServer::operator=(const ConfigServer & other)
         this->errorPages = other.errorPages;
         this->Fd = other.Fd;
         this->serverAddress = other.serverAddress;
-        // this->locations = other.locations;
+        this->locationList = other.locationList;
     }
     return *this;
 }
-
-
 
 ConfigServer::~ConfigServer() { clear(); }
 
@@ -54,6 +52,7 @@ void        ConfigServer::clear()
     this->clientMaxBodySize = 0;
     this->Index.clear();
     this->errorPages.clear();
+    this->locationList.clear();
 }
 
 void                                ConfigServer::initErrorPages()
@@ -103,7 +102,7 @@ void                ConfigServer::setServerName(std::string ServerName) { this->
 
 void                ConfigServer::setRoot(std::string root) { this->Root = root; }
 
-void                ConfigServer::setClientMaxBodySize(unsigned long size) { this->clientMaxBodySize = size; }
+void                ConfigServer::setClientMaxBodySize(std::string size) { this->clientMaxBodySize = std::stoul(size); }
 
 void                ConfigServer::setIndex(std::string index) { this->Index = index; }
 
