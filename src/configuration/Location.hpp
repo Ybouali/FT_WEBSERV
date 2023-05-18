@@ -15,6 +15,7 @@ class Location
         std::string autoindex;
         std::string index;
         std::string redirection;
+        std::string cgi;
         
     public:
         Location();
@@ -31,6 +32,7 @@ class Location
         const std::string& getRedirection() const;
         const std::string& getLocation() const;
         bool  getError() const;
+        std::string getCgi() const;
 
         //setters
         void setMethod(std::vector<std::string>& );
@@ -40,6 +42,7 @@ class Location
         void setIndex(const std::string& );
         void setRedirection(const std::string& );
         void setLocation(const std::string& );
+        void setCgi(std::string & );
 
         void    clear();
 

@@ -48,7 +48,7 @@
 #include <regex>
 
 # include "configuration/Location.hpp"
-# include "configuration/server.hpp"
+# include "configuration/ServerParser.hpp"
 # include "configuration/ConfigServer.hpp"
 # include "request/Request.hpp"
 

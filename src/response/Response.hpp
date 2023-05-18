@@ -1,9 +1,7 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include <iostream>
-#include <ctime>
-#include <string>
+#include "../webserv.hpp"
 
 class Response
 {

@@ -275,7 +275,7 @@ void                            ManageServers::startServers()
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
                 // ! Here printing the request for the start working in the response
-                // this->clientsMap[i].request.printRequest(i);
+                this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
             {
@@ -296,20 +296,20 @@ void                            ManageServers::sendRes(const int & i, Client & c
     std::string response = "";
     // TODO: here the headers is static it should be dynamic !! 
     
-    //     response = "HTTP/1.1 501 Not Implemented\r\n";
-    //     response.append("Content-Type: text/html\r\n");
-    //     // response.append("Content-Length: 113\r\n");
-    //     response.append("Server: small_nginx\r\n");
-    //     response.append("Date: Sun, 07 May 2023 20:30:06 UTC\r\n\r\n");
+        response = "HTTP/1.1 501 Not Implemented\r\n";
+        response.append("Content-Type: text/html\r\n");
+        // response.append("Content-Length: 113\r\n");
+        response.append("Server: small_nginx\r\n");
+        response.append("Date: Sun, 07 May 2023 20:30:06 UTC\r\n\r\n");
     
     // // ! FOR_TESTING:
-    // if (client.request.getCodeError() == 0)
-    //     client.request.setCodeError(200);
+    if (client.request.getCodeError() == 0)
+        client.request.setCodeError(200);
 
-    // std::string errorMessage = getPageError(client.request.getCodeError());
+    std::string errorMessage = getPageError(client.request.getCodeError());
     
-    // if (!errorMessage.empty())
-    //     response.append(errorMessage);
+    if (!errorMessage.empty())
+        response.append(errorMessage);
 
     if (response.size() >= MSG_BUF)
         sentBytes = send(i, response.c_str(), MSG_BUF, 0);
@@ -343,13 +343,13 @@ void                            ManageServers::sendRes(const int & i, Client & c
     }
 }
 
-std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<server *> servers)
+std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerParser *> servers)
 {
     std::vector<ConfigServer> vecServers;
     ConfigServer              server;
     for (size_t i = 0; i < servers.size(); i++)
     {
-        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->getRoot(), servers[i]->getIndex(), servers[i]->get_locations());
+        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->get_locations());
         server.setClientMaxBodySize(servers[i]->getClientMaxBodySize());
 
         vecServers.push_back(server);

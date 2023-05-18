@@ -61,7 +61,7 @@ class ManageServers {
         
         void                            assignServerToClient(Client &);
 
-        std::vector<ConfigServer>       getInfoServer(std::vector<server *> );
+        std::vector<ConfigServer>       getInfoServer(std::vector<ServerParser *> );
 
         void                            setupServers(std::vector<ConfigServer>);
 

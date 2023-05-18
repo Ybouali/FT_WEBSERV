@@ -54,6 +54,7 @@ void    Location::clear()
     this->autoindex.clear();
     this->index.clear();
     this->redirection.clear();
+    this->cgi.clear();
 }
 
 const std::string& Location::getRedirection() const {
@@ -93,6 +94,17 @@ Location& Location::operator=(const Location& other) {
     return *this;
 }
 
+void    Location::setCgi(std::string & value)
+{
+    if (value == "on" || value == "off"){
+        cgi = value;
+    }
+    else
+        error = true;
+}
+
+std::string    Location::getCgi() const { return this->cgi; }
+
 Location::Location()
     : error(false) , location_path(), method(), root(), upload(), autoindex(), index(), redirection()
 {
@@ -113,6 +125,7 @@ void Location::printLocationInfo(){
     std::cout << "ROOT            (" << this->getRoot() << ") \n";
     std::cout << "UPLOAD          (" << this->getUpload() << ")\n";
     std::cout << "AUTOINDEX       (" << this->getAutoindex() << ") \n";
+    std::cout << "CGI             (" << this->getCgi() << ") \n";
     std::cout << "INDEX           (" << this->getIndex() << ") \n";
     std::cout << "REDIRECTION     (" << this->getRedirection() << ") \n";
 }

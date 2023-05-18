@@ -1,20 +1,18 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer()
-    : Port(), serverName("exempl.com"), Root("www/"), Index("index.html"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE)
+    : Port(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE)
 {
     this->setPort("8080");
     this->setHost("127.0.0.1");
 }
 
-ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::string root, std::string index, std::vector<Location * > _locationList)
-    : Port(0), Host(), serverName(), Root(""),  Index(""), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList)
+    : Port(0), Host(), serverName(), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
 {
     this->setPort(port);
     this->setHost(host);
     this->setServerName(ServerName);
-    this->setRoot(root);
-    this->setIndex(index);
     this->locationList = _locationList;
     this->initErrorPages();
     this->setFd(0);
@@ -30,9 +28,7 @@ ConfigServer & ConfigServer::operator=(const ConfigServer & other)
         this->Port = other.Port;
         this->Host = other.Host;
         this->serverName = other.serverName;
-        this->Root = other.Root;
         this->clientMaxBodySize = other.clientMaxBodySize;
-        this->Index = other.Index;
         this->errorPages = other.errorPages;
         this->Fd = other.Fd;
         this->serverAddress = other.serverAddress;
@@ -48,9 +44,7 @@ void        ConfigServer::clear()
     this->Port = 0;
     this->Host = 0;
     this->serverName.clear();
-    this->Root.clear();
     this->clientMaxBodySize = 0;
-    this->Index.clear();
     this->errorPages.clear();
     this->locationList.clear();
 }
@@ -82,11 +76,7 @@ in_addr_t                           ConfigServer::getHost() const { return this-
 
 std::string                         ConfigServer::getServerName() const { return this->serverName; }
 
-std::string                         ConfigServer::getRoot() const { return this->Root; }
-
 unsigned long                       ConfigServer::getClientMaxBodySize() const { return this->clientMaxBodySize; }
-
-std::string                         ConfigServer::getIndex() const { return this->Index; }
 
 std::map<short, std::string>        ConfigServer::getErrorPages() const { return this->errorPages; }
 
@@ -100,11 +90,7 @@ void                ConfigServer::setHost(std::string host) { this->Host = inet_
 
 void                ConfigServer::setServerName(std::string ServerName) { this->serverName = ServerName; }
 
-void                ConfigServer::setRoot(std::string root) { this->Root = root; }
-
 void                ConfigServer::setClientMaxBodySize(std::string size) { this->clientMaxBodySize = std::stoul(size); }
-
-void                ConfigServer::setIndex(std::string index) { this->Index = index; }
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 

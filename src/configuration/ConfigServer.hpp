@@ -9,18 +9,16 @@ class ConfigServer {
         uint16_t						Port;
 	    in_addr_t						Host; 
 		std::string						serverName;
-		std::string						Root;
-		std::string						Index;
 		std::map<short, std::string>    errorPages;
 		unsigned long					clientMaxBodySize;
-        std::vector<Location * >         locationList;
+        std::vector<Location * >        locationList;
         int     						Fd;
         struct sockaddr_in 				serverAddress;
 
     public : 
         ConfigServer();
         
-        ConfigServer(std::string , std::string , std::string , std::string , std::string , std::vector<Location * > );
+        ConfigServer(std::string , std::string , std::string , std::vector<Location * > );
 
         ConfigServer(const ConfigServer &);
 

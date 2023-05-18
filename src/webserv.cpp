@@ -3,9 +3,9 @@
 
 int main(int ac, char **av)
 {
-    std::string             filename;
-    server                  serversFromConfigFile;
-    std::vector<server *>   servers;
+    std::string                     filename;
+    ServerParser                    serversFromConfigFile;
+    std::vector<ServerParser *>     servers;
     ManageServers master;
 
 
