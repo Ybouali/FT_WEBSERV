@@ -16,6 +16,12 @@ Client::Client(const ConfigServer& server)
     this->lastMsgTime = time(NULL);
  }
 
+ void                        Client::buildResponse()
+ {
+    this->response.setRequest(this->request);
+    this->response.setConfigServer(this->server);
+ }
+
 //! ----------------------------- getters -----------------------------------
 
 int                     Client::getClientSocket() const { return this->clientSocket; }
@@ -39,6 +45,6 @@ void                    Client::updateTime() { this->setLastMsgTime(time(NULL));
 void                    Client::clear()
 {
     this->request.clear();
-    // TODO: need to clear also the response 
+    this->response.clear();
 }
 

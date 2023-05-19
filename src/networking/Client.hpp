@@ -2,6 +2,7 @@
 
 # include "../webserv.hpp"
 # include "../request/Request.hpp"
+# include "../response/Response.hpp"
 
 class Client
 {
@@ -9,6 +10,7 @@ class Client
         int                         clientSocket;
         time_t                      lastMsgTime;
         struct sockaddr_in          clientAddress;
+
     public:
         Client();
 
@@ -18,7 +20,9 @@ class Client
         
         Request         request;
         ConfigServer    server;
-        // TODO: here we should add the response class .
+        Response        response;
+        
+        void                        buildResponse();
         
         // ? ----------------------------- getters -----------------------------------
 

@@ -120,9 +120,9 @@ void                            ManageServers::readRequest(const int & i, Client
         // ! We should assign the Server to the client
         this->assignServerToClient(client);
 
-        // TODO: need a build Response for the client based on the request object
-        // ! and also handle the the cgi if exists
-        
+        // TODO: ! and also handle the the cgi if exists    
+
+        client.buildResponse();
 
         // ! Remove fd from recv fd
         this->removeFromSet(i, this->readFd);

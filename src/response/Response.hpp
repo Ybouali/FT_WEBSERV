@@ -6,19 +6,23 @@
 class Response
 {
     private:
-        /* data */
-        std::string Date;
+        std::string     response_content;
+        ConfigServer    server;
+        Request         request;
+
+        void Date();
     public:
-        Response(/* args */);
+        Response();
         ~Response();
 
-        //getters
-        const std::string& getDate() const;
+        void            clear();
 
-        //setters
-        void setDate(const std::string& );
+        void            setRequest(Request req);
+        void            setConfigServer(ConfigServer ser);
 
-        //functions
-        void getdatetime();
+        Request             getRequest() const;
+        ConfigServer        getConfigServer() const;
+
+        // void getdatetime();
 };
 #endif
