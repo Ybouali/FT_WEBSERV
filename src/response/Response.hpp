@@ -6,23 +6,49 @@
 class Response
 {
     private:
-        std::string     response_content;
-        ConfigServer    server;
-        Request         request;
+		ConfigServer	server;
+        Request			request;
+		std::string		responseContent;
+		std::string		protocol;
+		std::string		statusCode;
+		std::string		statusMessage;
+		std::string		contentType;
+		std::string		contentLength;
+		std::string		serverName;
+		std::string		Date;
 
-        void Date();
     public:
         Response();
         ~Response();
 
-        void            clear();
+        void				clear();
 
-        void            setRequest(Request req);
-        void            setConfigServer(ConfigServer ser);
+		// ----------------------------- Getters -----------------------------------
+		const ConfigServer	getConfigServer() const;
+		const Request		getRequest() const;
+		const std::string&	getResponseContent() const;
+		const std::string&	getProtocol() const;
+		const std::string&	getStatusCode() const;
+		const std::string&	getStatusMessage() const;
+		const std::string&	getContentType() const;
+		const std::string&	getContentLength() const;
+		const std::string&	getServerName() const;
+		const std::string&	getDate() const;
 
-        Request             getRequest() const;
-        ConfigServer        getConfigServer() const;
+        // ----------------------------- Setters -----------------------------------
+		void				setConfigServer(const ConfigServer&);
+		void				setRequest(const Request&);
+		void				setResponseContent(const std::string&);
+		void				setProtocol(const std::string&);
+		void				setStatusCode(const std::string&);
+		void				setStatusMessage(const std::string&);
+		void				setContentType(const std::string&);
+		void				setContentLength(const std::string&);
+		void				setServerName(const std::string&);
+		void				setDate(const std::string&);
 
-        // void getdatetime();
+        // ----------------------------- Methodes -----------------------------------
+		// void				getdatetime();
 };
+
 #endif
