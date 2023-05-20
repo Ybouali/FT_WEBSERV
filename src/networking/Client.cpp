@@ -14,13 +14,13 @@ Client::Client(const ConfigServer& server)
     this->server = server;
     this->request.setMaxBodySize(server.getClientMaxBodySize());
     this->lastMsgTime = time(NULL);
- }
+}
 
- void                        Client::buildResponse()
- {
+void                        Client::buildResponse()
+{
     this->response.setRequest(this->request);
     this->response.setConfigServer(this->server);
- }
+}
 
 //! ----------------------------- getters -----------------------------------
 
