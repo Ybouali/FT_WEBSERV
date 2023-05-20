@@ -21,7 +21,7 @@ class Response
         Response();
         ~Response();
 
-        void				clear();
+        void	clear();
 
 		// ----------------------------- Getters -----------------------------------
 
@@ -38,14 +38,14 @@ class Response
 
         // ----------------------------- Setters -----------------------------------
 
-		void				setConfigServer(const ConfigServer&);
-		void				setRequest(const Request&);
-		void				setResponseContent(const std::string&);
-		void				setStatusCode(const std::string&);
-		void				setStatusMessage(const std::string&);
-		void				setContentType(const std::string&);
-		void				setContentLength(const std::string&);
-		void				setDate(const std::string&);
+		void	setConfigServer(const ConfigServer&);
+		void	setRequest(const Request&);
+		void	setResponseContent(const std::string&);
+		void	setStatusCode(const std::string&);
+		void	setStatusMessage(const std::string&);
+		void	setContentType(const std::string&);
+		void	setContentLength(const std::string&);
+		void	setDate(const std::string&);
 
         // ----------------------------- Methodes -----------------------------------
 
