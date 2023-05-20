@@ -109,3 +109,7 @@ void	Response::setDate(const std::string& Date) { this->Date = Date; }
 
 //     r.setDate(dateString);
 // }
+
+void	Response::createResponse()
+{
+}

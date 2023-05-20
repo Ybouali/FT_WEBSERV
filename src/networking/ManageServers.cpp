@@ -298,7 +298,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
     
         response = "HTTP/1.1 501 Not Implemented\r\n";
         response.append("Content-Type: text/html\r\n");
-        // response.append("Content-Length: 113\r\n");
+        response.append("Content-Length: 113\r\n");
         response.append("Server: small_nginx\r\n");
         response.append("Date: Sun, 07 May 2023 20:30:06 UTC\r\n\r\n");
     

@@ -50,6 +50,7 @@ class Response
         // ----------------------------- Methodes -----------------------------------
 
 		// void				getdatetime();
+		void	createResponse();
 };
 
 #endif
