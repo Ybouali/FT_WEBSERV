@@ -24,6 +24,7 @@ class Response
         void				clear();
 
 		// ----------------------------- Getters -----------------------------------
+
 		const ConfigServer	getConfigServer() const;
 		const Request		getRequest() const;
 		const std::string&	getResponseContent() const;
@@ -36,6 +37,7 @@ class Response
 		const std::string&	getDate() const;
 
         // ----------------------------- Setters -----------------------------------
+
 		void				setConfigServer(const ConfigServer&);
 		void				setRequest(const Request&);
 		void				setResponseContent(const std::string&);
@@ -46,6 +48,7 @@ class Response
 		void				setDate(const std::string&);
 
         // ----------------------------- Methodes -----------------------------------
+
 		// void				getdatetime();
 };
 
