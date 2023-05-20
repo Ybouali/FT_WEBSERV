@@ -67,5 +67,5 @@ class ManageServers {
 
         void                            startServers();
 
-        void                            sendRes(const int &, Client &);
+        void                            sendResponse(const int &, Client &);
 };

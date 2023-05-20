@@ -280,7 +280,7 @@ void                            ManageServers::startServers()
             else if (FD_ISSET(i, &writeCpy))
             {
                 // ! Here sending the response
-                this->sendRes(i, this->clientsMap[i]);
+                this->sendResponse(i, this->clientsMap[i]);
             }
         }
         // ! Here we check the time if the client write a request with more than one minute 
@@ -290,7 +290,7 @@ void                            ManageServers::startServers()
     }
 }
 
-void                            ManageServers::sendRes(const int & i, Client & client)
+void                            ManageServers::sendResponse(const int & i, Client & client)
 {
     int sentBytes;
     std::string response = "";
@@ -318,7 +318,7 @@ void                            ManageServers::sendRes(const int & i, Client & c
 
     if (sentBytes < 0) 
     {
-        std::cerr << "sendRes(): error sending : " << strerror(errno) << std::endl;
+        std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
     }
     else if (sentBytes == 0 || (size_t) sentBytes == response.length())
