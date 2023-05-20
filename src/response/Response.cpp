@@ -9,7 +9,7 @@ Response::Response() :
 	statusMessage(),
 	contentType(),
 	contentLength(),
-	serverName("1337_webserv"),
+	serverName("nginx/13.37"),
 	Date()
 {}
 
