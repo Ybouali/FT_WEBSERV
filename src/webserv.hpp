@@ -2,7 +2,7 @@
 
 # define CLIENT_MAX_BODY_SIZE 3000000
 
-# define MAX_URI_LENGTH 4096
+# define MAX_URI_LENGTH 2048
 
 # define TIMEOUT_CONNECTION 60
 
@@ -58,6 +58,6 @@ std::string     skipWhitespaceBeginAnd(std::string );
 bool            errorPath(std::string );
 bool            checkUriCharacters(u_int8_t );
 bool            checkIsToken(u_int8_t );
+std::string     statusCodeString(short );
 std::string     getPageError(short );
-std::string     getIndexHomePageSmallNginx();
-
+std::string		getDateFormat();

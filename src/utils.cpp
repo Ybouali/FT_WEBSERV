@@ -165,3 +165,29 @@ std::string getPageError(short statusCode)
     page.append("]</h2> </center>\r\n</body>\r\n </html>");
     return page;
 }
+
+std::string	getDateFormat()
+{
+	time_t	currentTime = time(NULL);
+	tm*		utcTime = gmtime(&currentTime);
+
+	std::string monthNames[] = {
+	    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	};
+	std::string monthName = monthNames[utcTime->tm_mon];
+
+	std::string dayNames[] = {
+	    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+	};
+	std::string dayName = dayNames[utcTime->tm_wday];
+
+	std::string date = "Date: " + dayName + ", " +
+	std::to_string(utcTime->tm_mday) + " " + monthName + " " +
+	std::to_string(utcTime->tm_year + 1900) + " " +
+	std::to_string(utcTime->tm_hour) + ":" +
+	std::to_string(utcTime->tm_min) + ":" +
+	std::to_string(utcTime->tm_sec) + " UTC";
+
+	return (date);
+}

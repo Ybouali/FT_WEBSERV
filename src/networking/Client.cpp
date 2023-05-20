@@ -20,7 +20,7 @@ void                        Client::buildResponse()
 {
     this->response.setRequest(this->request);
     this->response.setConfigServer(this->server);
-	this->response.createResponse();
+	this->response.buildResponse();
 }
 
 //! ----------------------------- getters -----------------------------------
