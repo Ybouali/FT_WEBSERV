@@ -4,12 +4,12 @@ Response::Response() :
 	responseContent(), 
 	server(),
 	request(),
-	protocol(),
+	protocol("HTTP/1.1"),
 	statusCode(),
 	statusMessage(),
 	contentType(),
 	contentLength(),
-	serverName(),
+	serverName("1337_webserv"),
 	Date()
 {}
 
@@ -23,12 +23,10 @@ void	Response::clear()
     this->server.clear();
     this->request.clear();
 	this->responseContent.clear();
-	this->protocol.clear();
 	this->statusCode.clear();
 	this->statusMessage.clear();
 	this->contentType.clear();
 	this->contentLength.clear();
-	this->serverName.clear();
 	this->Date.clear();
 }
 
@@ -62,8 +60,6 @@ void	Response::setRequest(const Request& request) { this->request = request; }
 
 void	Response::setResponseContent(const std::string& responseContent) { this->responseContent = responseContent; }
 
-void	Response::setProtocol(const std::string& protocol) { this->protocol = protocol; }
-
 void	Response::setStatusCode(const std::string& statusCode) { this->statusCode = statusCode; }
 
 void	Response::setStatusMessage(const std::string& statusMessage) { this->statusMessage = statusMessage; }
@@ -71,8 +67,6 @@ void	Response::setStatusMessage(const std::string& statusMessage) { this->status
 void	Response::setContentType(const std::string& contentType) { this->contentType = contentType; }
 
 void	Response::setContentLength(const std::string& contentLength) { this->contentLength = contentLength; }
-
-void	Response::setServerName(const std::string& serverName) { this->serverName = serverName; }
 
 void	Response::setDate(const std::string& Date) { this->Date = Date; }
 

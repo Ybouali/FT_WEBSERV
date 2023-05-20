@@ -6,16 +6,16 @@
 class Response
 {
     private:
-		ConfigServer	server;
-        Request			request;
-		std::string		responseContent;
-		std::string		protocol;
-		std::string		statusCode;
-		std::string		statusMessage;
-		std::string		contentType;
-		std::string		contentLength;
-		std::string		serverName;
-		std::string		Date;
+		ConfigServer		server;
+        Request				request;
+		std::string			responseContent;
+		const std::string	protocol;
+		std::string			statusCode;
+		std::string			statusMessage;
+		std::string			contentType;
+		std::string			contentLength;
+		const std::string	serverName;
+		std::string			Date;
 
     public:
         Response();
@@ -39,12 +39,10 @@ class Response
 		void				setConfigServer(const ConfigServer&);
 		void				setRequest(const Request&);
 		void				setResponseContent(const std::string&);
-		void				setProtocol(const std::string&);
 		void				setStatusCode(const std::string&);
 		void				setStatusMessage(const std::string&);
 		void				setContentType(const std::string&);
 		void				setContentLength(const std::string&);
-		void				setServerName(const std::string&);
 		void				setDate(const std::string&);
 
         // ----------------------------- Methodes -----------------------------------
