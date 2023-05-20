@@ -1,9 +1,9 @@
 #include "Response.hpp"
 
 Response::Response() :
-	responseContent(), 
 	server(),
 	request(),
+	responseContent(),
 	protocol("HTTP/1.1"),
 	statusCode(),
 	statusMessage(),
