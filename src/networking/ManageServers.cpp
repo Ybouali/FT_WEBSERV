@@ -275,7 +275,9 @@ void                            ManageServers::startServers()
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
                 // ! Here printing the request for the start working in the response
-                this->clientsMap[i].request.printRequest(i);
+                // ! Just if there is no error on the request parsing .
+                if (!this->clientsMap[i].request.getCodeError())
+                    this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
             {

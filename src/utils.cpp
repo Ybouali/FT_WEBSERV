@@ -27,10 +27,44 @@ bool            errorPath(std::string path)
 
 bool            checkUriCharacters(u_int8_t c)
 {
-    if ((c >= '#' && c <= ';') || (c >= '?' && c <= '[') || (c >= 'a' && c <= 'z') || \
-       c == '!' || c == '=' || c == ']' || c == '_' || c == '~')
-        return (true);
-    return (false);
+    // <   - ASCII value: 60
+    // >   - ASCII value: 62
+    // "   - ASCII value: 34
+    // #   - ASCII value: 35
+    // %   - ASCII value: 37
+    // {   - ASCII value: 123
+    // }   - ASCII value: 125
+    // |   - ASCII value: 124
+    // \   - ASCII value: 92
+    // ^   - ASCII value: 94
+    // ~   - ASCII value: 126
+    // [   - ASCII value: 91
+    // ]   - ASCII value: 93
+    // `   - ASCII value: 96
+    // (   - ASCII value: 40
+    // )   - ASCII value: 41
+    // ;   - ASCII value: 59
+    // /   - ASCII value: 47
+    // ?   - ASCII value: 63
+    return (c >= 60 && c <= 62) ||
+           (c >= 34 && c <= 35) ||
+           c == 37 ||
+           (c >= 123 && c <= 125) ||
+           c == 124 ||
+           c == 92 ||
+           c == 94 ||
+           c == 126 ||
+           (c >= 91 && c <= 93) ||
+           c == 96 ||
+           (c >= 40 && c <= 41) ||
+           c == 59 ||
+           c == 47 ||
+           c == 63 ||
+           c == 58 ||
+           c == 64 ||
+           c == 61 ||
+           c == 38 ||
+           c == 36;
 }
 
 bool           checkIsToken(u_int8_t c)
