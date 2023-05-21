@@ -49,12 +49,6 @@ class Response
         // ----------------------------- Methodes -----------------------------------
 
 		void	buildResponse();
-		void	createResponseContent();
-		void	createErrorResponse();
-		void	isMethodSupported();
-		void	isPathTooLong();
-		void	isPathForbidden();
-		void	isBodyTooLarge();
 };
 
 #endif
