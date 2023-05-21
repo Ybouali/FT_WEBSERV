@@ -300,8 +300,6 @@ void                            ManageServers::sendResponse(const int & i, Clien
     else
         response = client.response.getResponseContent();
 
-    std::cout << response << std::endl;
-
     if (response.size() >= MSG_BUF)
         sentBytes = send(i, response.c_str(), MSG_BUF, 0);
     else

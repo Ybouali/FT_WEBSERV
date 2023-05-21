@@ -73,6 +73,8 @@ class Request {
         bool                                    chunkedFlag;
         bool                                    multiformFlag;
 
+        bool                                    needBody;
+
         void                                   handleHeaders();
 
     public :

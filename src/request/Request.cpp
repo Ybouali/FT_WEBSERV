@@ -24,7 +24,8 @@ Request::Request()
       bodyDoneFlag(false),
       completeFlag(false),
       chunkedFlag(false),
-      multiformFlag(false)
+      multiformFlag(false),
+      needBody(false)
 {
     this->methodsString[::GET] = "GET";
     this->methodsString[::POST] = "POST";
@@ -62,6 +63,7 @@ void            Request::clear()
     this->completeFlag = false;
     this->chunkedFlag = false;
     this->multiformFlag = false;
+    this->needBody = false;
 }
 
 // ? ----------------------------- getters -----------------------------------
@@ -183,6 +185,8 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->Method = DELETE;
                 else 
                 {
+                    if (c == 'H')
+                        this->needBody = true;
                     this->errorCode = 501;
                     return;
                 }
@@ -242,7 +246,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->Storage.clear();
                     continue ;
                 }
-                else if (!checkUriCharacters(c))
+                else if (checkUriCharacters(c))
                 {
                     this->errorCode = 400;
                     return ;
@@ -263,7 +267,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->Storage.clear();
                     continue ;
                 }
-                else if (!checkUriCharacters(c))
+                else if (checkUriCharacters(c))
                 {
                     this->errorCode = 400;
                     return ;
@@ -634,19 +638,27 @@ void                                   Request::printRequest(const int & i)
 std::string                     Request::sendErrorRequest()
 {
     std::string response;
+
     std::string messageError = getPageError(this->getCodeError());
 	response.append("HTTP/1.1 ");
 	response.append(std::to_string(this->getCodeError()));
 	response.append(" ");
 	response.append(statusCodeString(this->getCodeError()));
 	response.append("\r\n");
-	response.append("Content-Type: text/html\r\n");
-	response.append("Content-Length: ");
-	response.append(std::to_string(messageError.length()));
-	response.append("\r\n");
+	
+    if (!this->needBody)
+    {
+        response.append("Content-Type: text/html\r\n");
+        response.append("Content-Length: ");
+        response.append(std::to_string(messageError.length()));
+        response.append("\r\n");
+    }
+
     response.append("Server: Small nginx\r\n");
 	response.append(getDateFormat());
-	response.append(messageError);
+	
+    if (!this->needBody)
+        response.append(messageError);
 
     return response;
 }
