@@ -92,6 +92,8 @@ bool                                                Request::getMultiformFlag() 
 
 state                                               Request::getState() { return this->State; }
 
+bool                                                Request::getNeedBody() { return this->needBody; }
+
 // ? ----------------------------- setters -----------------------------------
 
 void                                            Request::setHeader(std::string & key, std::string & value)
@@ -130,10 +132,7 @@ void                                   Request::handleHeaders()
         ss << this->requestHeaders["Content-Length"];
         ss >> this->bodySize;
         if (this->bodySize == 0)
-        {
-            std::cout << "No Content-Length" << std::endl;
-            // this->setCodeError()
-        }
+            this->setCodeError(204);
     }
     if (this->requestHeaders.count("Transfer-Encoding"))
     {
@@ -170,6 +169,8 @@ void                                   Request::readBufferFromReq(char * buffer,
     u_int8_t                        c;
     static std::stringstream        str;
     
+    // std::cout << buffer << std::endl;
+
     for (size_t i = 0; i < readBytes; i++)
     {
         c = buffer[i];
@@ -267,7 +268,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->Storage.clear();
                     continue ;
                 }
-                else if (checkUriCharacters(c))
+                else if (errorCharQuery(c))
                 {
                     this->errorCode = 400;
                     return ;
@@ -633,32 +634,4 @@ void                                   Request::printRequest(const int & i)
         std::cout << "( Done reading body ?                 :: " << (this->fieldsDoneFlag ? "TRUE" : "FALSE") << ")\n";
     }
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  ::::::::::::::::::" << "\n\n";
-}
-
-std::string                     Request::sendErrorRequest()
-{
-    std::string response;
-
-    std::string messageError = getPageError(this->getCodeError());
-	response.append("HTTP/1.1 ");
-	response.append(std::to_string(this->getCodeError()));
-	response.append(" ");
-	response.append(statusCodeString(this->getCodeError()));
-	response.append("\r\n");
-	
-    if (!this->needBody)
-    {
-        response.append("Content-Type: text/html\r\n");
-        response.append("Content-Length: ");
-        response.append(std::to_string(messageError.length()));
-        response.append("\r\n");
-    }
-
-    response.append("Server: Small nginx\r\n");
-	response.append(getDateFormat());
-	
-    if (!this->needBody)
-        response.append(messageError);
-
-    return response;
 }

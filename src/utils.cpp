@@ -27,44 +27,16 @@ bool            errorPath(std::string path)
 
 bool            checkUriCharacters(u_int8_t c)
 {
-    // <   - ASCII value: 60
-    // >   - ASCII value: 62
-    // "   - ASCII value: 34
-    // #   - ASCII value: 35
-    // %   - ASCII value: 37
-    // {   - ASCII value: 123
-    // }   - ASCII value: 125
-    // |   - ASCII value: 124
-    // \   - ASCII value: 92
-    // ^   - ASCII value: 94
-    // ~   - ASCII value: 126
-    // [   - ASCII value: 91
-    // ]   - ASCII value: 93
-    // `   - ASCII value: 96
-    // (   - ASCII value: 40
-    // )   - ASCII value: 41
-    // ;   - ASCII value: 59
-    // /   - ASCII value: 47
-    // ?   - ASCII value: 63
-    return (c >= 60 && c <= 62) ||
-           (c >= 34 && c <= 35) ||
-           c == 37 ||
-           (c >= 123 && c <= 125) ||
-           c == 124 ||
-           c == 92 ||
-           c == 94 ||
-           c == 126 ||
-           (c >= 91 && c <= 93) ||
-           c == 96 ||
-           (c >= 40 && c <= 41) ||
-           c == 59 ||
-           c == 47 ||
-           c == 63 ||
-           c == 58 ||
-           c == 64 ||
-           c == 61 ||
-           c == 38 ||
-           c == 36;
+    const std::string forbiddenChars = "<>\"%{}|\\^~[]`();/?:@=&$,#";
+  
+    return forbiddenChars.find(c) != std::string::npos;
+}
+
+bool            errorCharQuery(char c)
+{
+    const std::string forbiddenChars = " \"<>{}|\\^~[]`();/?:@$,#";
+  
+    return forbiddenChars.find(c) != std::string::npos;
 }
 
 bool           checkIsToken(u_int8_t c)
@@ -225,4 +197,32 @@ std::string	getDateFormat()
     date.append("\r\n\r\n");
 
 	return (date);
+}
+
+std::string getPageErrorWithHeaders(short codeStatus, bool needBody)
+{
+    std::string response;
+
+    std::string messageError = getPageError(codeStatus);
+	response.append("HTTP/1.1 ");
+	response.append(std::to_string(codeStatus));
+	response.append(" ");
+	response.append(statusCodeString(codeStatus));
+	response.append("\r\n");
+	
+    if (!needBody)
+    {
+        response.append("Content-Type: text/html\r\n");
+        response.append("Content-Length: ");
+        response.append(std::to_string(messageError.length()));
+        response.append("\r\n");
+    }
+
+    response.append("Server: Small nginx\r\n");
+	response.append(getDateFormat());
+	
+    if (!needBody)
+        response.append(messageError);
+
+    return response;
 }

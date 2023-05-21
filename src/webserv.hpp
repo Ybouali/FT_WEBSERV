@@ -61,3 +61,5 @@ bool            checkIsToken(u_int8_t );
 std::string     statusCodeString(short );
 std::string     getPageError(short );
 std::string		getDateFormat();
+std::string     getPageErrorWithHeaders(short , bool);
+bool            errorCharQuery(char );

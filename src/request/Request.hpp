@@ -111,6 +111,8 @@ class Request {
 
         state                                               getState();
 
+        bool                                                getNeedBody();
+
         // ? ----------------------------- setters -----------------------------------
 
         void        setHeader(std::string &, std::string &);
@@ -131,8 +133,6 @@ class Request {
         bool        keepAlive();
         
         void        readBufferFromReq(char *, std::size_t);
-
-        std::string sendErrorRequest();
 
         void        printRequest(const int &);
 };

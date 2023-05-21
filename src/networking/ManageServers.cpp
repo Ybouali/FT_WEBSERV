@@ -276,7 +276,7 @@ void                            ManageServers::startServers()
                 this->readRequest(i, this->clientsMap[i]);
                 // ! Here printing the request for the start working in the response
                 // ! Just if there is no error on the request parsing .
-                if (!this->clientsMap[i].request.getCodeError())
+                // if (!this->clientsMap[i].request.getCodeError())
                     this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
@@ -297,8 +297,12 @@ void                            ManageServers::sendResponse(const int & i, Clien
     int sentBytes;
     std::string response = "";
 
+    // ! FOR TESTING ONLY
+    if (!client.request.getCodeError())
+        client.request.setCodeError(200);
+
     if (client.request.getCodeError())
-        response = client.request.sendErrorRequest();
+        response = getPageErrorWithHeaders(client.request.getCodeError(), client.request.getNeedBody());
     else
         response = client.response.getResponseContent();
 
