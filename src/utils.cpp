@@ -188,6 +188,7 @@ std::string	getDateFormat()
 	std::to_string(utcTime->tm_hour) + ":" +
 	std::to_string(utcTime->tm_min) + ":" +
 	std::to_string(utcTime->tm_sec) + " UTC";
+    date.append("\r\n\r\n");
 
 	return (date);
 }

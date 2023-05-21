@@ -184,7 +184,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else 
                 {
                     this->errorCode = 501;
-                    std::cerr << "error code status (" << this->errorCode << ") unseported method"  << std::endl;
                     return;
                 }
                 this->State = Request_Line_Method;
@@ -197,7 +196,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 501;
-                    std::cerr << "error code status (" << this->errorCode << ") unseported method"  << std::endl;
                     return ;
                 }
                 if ((size_t) this->methodIndex == this->methodsString[this->Method].length())
@@ -209,7 +207,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != ' ')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_URI_Path_Slash;
@@ -225,7 +222,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 break;
@@ -249,13 +245,11 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else if (!checkUriCharacters(c))
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 else if ( i > MAX_URI_LENGTH)
                 {
                     this->errorCode = 414;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 break ;
@@ -272,13 +266,11 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else if (!checkUriCharacters(c))
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 else if ( i > MAX_URI_LENGTH)
                 {
                     this->errorCode = 414;
-                    std::cout << "URI Too Long" << std::endl;
                     return ;
                 }
                 break ;
@@ -288,13 +280,11 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (errorPath(this->Path))
                 {
                     this->errorCode = 400;
-                    std::cerr << "Request URI ERROR" << std::endl;
                     return ;
                 }
                 if (c != 'H')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_HT;
@@ -305,7 +295,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != 'T')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_HTT;
@@ -316,7 +305,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != 'T')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_HTTP;
@@ -328,7 +316,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != 'P')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_HTTP_Slash;
@@ -339,7 +326,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != '/')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_Major;
@@ -350,7 +336,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (!isdigit(c))
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->verMajor = c;
@@ -363,7 +348,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != '.')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_Minor;
@@ -374,7 +358,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (!isdigit(c))
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 this->verMinor = c;
@@ -386,7 +369,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != '\r')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Request_Line_LF;
@@ -397,7 +379,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != '\n')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Field_Name_Start;
@@ -413,7 +394,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 break ;
@@ -439,7 +419,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 break ;
@@ -456,7 +435,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else if (!checkIsToken(c))
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 break ;
@@ -483,18 +461,15 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 break ;
             }
             case Chunked_Length_Begin:
             {
-                std::cout << "Bad Chunk" << std::endl;
                 if (isxdigit(c) == 0)
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 str.str("");
@@ -532,7 +507,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 continue ;
@@ -549,7 +523,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 continue ;
@@ -575,7 +548,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 continue ;
@@ -587,7 +559,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 else
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 continue ;
@@ -597,19 +568,16 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c != '\r')
                 {
                     this->errorCode = 400;
-                    std::cerr << "Bad Character" << std::endl;
                     return ;
                 }
                 this->State = Chunked_End_LF;
                 continue ;
-
             }
             case Chunked_End_LF:
             {
                 if (c != '\n')
                 {
                     this->errorCode = 400;
-                    std::cout << "Bad Character" << std::endl;
                     return ;
                 }
                 this->bodyDoneFlag = true;
@@ -661,4 +629,24 @@ void                                   Request::printRequest(const int & i)
         std::cout << "( Done reading body ?                 :: " << (this->fieldsDoneFlag ? "TRUE" : "FALSE") << ")\n";
     }
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  ::::::::::::::::::" << "\n\n";
+}
+
+std::string                     Request::sendErrorRequest()
+{
+    std::string response;
+    std::string messageError = getPageError(this->getCodeError());
+	response.append("HTTP/1.1 ");
+	response.append(std::to_string(this->getCodeError()));
+	response.append(" ");
+	response.append(statusCodeString(this->getCodeError()));
+	response.append("\r\n");
+	response.append("Content-Type: text/html\r\n");
+	response.append("Content-Length: ");
+	response.append(std::to_string(messageError.length()));
+	response.append("\r\n");
+    response.append("Server: Small nginx\r\n");
+	response.append(getDateFormat());
+	response.append(messageError);
+
+    return response;
 }

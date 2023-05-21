@@ -130,5 +130,7 @@ class Request {
         
         void        readBufferFromReq(char *, std::size_t);
 
+        std::string sendErrorRequest();
+
         void        printRequest(const int &);
 };

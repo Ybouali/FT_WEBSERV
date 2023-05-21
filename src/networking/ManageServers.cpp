@@ -293,22 +293,14 @@ void                            ManageServers::startServers()
 void                            ManageServers::sendResponse(const int & i, Client & client)
 {
     int sentBytes;
-    std::string response = client.response.getResponseContent();
+    std::string response = "";
 
-	// response = "HTTP/1.1 501 Not Implemented\r\n";
-	// response.append("Content-Type: text/html\r\n");
-	// response.append("Content-Length: 113\r\n");
-	// response.append("Server: small_nginx\r\n");
-	// response.append("Date: Sun, 07 May 2023 20:30:06 UTC\r\n\r\n");
+    if (client.request.getCodeError())
+        response = client.request.sendErrorRequest();
+    else
+        response = client.response.getResponseContent();
 
-    // // // ! FOR_TESTING:
-    // if (client.request.getCodeError() == 0)
-    //     client.request.setCodeError(200);
-
-    // std::string errorMessage = getPageError(client.request.getCodeError());
-    
-    // if (!errorMessage.empty())
-    //     response.append(errorMessage);
+    std::cout << response << std::endl;
 
     if (response.size() >= MSG_BUF)
         sentBytes = send(i, response.c_str(), MSG_BUF, 0);

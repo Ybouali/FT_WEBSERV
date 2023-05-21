@@ -18,9 +18,12 @@ Client::Client(const ConfigServer& server)
 
 void                        Client::buildResponse()
 {
-    this->response.setRequest(this->request);
-    this->response.setConfigServer(this->server);
-	this->response.buildResponse();
+    if (!this->request.getCodeError())
+    {
+        this->response.setRequest(this->request);
+        this->response.setConfigServer(this->server);
+        this->response.buildResponse();
+    }
 }
 
 //! ----------------------------- getters -----------------------------------
