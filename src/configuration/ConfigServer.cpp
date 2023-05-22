@@ -1,20 +1,20 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer()
-    : Port(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE)
+    : Port(), Host(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
 {
     this->setPort("8080");
     this->setHost("127.0.0.1");
 }
 
-ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList)
-    : Port(0), Host(), serverName(), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList, std::map<short, std::string> errorPages)
+    : Port(), Host(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
 {
     this->setPort(port);
     this->setHost(host);
     this->setServerName(ServerName);
     this->locationList = _locationList;
-    this->initErrorPages();
+    this->errorPages = errorPages;
     this->setFd(0);
 }
 
@@ -47,25 +47,6 @@ void        ConfigServer::clear()
     this->clientMaxBodySize = 0;
     this->errorPages.clear();
     this->locationList.clear();
-}
-
-void                                ConfigServer::initErrorPages()
-{
-    this->errorPages[301] = "";
-	this->errorPages[302] = "";
-	this->errorPages[400] = "";
-	this->errorPages[401] = "";
-	this->errorPages[402] = "";
-	this->errorPages[403] = "";
-	this->errorPages[404] = "";
-	this->errorPages[405] = "";
-	this->errorPages[406] = "";
-	this->errorPages[500] = "";
-	this->errorPages[501] = "";
-	this->errorPages[502] = "";
-	this->errorPages[503] = "";
-	this->errorPages[505] = "";
-	this->errorPages[505] = "";
 }
 
 //! ----------------------------- getters -----------------------------------

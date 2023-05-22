@@ -344,7 +344,7 @@ std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerP
     ConfigServer              server;
     for (size_t i = 0; i < servers.size(); i++)
     {
-        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->get_locations());
+        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->get_locations(), servers[i]->getErrorPages());
         server.setClientMaxBodySize(servers[i]->getClientMaxBodySize());
 
         vecServers.push_back(server);

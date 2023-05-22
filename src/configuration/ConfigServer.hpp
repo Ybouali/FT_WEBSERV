@@ -18,7 +18,7 @@ class ConfigServer {
     public : 
         ConfigServer();
         
-        ConfigServer(std::string , std::string , std::string , std::vector<Location * > );
+        ConfigServer(std::string , std::string , std::string , std::vector<Location * > , std::map<short, std::string>);
 
         ConfigServer(const ConfigServer &);
 
@@ -27,9 +27,6 @@ class ConfigServer {
         ~ConfigServer();
 
         void        clear();
-
-        // ! INITIALIZATION OF ERROR PAGES
-        void                                initErrorPages();
 
         //! ----------------------------- getters -----------------------------------
 
