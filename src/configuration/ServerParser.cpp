@@ -32,14 +32,14 @@ void ServerParser::setServerName(const std::string& value) {
     server_name = value;
 }
 
-const std::string& ServerParser::getErrorPages() const {
+const std::map<short, std::string>& ServerParser::getErrorPages() const {
     return error_pages;
 }
 
 std::string ServerParser::getPort() const { return port; }
 
-void ServerParser::setErrorPages(const std::string& value) {
-    error_pages = value;
+void ServerParser::setErrorPages(short codeStatus, const std::string& value) {
+    error_pages[codeStatus] = value;
 }
 
 std::string ServerParser::getClientMaxBodySize() const {
@@ -78,6 +78,7 @@ ServerParser& ServerParser::operator=(const ServerParser& other) {
         error_pages = other.error_pages;
         client_max_body_size = other.client_max_body_size;
         _location = other._location;
+        this->error_pages = other.error_pages;
     }
     return *this;
 }
@@ -151,7 +152,33 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
                 }
                 else if (key == "error_page" && !value.empty())
                 {
-                    s->setErrorPages(value);
+                    short codeS = 1;
+                    std::string errorPath;
+                    std::string var;
+
+                    std::istringstream iss(line);
+                    while (std::getline(iss, var, ' '))
+                    {
+                        if (!var.empty() && var != "error_page")
+                        {
+                            if (var.size() == 3)
+                            {
+                                for (size_t i = 0; i < var.size(); i++)
+                                {
+                                    if (!std::isdigit(var[i]))
+                                        codeS = 0;
+                                }
+                                if (codeS)
+                                    codeS = std::stoi(var);
+                                else
+                                    std::cerr << "[WARNING] :: The code status of the page should be a number [" << var << "]" << std::endl;
+                            }
+                            else
+                                errorPath = var;
+                            if (!errorPath.empty() && codeS)
+                                this->setErrorPages(codeS, errorPath);
+                        }
+                    }
                     key.clear();
                     value.clear();
                 }
@@ -267,8 +294,8 @@ void    ServerParser::printTheServerInfo()
     std::cout << "HOST (" << this->getHost() << ") \n";
     std::cout << "PORT (" << this->getPort() << ") \n";
     std::cout << "SERVER NAME (" << this->getServerName() << ")\n";
-    if (!this->getErrorPages().empty())
-        std::cout << "PATH TO THE ERROR PAGES  ("<< this->getErrorPages() << ") \n";
+    // if (!this->getErrorPages().empty())
+    //     std::cout << "PATH TO THE ERROR PAGES  ("<< this->getErrorPages() << ") \n";
     if (!this->getClientMaxBodySize().empty())
         std::cout << "THE CLIENT MAX BODY SIZE (" << this->getClientMaxBodySize() << ") \n";
     std::cout << "\n\n";

@@ -9,13 +9,13 @@ class ServerParser
 {
     private:
         /* data */
-        bool                        error;
-        std::string                 port;
-        std::string                 host;
-        std::string                 server_name;
-        std::string                 error_pages;
-        std::string                 client_max_body_size;
-        std::vector<Location *>     _location;
+        bool                            error;
+        std::string                     port;
+        std::string                     host;
+        std::string                     server_name;
+        std::map<short, std::string>    error_pages;
+        std::string                     client_max_body_size;
+        std::vector<Location *>         _location;
     public:
         //constructors
         ServerParser();
@@ -27,7 +27,7 @@ class ServerParser
         std::string getPort() const;
         const std::string& getHost() const;
         const std::string& getServerName() const;
-        const std::string& getErrorPages() const;
+        const std::map<short, std::string>& getErrorPages() const;
         std::string getClientMaxBodySize() const;
         std::vector<Location*> get_locations() const;
         
@@ -35,7 +35,7 @@ class ServerParser
         void setPort(const std::string& );
         void setHost(const std::string& );
         void setServerName(const std::string& );
-        void setErrorPages(const std::string& );
+        void setErrorPages(short, const std::string& );
         void setClientMaxBodySize(const std::string& );
         void set_locations(Location* new_locations);
 
