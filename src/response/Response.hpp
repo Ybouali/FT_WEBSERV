@@ -6,15 +6,16 @@
 class Response
 {
     private:
-		ConfigServer		server;
-        Request				request;
-		std::string			responseContent;
-		short				statusCode;
-		std::string			statusMessage;
-		std::string			date;
-		std::string			contentType;
-		std::string			contentLength;
-		std::string			body;
+		ConfigServer						server;
+        Request								request;
+		std::string							responseContent;
+		short								statusCode;
+		std::string							statusMessage;
+		std::string							date;
+		std::string							contentType;
+		std::string							contentLength;
+		std::string							body;
+		std::vector<Location *>::iterator	itLocation;
 
     public:
         Response();
@@ -24,15 +25,16 @@ class Response
 
 		// ----------------------------- Getters -----------------------------------
 
-		const ConfigServer&	getConfigServer() const;
-		const Request&		getRequest() const;
-		const std::string&	getResponseContent() const;
-		short				getStatusCode() const;
-		const std::string&	getStatusMessage() const;
-		const std::string&	getDate() const;
-		const std::string&	getContentType() const;
-		const std::string&	getContentLength() const;
-		const std::string&	getBody() const;
+		const ConfigServer&							getConfigServer() const;
+		const Request&								getRequest() const;
+		const std::string&							getResponseContent() const;
+		short										getStatusCode() const;
+		const std::string&							getStatusMessage() const;
+		const std::string&							getDate() const;
+		const std::string&							getContentType() const;
+		const std::string&							getContentLength() const;
+		const std::string&							getBody() const;
+		const std::vector<Location *>::iterator&	getItLocation() const;
 
         // ----------------------------- Setters -----------------------------------
 
@@ -45,10 +47,12 @@ class Response
 		void	setContentType(const std::string&);
 		void	setContentLength(const std::string&);
 		void	setBody(const std::string&);
+		void	setItLocation(const std::vector<Location *>::iterator&);
 
         // ----------------------------- Methodes -----------------------------------
 
 		void	buildResponse();
+		void	isLocationMatched();
 };
 
 #endif
