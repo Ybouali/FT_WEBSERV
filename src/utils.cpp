@@ -227,6 +227,9 @@ std::string getPageErrorWithHeaders(short codeStatus, bool needBody, std::string
 	response.append(" ");
 	response.append(statusCodeString(codeStatus));
 	response.append("\r\n");
+
+    if (codeStatus == 101)
+        response.append("Upgrade: HTTP/1.1\r\nConnection: Upgrade\r\n");
 	
     if (!needBody)
     {
@@ -243,4 +246,17 @@ std::string getPageErrorWithHeaders(short codeStatus, bool needBody, std::string
         response.append(messageError);
 
     return response;
+}
+
+bool checkStringIsEmpty(std::string str)
+{
+    if (str.empty())
+        return true;
+
+    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+        if (!std::isspace(static_cast<unsigned char>(*it)))
+            return false;
+    }
+
+    return true;
 }

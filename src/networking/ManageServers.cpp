@@ -120,8 +120,6 @@ void                            ManageServers::readRequest(const int & i, Client
         // ! We should assign the Server to the client
         this->assignServerToClient(client);
 
-        // TODO: ! and also handle the the cgi if exists    
-
         client.buildResponse();
 
         // ! Remove fd from recv fd
@@ -274,9 +272,12 @@ void                            ManageServers::startServers()
             {
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
+                std::cout << "HOST config (" << this->clientsMap[i].server.getServerName() << ")" << std::endl;
+                if (this->clientsMap[i].server.getServerName() != skipWhitespaceBeginAnd(this->clientsMap[i].request.getHeader("Host")))
+                    this->clientsMap[i].request.setCodeError(400);
                 // ! Here printing the request for the start working in the response
                 // ! Just if there is no error on the request parsing .
-                // if (!this->clientsMap[i].request.getCodeError())
+                if (!this->clientsMap[i].request.getCodeError())
                     this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
@@ -300,6 +301,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
     // ! FOR TESTING ONLY
     if (!client.request.getCodeError())
         client.request.setCodeError(200);
+
 
     if (client.request.getCodeError())
         response = getPageErrorWithHeaders(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);

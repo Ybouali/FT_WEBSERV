@@ -99,7 +99,6 @@ bool                                                Request::getNeedBody() { ret
 void                                            Request::setHeader(std::string & key, std::string & value)
 {
     key = skipWhitespaceBeginAnd(key);
-    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
     this->requestHeaders[key] = value;
 }
 
@@ -169,11 +168,13 @@ void                                   Request::readBufferFromReq(char * buffer,
     u_int8_t                        c;
     static std::stringstream        str;
     
-    // std::cout << buffer << std::endl;
+    std::cout << buffer << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {
         c = buffer[i];
+        if (this->getCodeError())
+            return;
         switch (this->State)
         {
             case Request_Line:
@@ -344,7 +345,10 @@ void                                   Request::readBufferFromReq(char * buffer,
                     return ;
                 }
                 this->verMajor = c;
-
+                if (this->verMajor > '1')
+                    this->errorCode = 505;
+                else if (this->verMajor < '1')
+                    this->errorCode = 101;
                 this->State = Request_Line_Dot;
                 break ;
             }
@@ -366,6 +370,12 @@ void                                   Request::readBufferFromReq(char * buffer,
                     return ;
                 }
                 this->verMinor = c;
+
+                if (this->verMinor > '1')
+                    this->errorCode = 505;
+                else if (this->verMinor < '1')
+                    this->errorCode = 101;
+                
                 this->State = Request_Line_CR;
                 break ;
             }
@@ -448,6 +458,8 @@ void                                   Request::readBufferFromReq(char * buffer,
             {
                 if ( c == '\r' )
                 {
+                    if (checkStringIsEmpty(this->keyStorage) || checkStringIsEmpty(this->Storage))
+                        this->errorCode = 400;
                     this->setHeader(this->keyStorage, this->Storage);
                     this->keyStorage.clear();
                     this->Storage.clear();
@@ -609,6 +621,9 @@ void                                   Request::readBufferFromReq(char * buffer,
     }
     if (this->State == Parsing_Done)
         this->bodyString.append((char*)this->Body.data(), this->Body.size());
+    std::string tmp = this->requestHeaders.find("Host")->second;
+    if (tmp.empty())
+        this->errorCode = 400;
 }
 
 void                                   Request::printRequest(const int & i)

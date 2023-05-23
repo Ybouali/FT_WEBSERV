@@ -63,3 +63,4 @@ std::string     getPageError(short );
 std::string		getDateFormat();
 std::string     getPageErrorWithHeaders(short , bool, std::string );
 bool            errorCharQuery(char );
+bool            checkStringIsEmpty(std::string );
