@@ -36,13 +36,11 @@ class ConfigServer {
 
         std::string                         getServerName() const;
 
-        std::string                         getRoot() const;
+        std::map<short, std::string>        getErrorPages() const;
 
         unsigned long                       getClientMaxBodySize() const;
 
-        std::string                         getIndex() const;
-
-        std::map<short, std::string>        getErrorPages() const;
+		std::vector<Location * >			getLocationList() const;
 
         int                                 getFd() const;
 
@@ -54,13 +52,11 @@ class ConfigServer {
 
         void                                setServerName(std::string);
 
-        void                                setRoot(std::string);
+        void                                setErrorPages(std::map<short, std::string>);
 
         void                                setClientMaxBodySize(std::string);
 
-        void                                setIndex(std::string);
-
-        void                                setErrorPages(std::map<short, std::string>);
+		void                                setLocationList(std::vector<Location * >);
 
         void                                setFd(int);
 

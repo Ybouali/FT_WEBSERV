@@ -57,9 +57,11 @@ in_addr_t                           ConfigServer::getHost() const { return this-
 
 std::string                         ConfigServer::getServerName() const { return this->serverName; }
 
+std::map<short, std::string>        ConfigServer::getErrorPages() const { return this->errorPages; }
+
 unsigned long                       ConfigServer::getClientMaxBodySize() const { return this->clientMaxBodySize; }
 
-std::map<short, std::string>        ConfigServer::getErrorPages() const { return this->errorPages; }
+std::vector<Location * >            ConfigServer::getLocationList() const { return this->locationList; }
 
 int                                 ConfigServer::getFd() const { return this->Fd; }
 
@@ -71,9 +73,11 @@ void                ConfigServer::setHost(std::string host) { this->Host = inet_
 
 void                ConfigServer::setServerName(std::string ServerName) { this->serverName = ServerName; }
 
+void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
+
 void                ConfigServer::setClientMaxBodySize(std::string size) { this->clientMaxBodySize = std::stoul(size); }
 
-void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
+void                ConfigServer::setLocationList(std::vector<Location * > _locationList) { this->locationList = _locationList; }
 
 void                ConfigServer::setFd(int fd) { this->Fd = fd; }
 

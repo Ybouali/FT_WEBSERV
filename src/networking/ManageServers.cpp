@@ -296,12 +296,11 @@ void                            ManageServers::startServers()
 void                            ManageServers::sendResponse(const int & i, Client & client)
 {
     int sentBytes;
-    std::string response = "";
+    std::string response;
 
     // ! FOR TESTING ONLY
     if (!client.request.getCodeError())
         client.request.setCodeError(200);
-
 
     if (client.request.getCodeError())
         response = getPageErrorWithHeaders(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);
