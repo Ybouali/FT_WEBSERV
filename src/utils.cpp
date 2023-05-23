@@ -199,11 +199,29 @@ std::string	getDateFormat()
 	return (date);
 }
 
-std::string getPageErrorWithHeaders(short codeStatus, bool needBody)
+static std::string getContentFileFromPathFile(std::string path)
+{
+    std::ifstream   file(path);
+    std::string     content;
+
+    if (file.is_open())
+    {
+        std::string line;
+
+        while (std::getline(file, line))
+            content += line;
+    }
+    return content;
+}
+
+std::string getPageErrorWithHeaders(short codeStatus, bool needBody, std::string pathErrorFile)
 {
     std::string response;
+    std::string messageError = getContentFileFromPathFile(pathErrorFile);
 
-    std::string messageError = getPageError(codeStatus);
+    if (messageError.empty())
+        messageError = getPageError(codeStatus);
+
 	response.append("HTTP/1.1 ");
 	response.append(std::to_string(codeStatus));
 	response.append(" ");

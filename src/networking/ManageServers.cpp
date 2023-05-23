@@ -302,7 +302,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
         client.request.setCodeError(200);
 
     if (client.request.getCodeError())
-        response = getPageErrorWithHeaders(client.request.getCodeError(), client.request.getNeedBody());
+        response = getPageErrorWithHeaders(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);
     else
         response = client.response.getResponseContent();
 

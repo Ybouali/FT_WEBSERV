@@ -176,7 +176,7 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
                             else
                                 errorPath = var;
                             if (!errorPath.empty() && codeS)
-                                this->setErrorPages(codeS, errorPath);
+                                s->setErrorPages(codeS, errorPath);
                         }
                     }
                     key.clear();
