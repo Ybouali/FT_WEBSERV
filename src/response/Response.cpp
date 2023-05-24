@@ -20,29 +20,33 @@ void	Response::clear()
 	this->contentType.clear();
 	this->contentLength.clear();
 	this->body.clear();
+	this->location.clear();
+	this->method.clear();
 }
 
 // ----------------------------- Getters -----------------------------------
 
-const ConfigServer&							Response::getConfigServer() const { return this->server; }
+const ConfigServer&	Response::getConfigServer() const { return this->server; }
 
-const Request&								Response::getRequest() const { return this->request; }
+const Request&		Response::getRequest() const { return this->request; }
 
-const std::string&							Response::getResponseContent() const { return this->responseContent; }
+const std::string&	Response::getResponseContent() const { return this->responseContent; }
 
-short										Response::getStatusCode() const { return this->statusCode; }
+short				Response::getStatusCode() const { return this->statusCode; }
 
-const std::string&							Response::getStatusMessage() const { return this->statusMessage; }
+const std::string&	Response::getStatusMessage() const { return this->statusMessage; }
 
-const std::string&							Response::getContentType() const { return this->contentType; }
+const std::string&	Response::getContentType() const { return this->contentType; }
 
-const std::string&							Response::getDate() const { return this->date; }
+const std::string&	Response::getDate() const { return this->date; }
 
-const std::string&							Response::getContentLength() const { return this->contentLength; }
+const std::string&	Response::getContentLength() const { return this->contentLength; }
 
-const std::string&							Response::getBody() const { return this->body; }
+const std::string&	Response::getBody() const { return this->body; }
 
-const std::vector<Location *>::iterator&	Response::getItLocation() const { return this->itLocation; }
+const Location&		Response::getLocation() const { return this->location; }
+
+const std::string&	Response::getMethod() const { return this->method; }
 
 // ----------------------------- Setters -----------------------------------
 
@@ -64,7 +68,9 @@ void	Response::setContentLength(const std::string& contentLength) { this->conten
 
 void	Response::setBody(const std::string& body) { this->body = body; }
 
-void	Response::setItLocation(const std::vector<Location *>::iterator& itLocation) { this->itLocation = itLocation; }
+void	Response::setLocation(const Location& location) { this->location = location; }
+
+void	Response::setMethod(const std::string& method) { this->method = method; }
 
 // ----------------------------- Methodes -----------------------------------
 
@@ -73,6 +79,8 @@ void	Response::buildResponse()
 	try
 	{
 		this->isLocationMatched();
+		this->isRedirectionExist();
+		this->isMethodAllowed();
 	}
 	catch(const std::exception& e)
 	{
@@ -98,18 +106,55 @@ void	Response::isLocationMatched()
 	// We check if the request location match with a location in the server
 	for (std::vector<Location *>::iterator it = locations.begin(); it != locations.end(); it++)
 	{
-		// If the location is matched, we set the iterator to the location
+		// If the request location is matched, we set it to the response location
 		if ((*it)->getLocation() == requestLocation)
 		{
 			isMatched = true;
-			this->itLocation = it;
+			this->location = *(*it);
 		}
 	}
 
-	// If the location is not matched, we set the status code to 404
+	// If the request location is not matched, we set the status code to 404
 	if (!isMatched)
 	{
 		this->statusCode = 404;
+		throw std::exception();
+	}
+}
+
+void	Response::isRedirectionExist()
+{
+	// still not sure if this is the right way to do it ???
+
+	// If the redirection exist, we set the status code to 301
+	if (!location.getRedirection().empty())
+	{
+		this->statusCode = 301;
+		throw std::exception();
+	}
+}
+
+void	Response::isMethodAllowed()
+{
+	std::vector<std::string>	allowedMethods = location.getMethod();
+	std::string					requestMethod = this->request.getMethodsString();
+	bool						isAllowed = false;
+
+	// We check if the request method is allowed
+	for (std::vector<std::string>::iterator it = allowedMethods.begin(); it != allowedMethods.end(); it++)
+	{
+		// If the request method is allowed, we set it to the response method
+		if (*it == requestMethod)
+		{
+			isAllowed = true;
+			this->method = *it;
+		}
+	}
+
+	// If the request method is not allowed, we set the status code to 405
+	if (!isAllowed)
+	{
+		this->statusCode = 405;
 		throw std::exception();
 	}
 }
