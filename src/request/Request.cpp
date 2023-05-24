@@ -167,8 +167,6 @@ void                                   Request::readBufferFromReq(char * buffer,
 {
     u_int8_t                        c;
     static std::stringstream        str;
-    
-    std::cout << buffer << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {

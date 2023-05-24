@@ -176,12 +176,12 @@ void                            ManageServers::setupServers(std::vector<ConfigSe
     this->Servers = servers;
     if (this->Servers.empty())
     {
-        // ! Here if there is no server the program will start immediately with a default server 
+        // ! Here if there is no server. the program will start immediately with a default server 
         this->Servers.push_back(ConfigServer());
         std::cout << "[INFO]: There is no server in the config file or there is no config file " << std::endl;
         std::cout << "[INFO]: So the Host [127.0.0.1] and the post will be [" << this->Servers.at(0).getPort() << "]" << std::endl;
     }
-    // ! If there is a server or server with the same port and the same host.
+    // ! If there is two servers with the same port and the same host.
     // ! The program will use the first fd socket for the both theme
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
@@ -272,12 +272,10 @@ void                            ManageServers::startServers()
             {
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
-                std::cout << "HOST config (" << this->clientsMap[i].server.getServerName() << ")" << std::endl;
-                if (this->clientsMap[i].server.getServerName() != skipWhitespaceBeginAnd(this->clientsMap[i].request.getHeader("Host")))
-                    this->clientsMap[i].request.setCodeError(400);
+                
                 // ! Here printing the request for the start working in the response
                 // ! Just if there is no error on the request parsing .
-                if (!this->clientsMap[i].request.getCodeError())
+                // if (!this->clientsMap[i].request.getCodeError())
                     this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))

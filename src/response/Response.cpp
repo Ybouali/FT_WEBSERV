@@ -74,6 +74,7 @@ void	Response::buildResponse()
 	}
 	catch(const std::exception& e)
 	{
+		// TODO: here we should use ur getStatus() instead of using the request code status ?
 		responseContent = getPageErrorWithHeaders(this->statusCode, true, this->server.getErrorPages().find(this->request.getCodeError())->second);
 	}
 

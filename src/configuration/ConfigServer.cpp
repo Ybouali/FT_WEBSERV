@@ -5,6 +5,8 @@ ConfigServer::ConfigServer()
 {
     this->setPort("8080");
     this->setHost("127.0.0.1");
+    Location *local = new Location();
+    this->locationList.push_back(local);
 }
 
 ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList, std::map<short, std::string> errorPages)

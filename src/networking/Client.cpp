@@ -21,7 +21,6 @@ void                        Client::buildResponse()
     if (!this->request.getCodeError())
     {
         this->response.setRequest(this->request);
-        this->response.setConfigServer(this->server);
         this->response.buildResponse();
     }
 }

@@ -6,7 +6,7 @@
 
 # define TIMEOUT_CONNECTION 60
 
-# define MSG_BUF 40960
+# define MSG_BUF 1000
 
 # include <iostream>
 # include <fstream>

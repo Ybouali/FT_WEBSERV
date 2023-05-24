@@ -106,8 +106,10 @@ void    Location::setCgi(std::string & value)
 std::string    Location::getCgi() const { return this->cgi; }
 
 Location::Location()
-    : error(false) , location_path(), method(), root(), upload(), autoindex(), index(), redirection()
+    : error(false) , location_path("/"), method(), root("www/"), upload(), autoindex("off"), index("index.html"), redirection()
 {
+    this->method.push_back("GET");
+    this->method.push_back("DELETE");
 
 }
 
