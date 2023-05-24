@@ -1,6 +1,8 @@
 #include "Response.hpp"
 
-Response::Response() {}
+Response::Response() : statusCode(0)
+{
+}
 
 Response::~Response()
 {
@@ -74,8 +76,7 @@ void	Response::buildResponse()
 	}
 	catch(const std::exception& e)
 	{
-		// TODO: here we should use ur getStatus() instead of using the request code status ?
-		responseContent = getPageErrorWithHeaders(this->statusCode, true, this->server.getErrorPages().find(this->request.getCodeError())->second);
+		this->responseContent = getPageErrorWithHeaders(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
 	}
 
 }
