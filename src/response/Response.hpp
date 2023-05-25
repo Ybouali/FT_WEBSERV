@@ -19,6 +19,7 @@ class Response
 		std::string		method;
 
     public:
+		static MimeTypes mime_type;
         Response();
         ~Response();
 

@@ -47,6 +47,8 @@
 
 #include <regex>
 
+# include "response/MimeTypes.hpp"
+
 # include "configuration/Location.hpp"
 # include "configuration/ServerParser.hpp"
 # include "configuration/ConfigServer.hpp"

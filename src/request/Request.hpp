@@ -1,6 +1,7 @@
 # pragma once
 
 #include "../webserv.hpp"
+class MimeTypes;
 
 enum Methods {
     GET,
@@ -78,7 +79,7 @@ class Request {
         void                                   handleHeaders();
 
     public :
-        
+        static MimeTypes mime;
         Request();
 
         ~Request();

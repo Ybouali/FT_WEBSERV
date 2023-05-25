@@ -354,3 +354,9 @@ std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerP
 
     return vecServers;
 }
+
+// void                            ManageServers::uploadFile(std::string path, std::string filename, Request request)
+// {
+//     // START WORKING ON UPLOADING FILE OR FILES
+
+// }

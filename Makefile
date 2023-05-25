@@ -14,6 +14,7 @@ SRCS = src/webserv.cpp \
 	   src/networking/Client.cpp \
 	   src/request/Request.cpp \
 	   src/response/Response.cpp \
+	   src/response/MimeTypes.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 

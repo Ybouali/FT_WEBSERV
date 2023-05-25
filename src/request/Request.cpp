@@ -619,9 +619,10 @@ void                                   Request::readBufferFromReq(char * buffer,
     }
     if (this->State == Parsing_Done)
         this->bodyString.append((char*)this->Body.data(), this->Body.size());
-    std::string tmp = this->requestHeaders.find("Host")->second;
-    if (tmp.empty())
-        this->errorCode = 400;
+    // ! HERE CHECK FOR THE HOST IS EXIST IN THE HEADERS ?
+    // std::string tmp = this->requestHeaders.find("Host")->second;
+    // if (tmp.empty())
+    //     this->errorCode = 400;
 }
 
 void                                   Request::printRequest(const int & i)
