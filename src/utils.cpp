@@ -260,3 +260,24 @@ bool checkStringIsEmpty(std::string str)
 
     return true;
 }
+
+
+std::string generateRandomFileName() {
+    
+    srand(time(NULL));
+
+    const std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    std::string randomName;
+    for (int i = 0; i < 10; ++i) {
+        int randomIndex = rand() % characters.size();
+        randomName += characters[randomIndex];
+    }
+
+    return randomName;
+}
+
+bool checkFileExists(const std::string path_filename) {
+    std::ifstream file(path_filename.c_str());
+    return (file.good());
+}

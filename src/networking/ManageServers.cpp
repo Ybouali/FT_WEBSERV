@@ -276,7 +276,7 @@ void                            ManageServers::startServers()
                 // ! Here printing the request for the start working in the response
                 // ! Just if there is no error on the request parsing .
                 // if (!this->clientsMap[i].request.getCodeError())
-                    this->clientsMap[i].request.printRequest(i);
+                //     this->clientsMap[i].request.printRequest(i);
             }
             else if (FD_ISSET(i, &writeCpy))
             {
@@ -354,9 +354,3 @@ std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerP
 
     return vecServers;
 }
-
-// void                            ManageServers::uploadFile(std::string path, std::string filename, Request request)
-// {
-//     // START WORKING ON UPLOADING FILE OR FILES
-
-// }

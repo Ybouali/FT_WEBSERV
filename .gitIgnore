@@ -2,3 +2,6 @@
 webserv
 .vscode
 .hintrc
+test.cpp
+test.txt
+*.out

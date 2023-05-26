@@ -66,3 +66,5 @@ std::string		getDateFormat();
 std::string     getPageErrorWithHeaders(short , bool, std::string );
 bool            errorCharQuery(char );
 bool            checkStringIsEmpty(std::string );
+std::string     generateRandomFileName();
+bool            checkFileExists(const std::string);

@@ -80,6 +80,7 @@ class Request {
 
     public :
         static MimeTypes mime;
+
         Request();
 
         ~Request();
@@ -136,4 +137,9 @@ class Request {
         void        readBufferFromReq(char *, std::size_t);
 
         void        printRequest(const int &);
+
+        // ! upload file just for testing
+        void                            uploadFile(std::string , std::string);
+
+        std::string                     getNewFileName(std::string );
 };

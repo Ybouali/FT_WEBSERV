@@ -68,7 +68,4 @@ class ManageServers {
         void                            startServers();
 
         void                            sendResponse(const int &, Client &);
-
-        // ! upload file just for testing
-        // void                            uploadFile(std::string , std::string , Request );
 };

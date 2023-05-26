@@ -1,5 +1,7 @@
 # include "Request.hpp"
 
+MimeTypes Request::mime;
+
 Request::Request() 
     : Path(),
       Query(),
@@ -130,12 +132,10 @@ void                                   Request::handleHeaders()
         this->bodyFlag = true;
         ss << this->requestHeaders["Content-Length"];
         ss >> this->bodySize;
-        if (this->bodySize == 0)
-            this->setCodeError(204);
     }
     if (this->requestHeaders.count("Transfer-Encoding"))
     {
-        if (this->requestHeaders["Transfer-Encoding"].find_first_of("Chunked") != std::string::npos)
+        if (this->requestHeaders["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
             this->chunkedFlag = true;
         this->bodyFlag = true;
     }
@@ -648,4 +648,42 @@ void                                   Request::printRequest(const int & i)
         std::cout << "( Done reading body ?                 :: " << (this->fieldsDoneFlag ? "TRUE" : "FALSE") << ")\n";
     }
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  ::::::::::::::::::" << "\n\n";
+}
+
+std::string Request::getNewFileName(std::string path)
+{
+    std::string file_name_never_exist = path;
+    std::string exe_flie = this->mime.getMimeType(skipWhitespaceBeginAnd(this->getHeader("Content-Type")));
+    if (exe_flie.empty())
+    {
+        this->setCodeError(415);
+        return "";
+    }
+    file_name_never_exist.append(generateRandomFileName());
+    file_name_never_exist.append(exe_flie);
+    
+    if (checkFileExists(file_name_never_exist))
+        getNewFileName(path);
+
+    return file_name_never_exist;
+}
+
+void                            Request::uploadFile(std::string path_to_upload_file, std::string file_name)
+{
+    if (path_to_upload_file.empty())
+        this->setCodeError(404);
+    
+    std::string path_joined = this->getNewFileName(path_to_upload_file);
+    if (file_name.empty())
+    {
+        // this->setCodeError(204);
+        return;
+    }
+
+    if (path_to_upload_file.empty())
+        return ;
+
+    std::cout << "HERE (" << path_joined << ")" << std::endl;
+    
+
 }

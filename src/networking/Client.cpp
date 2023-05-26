@@ -18,9 +18,17 @@ Client::Client(const ConfigServer& server)
 
 void                        Client::buildResponse()
 {
+    // ! FOR TESTING
+    if (this->request.getMethodsString() == "POST")
+    {
+        // In the second argument of this function we can set the name file 
+        this->request.uploadFile("www/uploads/", "");
+    }
+
     if (!this->request.getCodeError())
     {
         this->response.setRequest(this->request);
+        // ! start uploading file or files into the server whithout checking the errors
         this->response.buildResponse();
     }
 }
