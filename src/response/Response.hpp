@@ -3,6 +3,8 @@
 
 #include "../webserv.hpp"
 
+# include "../request/Request.hpp"
+
 class Response
 {
     private:

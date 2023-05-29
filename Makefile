@@ -13,6 +13,7 @@ SRCS = src/webserv.cpp \
 	   src/networking/ManageServers.cpp \
 	   src/networking/Client.cpp \
 	   src/request/Request.cpp \
+	   src/request/UploadMultipleFile.cpp \
 	   src/response/Response.cpp \
 	   src/response/MimeTypes.cpp \
 

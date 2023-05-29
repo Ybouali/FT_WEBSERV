@@ -52,7 +52,6 @@
 # include "configuration/Location.hpp"
 # include "configuration/ServerParser.hpp"
 # include "configuration/ConfigServer.hpp"
-# include "request/Request.hpp"
 
 // ? UTILS FUNCTIONS
 
@@ -68,3 +67,4 @@ bool            errorCharQuery(char );
 bool            checkStringIsEmpty(std::string );
 std::string     generateRandomFileName();
 bool            checkFileExists(const std::string);
+bool checkPathExists(const std::string);

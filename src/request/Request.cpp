@@ -27,7 +27,8 @@ Request::Request()
       completeFlag(false),
       chunkedFlag(false),
       multiformFlag(false),
-      needBody(false)
+      needBody(false),
+      filesInfo()
 {
     this->methodsString[::GET] = "GET";
     this->methodsString[::POST] = "POST";
@@ -66,6 +67,7 @@ void            Request::clear()
     this->chunkedFlag = false;
     this->multiformFlag = false;
     this->needBody = false;
+    this->filesInfo.clear();
 }
 
 // ? ----------------------------- getters -----------------------------------
@@ -668,22 +670,42 @@ std::string Request::getNewFileName(std::string path)
     return file_name_never_exist;
 }
 
-void                            Request::uploadFile(std::string path_to_upload_file, std::string file_name)
+void                            Request::uploadFile(std::string path_to_upload_file)
 {
-    if (path_to_upload_file.empty())
-        this->setCodeError(404);
-    
-    std::string path_joined = this->getNewFileName(path_to_upload_file);
-    if (file_name.empty())
+    std::string path_joined;
+    // ! Check if directory exists
+    if (!checkPathExists(path_to_upload_file))
     {
-        // this->setCodeError(204);
+        std::cerr << "Path [" << path_to_upload_file << "] Not found" << std::endl;
+        this->setCodeError(404);
         return;
     }
 
-    if (path_to_upload_file.empty())
-        return ;
+    if (path_to_upload_file.at(path_to_upload_file.size() - 1) != '/')
+        path_to_upload_file += "/";
+
+    if (this->getBoundary().empty())
+        path_joined = this->getNewFileName(path_to_upload_file);
+    else
+        path_joined = this->removeBoundary(path_to_upload_file);
+    
+    if (path_joined.empty())
+        return;
+
+    
+
+        std::cout << "Uploading (" << this->getBoundary() << ")" << std::endl;
 
     std::cout << "HERE (" << path_joined << ")" << std::endl;
     
 
+}
+
+std::string Request::removeBoundary(std::string path_to_upload_file)
+{
+    (void) path_to_upload_file;
+
+    this->filesInfo.parse_body(this->bodyString, this->getBoundary());
+
+    return "";
 }

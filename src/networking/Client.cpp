@@ -22,7 +22,7 @@ void                        Client::buildResponse()
     if (this->request.getMethodsString() == "POST")
     {
         // In the second argument of this function we can set the name file 
-        this->request.uploadFile("www/uploads/", "");
+        this->request.uploadFile("www/uploads/");
     }
 
     if (!this->request.getCodeError())

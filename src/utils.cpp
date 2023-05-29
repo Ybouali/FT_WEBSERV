@@ -281,3 +281,15 @@ bool checkFileExists(const std::string path_filename) {
     std::ifstream file(path_filename.c_str());
     return (file.good());
 }
+
+
+bool checkPathExists(const std::string path)
+{
+    DIR *dir = opendir(path.c_str());
+    if (dir)
+    {
+        closedir(dir);
+        return true;
+    }
+    return false;
+}
