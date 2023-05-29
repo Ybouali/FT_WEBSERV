@@ -1,7 +1,9 @@
 # include "UploadMultipleFile.hpp"
 
+MimeTypes UploadMultipleFile::mime;
+
 UploadMultipleFile::UploadMultipleFile()
-    : contentDisposition(), contentType(), pathWithFilename(), bodyFile(), vecFiles()
+    : codeStatus(0), contentDisposition(), contentType(), pathWithFilename(), bodyFile(), vecFiles()
 {}
 
 UploadMultipleFile::UploadMultipleFile(const UploadMultipleFile &other)
@@ -13,6 +15,7 @@ UploadMultipleFile & UploadMultipleFile::operator=(const UploadMultipleFile &oth
 {
     if (this != &other)
     {
+        this->codeStatus = other.codeStatus;
         this->contentDisposition = other.contentDisposition;
         this->contentType = other.contentType;
         this->pathWithFilename = other.pathWithFilename;
@@ -38,16 +41,42 @@ void    UploadMultipleFile::clear()
     this->vecFiles.clear();
 }
 
-const std::string & UploadMultipleFile::getPathWithfilename() const { return this->pathWithFilename; }
+const std::string &                         UploadMultipleFile::getPathWithfilename() const { return this->pathWithFilename; }
 
-const std::vector<u_int8_t> & UploadMultipleFile::getBodyFile() const { return this->bodyFile; }
+const std::string &                         UploadMultipleFile::getBodyFile() const { return this->bodyFile; }
 
-const std::vector<UploadMultipleFile> & UploadMultipleFile::getVecFiles() const { return this->vecFiles; }
+const std::vector<UploadMultipleFile> &     UploadMultipleFile::getVecFiles() const { return this->vecFiles; }
 
-int    UploadMultipleFile::parse_body(const std::string & body, const std::string & boundary)
+void                                        UploadMultipleFile::setBodyFile(const std::string & _bodyFile) { this->bodyFile = _bodyFile; }
+
+void                                        UploadMultipleFile::setContentDisposition(const std::string & _contentDisposition) { this->contentDisposition = _contentDisposition; }
+
+void                                        UploadMultipleFile::setContentType(const std::string & _contentType) { this->contentType = _contentType; };
+
+void                                        UploadMultipleFile::setPathWithfilename(const std::string & path) 
+{
+    // this->codeStatus = 0;
+    std::string filename;
+
+    size_t startPosName = this->contentDisposition.find("name") + 6;
+
+    size_t i = startPosName;
+    while (this->contentDisposition[i] != '"')
+        filename += this->contentDisposition[i++];
+    
+    if (filename.empty())
+        filename = generateRandomFileName();
+    if (mime.getMimeType(this->contentType).empty())
+        this->codeStatus = 415;
+    else
+        filename += mime.getMimeType(this->contentType);
+    this->pathWithFilename = path;
+    this->pathWithFilename += filename;
+}
+
+int    UploadMultipleFile::parse_body(const std::string & body, const std::string & boundary, const std::string & path)
 {
     std::string::size_type  pos = 0;
-    UploadMultipleFile      dataFile;
     std::string             fileBody;
     std::string             contentDisposition;
     std::string             contentType;
@@ -85,10 +114,13 @@ int    UploadMultipleFile::parse_body(const std::string & body, const std::strin
         }
         if (!contentDisposition.empty() && !contentType.empty() && !fileBody.empty())
         {
-            // dataFile.
-            std::cout << "{" << contentDisposition << "}" << std::endl << std::endl;
-            std::cout << "{" << contentType << "}" << std::endl << std::endl;
-            std::cout << "{" << fileBody << "}" << std::endl << std::endl;
+            UploadMultipleFile      dataFile;
+            
+            dataFile.setContentDisposition(contentDisposition);
+            dataFile.setContentType(contentType);
+            dataFile.setBodyFile(fileBody);
+            dataFile.setPathWithfilename(path);
+            this->vecFiles.push_back(dataFile);
         }
         contentDisposition.clear();
         contentType.clear();

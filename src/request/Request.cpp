@@ -703,9 +703,17 @@ void                            Request::uploadFile(std::string path_to_upload_f
 
 std::string Request::removeBoundary(std::string path_to_upload_file)
 {
-    (void) path_to_upload_file;
+    this->filesInfo.parse_body(this->bodyString, this->getBoundary(), path_to_upload_file);
 
-    this->filesInfo.parse_body(this->bodyString, this->getBoundary());
+    std::vector<UploadMultipleFile> files = this->filesInfo.getVecFiles();
+
+    for (size_t i = 0; i < files.size(); i++)
+    {
+        std::cout << "CODE STATUS (" << files[i].codeStatus << ")" << std::endl;
+        std::cout << "PATH with f [" << files[i].getPathWithfilename() << "]" << std::endl;
+        std::cout << files[i].getBodyFile() << std::endl;
+    }
+    
 
     return "";
 }

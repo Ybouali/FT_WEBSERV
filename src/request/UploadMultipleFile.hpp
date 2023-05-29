@@ -5,6 +5,8 @@
 class UploadMultipleFile {
 
     public :
+        static MimeTypes    mime;
+        short               codeStatus;
         UploadMultipleFile();
         ~UploadMultipleFile();
         UploadMultipleFile(const UploadMultipleFile &other);
@@ -14,15 +16,21 @@ class UploadMultipleFile {
 
 
         const std::string &                         getPathWithfilename() const;
-        const std::vector<u_int8_t> &               getBodyFile() const;
+        const std::string &                         getBodyFile() const;
         const std::vector<UploadMultipleFile> &     getVecFiles() const;
-        int             parse_body(const std::string & , const std::string & );
+
+        void                                        setContentDisposition(const std::string & );
+        void                                        setContentType(const std::string & );
+        void                                        setPathWithfilename(const std::string & );
+        void                                        setBodyFile(const std::string &);
+
+        int                                         parse_body(const std::string & , const std::string & , const std::string &);
 
     private :
         std::string                         contentDisposition;
         std::string                         contentType;
         std::string                         pathWithFilename;
-        std::vector<u_int8_t>               bodyFile;
+        std::string                         bodyFile;
         std::vector<UploadMultipleFile>     vecFiles;
 
 };
