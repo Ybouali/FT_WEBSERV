@@ -144,6 +144,4 @@ class Request {
         void                            uploadFile(std::string );
 
         std::string                     getNewFileName(std::string );
-
-        std::string                     removeBoundary(std::string );
 };

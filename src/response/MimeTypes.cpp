@@ -17,6 +17,7 @@ MimeTypes::MimeTypes()
     this->mime_types["text/plain"] = ".txt";
     this->mime_types["audio/mp3"] = ".mp3";
     this->mime_types["application/pdf"] = ".pdf";
+    this->mime_types["video/mp4"] = ".mp4";
 }
 MimeTypes::~MimeTypes()
 {

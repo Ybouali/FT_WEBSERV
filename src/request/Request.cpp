@@ -685,35 +685,40 @@ void                            Request::uploadFile(std::string path_to_upload_f
         path_to_upload_file += "/";
 
     if (this->getBoundary().empty())
-        path_joined = this->getNewFileName(path_to_upload_file);
-    else
-        path_joined = this->removeBoundary(path_to_upload_file);
-    
-    if (path_joined.empty())
-        return;
-
-    
-
-        std::cout << "Uploading (" << this->getBoundary() << ")" << std::endl;
-
-    std::cout << "HERE (" << path_joined << ")" << std::endl;
-    
-
-}
-
-std::string Request::removeBoundary(std::string path_to_upload_file)
-{
-    this->filesInfo.parse_body(this->bodyString, this->getBoundary(), path_to_upload_file);
-
-    std::vector<UploadMultipleFile> files = this->filesInfo.getVecFiles();
-
-    for (size_t i = 0; i < files.size(); i++)
     {
-        std::cout << "CODE STATUS (" << files[i].codeStatus << ")" << std::endl;
-        std::cout << "PATH with f [" << files[i].getPathWithfilename() << "]" << std::endl;
-        std::cout << files[i].getBodyFile() << std::endl;
+        path_joined = this->getNewFileName(path_to_upload_file);
+        if (path_joined.empty())
+            return;
+
+        std::ofstream file(path_joined.c_str(), std::ios::binary);
+
+        if (file.fail())
+        {
+            this->setCodeError(404);
+            return ;
+        }
+        file.write(this->getBody().c_str(), this->getBody().length());
+    }
+    else
+    {
+        std::vector<UploadMultipleFile> files = this->filesInfo.parse_body(this->bodyString, this->getBoundary(), path_to_upload_file);
+
+        for (size_t i = 0; i < files.size(); i++)
+        {
+            if (files[i].codeStatus)
+            {
+                this->setCodeError(files[i].codeStatus);
+                return ;
+            }
+            std::ofstream file(files[i].getPathWithfilename().c_str(), std::ios::binary);
+            if (file.fail())
+            {
+                this->setCodeError(404);
+                return ;
+            }
+            file.write(files[i].getBodyFile().c_str(), files[i].getBodyFile().length());
+        }
+        
     }
     
-
-    return "";
 }
