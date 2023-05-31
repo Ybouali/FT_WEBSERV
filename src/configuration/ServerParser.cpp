@@ -104,6 +104,7 @@ ServerParser::~ServerParser(){
 }
 
 std::vector<ServerParser*> ServerParser::get_server(std::string filename){
+    int codeP, codeH ,codeSer;
     ServerParser *  s;
     Location *      loc;
 
@@ -122,6 +123,7 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
         iss >> key >> value;
         if (key == "server" && value == "{")
         {
+            codeP = 0, codeH = 0, codeSer = 0; 
             s = new ServerParser();
             while (std::getline(infile, line))
             {
@@ -135,18 +137,21 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
                 else if (key == "port" && !value.empty())
                 {
                     s->setPort(value);
+                    codeP++;
                     key.clear();
                     value.clear();
                 }
                 else if (key == "host" && !value.empty())
                 {
                     s->setHost(value);
+                    codeH++;
                     key.clear();
                     value.clear();
                 }
                 else if (key == "server_name" && !value.empty())
                 {
                     s->setServerName(value);
+                    codeSer++;
                     key.clear();
                     value.clear();
                 }
@@ -282,6 +287,10 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
                     delete s;
                     break;
                 }
+            }
+            if (codeSer < 1 || codeP < 1 || codeH < 1){
+                std::cerr << "Missing element !" << std::endl;
+                exit(1);
             }
             
         }
