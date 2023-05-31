@@ -129,11 +129,16 @@ void                                   Request::handleHeaders()
 {
     std::stringstream ss;
     
+    if (this->getMethodsString() == "POST" && !this->requestHeaders.count("Content-Length") && !this->requestHeaders.count("Transfer-Encoding"))
+        this->setCodeError(411);
+
     if (this->requestHeaders.count("Content-Length"))
     {
         this->bodyFlag = true;
         ss << this->requestHeaders["Content-Length"];
         ss >> this->bodySize;
+        if (this->bodySize == 0)
+            this->setCodeError(204);
     }
     if (this->requestHeaders.count("Transfer-Encoding"))
     {
@@ -673,6 +678,7 @@ std::string Request::getNewFileName(std::string path)
 void                            Request::uploadFile(std::string path_to_upload_file)
 {
     std::string path_joined;
+
     // ! Check if directory exists
     if (!checkPathExists(path_to_upload_file))
     {
@@ -718,7 +724,7 @@ void                            Request::uploadFile(std::string path_to_upload_f
             }
             file.write(files[i].getBodyFile().c_str(), files[i].getBodyFile().length());
         }
-        
     }
+    this->setCodeError(201);
     
 }

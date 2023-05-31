@@ -19,10 +19,16 @@ Client::Client(const ConfigServer& server)
 void                        Client::buildResponse()
 {
     // ! FOR TESTING
-    if (this->request.getMethodsString() == "POST")
+    if (this->request.getMethodsString() == "POST" && !this->request.getCodeError())
     {
+        if (this->request.getBody().size() > this->server.getClientMaxBodySize())
+        {
+            this->request.setCodeError(413);
+            return ;
+        }
         // In the second argument of this function we can set the name file 
-        this->request.uploadFile("www/uploads/");
+        if (!this->request.getCodeError())
+            this->request.uploadFile("www/uploads/");
     }
 
     if (!this->request.getCodeError())
