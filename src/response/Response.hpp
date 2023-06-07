@@ -52,6 +52,11 @@ class Response
 		void	isRedirectionExist();
 		void	isMethodAllowed();
 		void	buildGetMethod();
+		void	handleDirectory();
+		void	handleFile();
+		void	handleAutoindex(DIR*);
+		void	handleCGI();
+		void	buildResponseContent();
 		void	buildPostMethod();
 		void	buildDeleteMethod();
 };

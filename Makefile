@@ -16,6 +16,9 @@ SRCS = src/webserv.cpp \
 	   src/request/UploadMultipleFile.cpp \
 	   src/response/Response.cpp \
 	   src/response/MimeTypes.cpp \
+	   src/response/methods/Get.cpp \
+	   src/response/methods/Post.cpp \
+	   src/response/methods/Delete.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 
