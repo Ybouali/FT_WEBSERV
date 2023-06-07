@@ -260,10 +260,8 @@ bool checkStringIsEmpty(std::string str)
     return true;
 }
 
-
 std::string generateRandomFileName()
 {
-    
     srand(time(NULL));
 
     const std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

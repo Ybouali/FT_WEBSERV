@@ -19,12 +19,13 @@ MimeTypes::MimeTypes()
     this->mime_types["application/pdf"] = ".pdf";
     this->mime_types["video/mp4"] = ".mp4";
 }
+
 MimeTypes::~MimeTypes()
 {
     this->mime_types.clear();
 }
 
-const std::string MimeTypes::getMimeType(const std::string & exe)
+const std::string MimeTypes::getMimeType(const std::string& exe)
 {
     if (this->mime_types.count(exe))
         return this->mime_types[exe];

@@ -1,14 +1,14 @@
-    # pragma once
+#pragma once
 
-# include "../webserv.hpp"
+#include "../webserv.hpp"
 
-class MimeTypes {
-
-    public :
-        MimeTypes();
-        ~MimeTypes();
-        const std::string getMimeType(const std::string &  );
-
+class MimeTypes
+{
     private:
         std::map<std::string, std::string>  mime_types;
+
+    public:
+        MimeTypes();
+        ~MimeTypes();
+        const std::string getMimeType(const std::string &);
 };

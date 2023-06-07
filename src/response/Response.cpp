@@ -189,11 +189,21 @@ void	Response::buildGetMethod()
 		// check if the location have CGI
 		if (this->location.getCgi() == "off")
 		{
-			std::ifstream		file(this->fullPath.c_str());
-			std::stringstream	buffer;
+			// open the file and check if it's open
+			std::ifstream	file(this->fullPath.c_str());
+			if (!file.is_open())
+			{
+				this->statusCode = 500;
+				throw std::exception();
+			}
 
+			// read the file content and store it in the body
+			std::stringstream	buffer;
 			buffer << file.rdbuf();
 			this->body = buffer.str();
+			file.close();
+
+			// build the response content
 			this->statusCode = 200;
 			this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
 			this->responseContent.append("Content-Type: ");
