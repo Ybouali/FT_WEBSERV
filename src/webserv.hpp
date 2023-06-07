@@ -55,16 +55,18 @@
 
 // ? UTILS FUNCTIONS
 
-std::string     skipWhitespaceBeginAnd(std::string );
-bool            errorPath(std::string );
-bool            checkUriCharacters(u_int8_t );
-bool            checkIsToken(u_int8_t );
-std::string     statusCodeString(short );
-std::string     getPageError(short );
-std::string		getDateFormat();
-std::string     getPageErrorWithHeaders(short , bool, std::string );
-bool            errorCharQuery(char );
-bool            checkStringIsEmpty(std::string );
-std::string     generateRandomFileName();
-bool            checkFileExists(const std::string);
-bool checkPathExists(const std::string);
+std::string     	skipWhitespaceBeginAnd(std::string);
+bool            	errorPath(std::string);
+bool            	checkUriCharacters(u_int8_t);
+bool            	checkIsToken(u_int8_t);
+std::string     	statusCodeString(short);
+std::string     	getPageError(short);
+std::string			getDateFormat();
+std::string     	getResponsePage(short, bool, std::string);
+bool            	errorCharQuery(char);
+bool            	checkStringIsEmpty(std::string);
+std::string     	generateRandomFileName();
+bool            	checkFileExists(const std::string);
+bool            	isDirectory(const std::string);
+bool				isTypeSupported(const std::string);
+const std::string	getContentType(const std::string);

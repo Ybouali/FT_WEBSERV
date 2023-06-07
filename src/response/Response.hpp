@@ -2,8 +2,7 @@
 #define RESPONSE_HPP
 
 #include "../webserv.hpp"
-
-# include "../request/Request.hpp"
+#include "../request/Request.hpp"
 
 class Response
 {
@@ -12,13 +11,10 @@ class Response
         Request			request;
 		std::string		responseContent;
 		short			statusCode;
-		std::string		statusMessage;
-		std::string		date;
-		std::string		contentType;
-		std::string		contentLength;
 		std::string		body;
 		Location		location;
 		std::string		method;
+		std::string		fullPath;
 
     public:
 		static MimeTypes mime_type;
@@ -33,13 +29,10 @@ class Response
 		const Request&		getRequest() const;
 		const std::string&	getResponseContent() const;
 		short				getStatusCode() const;
-		const std::string&	getStatusMessage() const;
-		const std::string&	getDate() const;
-		const std::string&	getContentType() const;
-		const std::string&	getContentLength() const;
 		const std::string&	getBody() const;
 		const Location&		getLocation() const;
 		const std::string&	getMethod() const;
+		const std::string&	getFullPath() const;
 
         // ----------------------------- Setters -----------------------------------
 
@@ -47,13 +40,10 @@ class Response
 		void	setRequest(const Request&);
 		void	setResponseContent(const std::string&);
 		void	setStatusCode(const int);
-		void	setStatusMessage(const std::string&);
-		void	setDate(const std::string&);
-		void	setContentType(const std::string&);
-		void	setContentLength(const std::string&);
 		void	setBody(const std::string&);
 		void	setLocation(const Location&);
 		void	setMethod(const std::string&);
+		void	setFullPath(const std::string&);
 
         // ----------------------------- Methodes -----------------------------------
 
@@ -61,6 +51,9 @@ class Response
 		void	isLocationMatched();
 		void	isRedirectionExist();
 		void	isMethodAllowed();
+		void	buildGetMethod();
+		void	buildPostMethod();
+		void	buildDeleteMethod();
 };
 
 #endif

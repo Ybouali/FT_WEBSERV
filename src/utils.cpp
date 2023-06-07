@@ -194,7 +194,7 @@ std::string	getDateFormat()
 	std::to_string(utcTime->tm_hour) + ":" +
 	std::to_string(utcTime->tm_min) + ":" +
 	std::to_string(utcTime->tm_sec) + " UTC";
-    date.append("\r\n\r\n");
+    date.append("\r\n");
 
 	return (date);
 }
@@ -214,13 +214,13 @@ static std::string getContentFileFromPathFile(std::string path)
     return content;
 }
 
-std::string getPageErrorWithHeaders(short codeStatus, bool needBody, std::string pathErrorFile)
+std::string getResponsePage(short codeStatus, bool needBody, std::string pathErrorFile)
 {
     std::string response;
-    std::string messageError = getContentFileFromPathFile(pathErrorFile);
+    std::string body = getContentFileFromPathFile(pathErrorFile);
 
-    if (messageError.empty())
-        messageError = getPageError(codeStatus);
+    if (body.empty())
+        body = getPageError(codeStatus);
 
 	response.append("HTTP/1.1 ");
 	response.append(std::to_string(codeStatus));
@@ -230,20 +230,18 @@ std::string getPageErrorWithHeaders(short codeStatus, bool needBody, std::string
 
     if (codeStatus == 101)
         response.append("Upgrade: HTTP/1.1\r\nConnection: Upgrade\r\n");
-	
+
+    response.append("Server: Small nginx\r\n");
+	response.append(getDateFormat());
+
     if (!needBody)
     {
         response.append("Content-Type: text/html\r\n");
         response.append("Content-Length: ");
-        response.append(std::to_string(messageError.length()));
-        response.append("\r\n");
+        response.append(std::to_string(body.length()));
+        response.append("\r\n\r\n");
+        response.append(body);
     }
-
-    response.append("Server: Small nginx\r\n");
-	response.append(getDateFormat());
-	
-    if (!needBody)
-        response.append(messageError);
 
     return response;
 }
@@ -253,7 +251,8 @@ bool checkStringIsEmpty(std::string str)
     if (str.empty())
         return true;
 
-    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+    {
         if (!std::isspace(static_cast<unsigned char>(*it)))
             return false;
     }
@@ -262,7 +261,8 @@ bool checkStringIsEmpty(std::string str)
 }
 
 
-std::string generateRandomFileName() {
+std::string generateRandomFileName()
+{
     
     srand(time(NULL));
 
@@ -277,19 +277,40 @@ std::string generateRandomFileName() {
     return randomName;
 }
 
-bool checkFileExists(const std::string path_filename) {
+bool checkFileExists(const std::string path_filename)
+{
     std::ifstream file(path_filename.c_str());
     return (file.good());
 }
 
-
-bool checkPathExists(const std::string path)
+bool    isDirectory(const std::string path)
 {
-    DIR *dir = opendir(path.c_str());
+    DIR* dir = opendir(path.c_str());
+
     if (dir)
     {
         closedir(dir);
         return true;
     }
+
     return false;
+}
+
+bool    isTypeSupported(const std::string path)
+{
+    std::string type = path.substr(path.find_last_of(".") + 1);
+    MimeTypes mimeTypes;
+
+    if (mimeTypes.getMimeType(type).empty())
+        return false;
+
+    return true;
+}
+
+const std::string  getContentType(const std::string path)
+{
+    std::string type = path.substr(path.find_last_of(".") + 1);
+    MimeTypes mimeTypes;
+
+    return mimeTypes.getMimeType(type);
 }

@@ -680,7 +680,7 @@ void                            Request::uploadFile(std::string path_to_upload_f
     std::string path_joined;
 
     // ! Check if directory exists
-    if (!checkPathExists(path_to_upload_file))
+    if (!isDirectory(path_to_upload_file))
     {
         std::cerr << "Path [" << path_to_upload_file << "] Not found" << std::endl;
         this->setCodeError(404);
