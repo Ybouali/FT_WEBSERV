@@ -69,15 +69,15 @@ void	Response::buildResponse()
 
 		if (this->method == "GET")
 		{
-			this->buildGetMethod();
+			this->handleGetMethod();
 		}
 		else if (this->method == "POST")
 		{
-			this->buildPostMethod();
+			this->handlePostMethod();
 		}
 		else if (this->method == "DELETE")
 		{
-			this->buildDeleteMethod();
+			this->handleDeleteMethod();
 		}
 	}
 	catch(const std::exception& e)
@@ -121,8 +121,8 @@ void	Response::isLocationMatched()
 
 void	Response::isRedirectionExist()
 {
-	// still not sure about this one ???
 	// if the redirection exist, set the status code to 301
+	// still not sure about this redirection stuff ???
 	if (!location.getRedirection().empty())
 	{
 		this->statusCode = 301;
@@ -153,4 +153,16 @@ void	Response::isMethodAllowed()
 		this->statusCode = 405;
 		throw std::exception();
 	}
+}
+
+void	Response::buildResponseContent()
+{
+	this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
+	this->responseContent.append("Content-Type: ");
+	this->responseContent.append(getContentType(this->fullPath));
+	this->responseContent.append("\r\n");
+	this->responseContent.append("Content-Length: ");
+	this->responseContent.append(std::to_string(this->body.length()));
+	this->responseContent.append("\r\n\r\n");
+	this->responseContent.append(this->body);
 }

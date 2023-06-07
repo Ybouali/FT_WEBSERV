@@ -1,6 +1,6 @@
 #include "../Response.hpp"
 
-void	Response::buildGetMethod()
+void	Response::handleGetMethod()
 {
 	// set the full path to the requested path and replace the location path with the root path
 	this->fullPath = this->request.getPath();
@@ -27,6 +27,7 @@ void	Response::buildGetMethod()
 void	Response::handleDirectory()
 {
 	// check if the requested path has a "/" at the end
+	// still not sure about this redirection stuff ???
 	if (this->fullPath[this->fullPath.length() - 1] != '/')
 	{
 		this->statusCode = 301;
@@ -139,12 +140,4 @@ void	Response::handleAutoindex(DIR* dir)
 void	Response::handleCGI()
 {
 	// TODO: later
-}
-
-void	Response::buildResponseContent()
-{
-	this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
-	this->responseContent.append("Content-Type: " + getContentType(this->fullPath) + "\r\n");
-	this->responseContent.append("Content-Length: " + std::to_string(this->body.length()) + "\r\n\r\n");
-	this->responseContent.append(this->body);
 }

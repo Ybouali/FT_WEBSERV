@@ -1,6 +1,6 @@
 #include "../Response.hpp"
 
-void	Response::buildDeleteMethod()
+void	Response::handleDeleteMethod()
 {
 	// TODO: later
 }
