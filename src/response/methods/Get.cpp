@@ -42,14 +42,15 @@ void	Response::handleDirectory()
 		throw std::exception();
 	}
 
-	// loop through the directory content and check if it has the index file
-	bool hasIndex = false;
 	struct dirent* ent;
+	bool hasIndex = false;
+
+	// loop through the directory content and check if it has the index file
 	while ((ent = readdir(dir)) != NULL)
 	{
+		// if the directory has the index file, append it to the full path
 		if (std::string(ent->d_name) == this->location.getIndex())
 		{
-			// if the directory has the index file, append it to the full path
 			this->fullPath.append(this->location.getIndex());
 			hasIndex = true;
 			break;
@@ -99,6 +100,7 @@ void	Response::handleFile()
 		std::stringstream buffer;
 		buffer << file.rdbuf();
 		this->body = buffer.str();
+
 		file.close();
 
 		// set the status code to 200 and build the response content
