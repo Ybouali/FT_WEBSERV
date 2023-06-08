@@ -62,11 +62,12 @@ void	Response::buildResponse()
 {
 	try
 	{
+		// check if the request is valid
 		this->isLocationMatched();
 		this->isRedirectionExist();
 		this->isMethodAllowed();
 
-
+		// handle the request based on the method type (GET, POST, DELETE)
 		if (this->method == "GET")
 		{
 			this->handleGetMethod();
