@@ -133,6 +133,7 @@ void	Response::handleAutoindex(DIR* dir)
 
 		// set the status code to 200 and build the response content
 		this->statusCode = 200;
+		this->fullPath.append("index.html");
 		this->buildResponseContent();
 	}
 }
