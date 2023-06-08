@@ -18,6 +18,7 @@ void	Response::clear()
 	this->body.clear();
 	this->location.clear();
 	this->method.clear();
+	this->fullPath.clear();
 }
 
 // ----------------------------- Getters -----------------------------------
