@@ -16,11 +16,25 @@ void	Response::handleGetMethod()
 	// check if the requested resource is a directory or a file
 	if (isDirectory(this->fullPath))
 	{
-		this->handleGetDirectory();
+		try
+		{
+			this->handleGetDirectory();
+		}
+		catch (const std::exception& e)
+		{
+			throw std::exception();
+		}
 	}
 	else
 	{
-		this->handleGetFile();
+		try
+		{
+			this->handleGetFile();
+		}
+		catch (const std::exception& e)
+		{
+			throw std::exception();
+		}
 	}
 }
 
@@ -58,11 +72,25 @@ void	Response::handleGetDirectory()
 
 	if (hasIndex)
 	{
-		this->handleGetFile();
+		try
+		{
+			this->handleGetFile();
+		}
+		catch (const std::exception& e)
+		{
+			throw std::exception();
+		}
 	}
 	else
 	{
-		this->handleGetAutoindex(dir);
+		try
+		{
+			this->handleGetAutoindex(dir);
+		}
+		catch (const std::exception& e)
+		{
+			throw std::exception();
+		}
 	}
 
 	closedir(dir);

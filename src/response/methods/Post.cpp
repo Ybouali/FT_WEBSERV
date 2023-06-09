@@ -23,11 +23,25 @@ void	Response::handlePostMethod()
 		// check if the requested resource is a directory or a file
 		if (isDirectory(this->fullPath))
 		{
-			this->handlePostDirectory();
+			try
+			{
+				this->handlePostDirectory();
+			}
+			catch (const std::exception& e)
+			{
+				throw std::exception();
+			}
 		}
 		else
 		{
-			this->handlePostFile();
+			try
+			{
+				this->handlePostFile();
+			}
+			catch (const std::exception& e)
+			{
+				throw std::exception();
+			}
 		}
 	}
 }
@@ -66,7 +80,14 @@ void	Response::handlePostDirectory()
 
 	if (hasIndex)
 	{
-		this->handlePostFile();
+		try
+		{
+			this->handlePostFile();
+		}
+		catch (const std::exception& e)
+		{
+			throw std::exception();
+		}
 	}
 	else
 	{
