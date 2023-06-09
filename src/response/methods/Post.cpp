@@ -26,7 +26,7 @@ void	Response::handlePostMethod()
 		}
 		catch (const std::exception& e)
 		{
-			throw std::exception();
+			throw;
 		}
 	}
 }
@@ -71,7 +71,7 @@ void	Response::handlePostDirectory()
 		}
 		catch (const std::exception& e)
 		{
-			throw std::exception();
+			throw;
 		}
 	}
 	else

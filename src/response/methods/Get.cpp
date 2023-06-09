@@ -19,7 +19,7 @@ void	Response::handleGetMethod()
 	}
 	catch (const std::exception& e)
 	{
-		throw std::exception();
+		throw;
 	}
 }
 
@@ -68,7 +68,7 @@ void	Response::handleGetDirectory()
 	}
 	catch (const std::exception& e)
 	{
-		throw std::exception();
+		throw;
 	}
 
 	closedir(dir);
