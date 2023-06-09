@@ -51,6 +51,7 @@ class Response
 		void	isLocationMatched();
 		void	isRedirectionExist();
 		void	isMethodAllowed();
+		void	isResourceExist();
 		void	buildResponseContent();
 	
 		// Get

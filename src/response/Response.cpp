@@ -157,6 +157,20 @@ void	Response::isMethodAllowed()
 	}
 }
 
+void	Response::isResourceExist()
+{
+	// set the full path to the requested path and replace the location path with the root path
+	this->fullPath = this->request.getPath();
+	this->fullPath.replace(0, this->location.getLocation().length(), this->location.getRoot());
+
+	// check if the requested resource exist
+	if (access(this->fullPath.c_str(), F_OK) == -1)
+	{
+		this->statusCode = 404;
+		throw std::exception();
+	}
+}
+
 void	Response::buildResponseContent()
 {
 	this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);

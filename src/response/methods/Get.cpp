@@ -2,39 +2,24 @@
 
 void	Response::handleGetMethod()
 {
-	// set the full path to the requested path and replace the location path with the root path
-	this->fullPath = this->request.getPath();
-	this->fullPath.replace(0, this->location.getLocation().length(), this->location.getRoot());
-
-	// check if the requested resource exist
-	if (access(this->fullPath.c_str(), F_OK) == -1)
+	try
 	{
-		this->statusCode = 404;
-		throw std::exception();
-	}
+		// check if the requested resource exists
+		this->isResourceExist();
 
-	// check if the requested resource is a directory or a file
-	if (isDirectory(this->fullPath))
-	{
-		try
+		// check if the requested resource is a directory or a file
+		if (isDirectory(this->fullPath))
 		{
 			this->handleGetDirectory();
 		}
-		catch (const std::exception& e)
-		{
-			throw std::exception();
-		}
-	}
-	else
-	{
-		try
+		else
 		{
 			this->handleGetFile();
 		}
-		catch (const std::exception& e)
-		{
-			throw std::exception();
-		}
+	}
+	catch (const std::exception& e)
+	{
+		throw std::exception();
 	}
 }
 
@@ -70,27 +55,20 @@ void	Response::handleGetDirectory()
 		}
 	}
 
-	if (hasIndex)
+	try
 	{
-		try
+		if (hasIndex)
 		{
 			this->handleGetFile();
 		}
-		catch (const std::exception& e)
-		{
-			throw std::exception();
-		}
-	}
-	else
-	{
-		try
+		else
 		{
 			this->handleGetAutoindex(dir);
 		}
-		catch (const std::exception& e)
-		{
-			throw std::exception();
-		}
+	}
+	catch (const std::exception& e)
+	{
+		throw std::exception();
 	}
 
 	closedir(dir);
