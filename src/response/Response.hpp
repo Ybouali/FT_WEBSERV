@@ -69,6 +69,11 @@ class Response
 
 		// Delete
 		void	handleDeleteMethod();
+		void	handleDeleteDirectory();
+		void	handleDeleteDirectoryContent();
+		void	handleDeleteEmptyDirectory();
+		void	handleDeleteFile();
+		void	handleDeleteCGI();
 };
 
 #endif

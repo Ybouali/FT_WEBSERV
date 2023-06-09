@@ -2,14 +2,14 @@
 
 void	Response::handlePostMethod()
 {
-	// check if the location supports upload
-	if (!this->location.getUpload().empty())
+	try
 	{
-		this->request.uploadFile(this->location.getUpload());
-	}
-	else
-	{
-		try
+		// check if the location supports upload
+		if (!this->location.getUpload().empty())
+		{
+			this->request.uploadFile(this->location.getUpload());
+		}
+		else
 		{
 			// check if the requested resource exists
 			this->isResourceExist();
@@ -24,17 +24,17 @@ void	Response::handlePostMethod()
 				this->handlePostFile();
 			}
 		}
-		catch (const std::exception& e)
-		{
-			throw;
-		}
+	}
+	catch (const std::exception& e)
+	{
+		throw;
 	}
 }
 
 void	Response::handlePostDirectory()
 {
 	// check if the directory path ends with a slash
-	if (this->fullPath[this->fullPath.length() - 1] != '/')
+	if (this->fullPath.at(this->fullPath.length() - 1) != '/')
 	{
 		this->statusCode = 301;
 		this->fullPath.append("/");
@@ -56,13 +56,16 @@ void	Response::handlePostDirectory()
 	while ((ent = readdir(dir)) != NULL)
 	{
 		// if the directory has the index file, append it to the full path
-		if (std::string(ent->d_name) == this->location.getIndex())
+		std::string fileName = ent->d_name;
+		if (fileName == this->location.getIndex())
 		{
-			this->fullPath.append(this->location.getIndex());
+			this->fullPath.append(fileName);
 			hasIndex = true;
 			break;
 		}
 	}
+
+	closedir(dir);
 
 	try
 	{
@@ -80,8 +83,6 @@ void	Response::handlePostDirectory()
 	{
 		throw;
 	}
-
-	closedir(dir);
 }
 
 void	Response::handlePostFile()

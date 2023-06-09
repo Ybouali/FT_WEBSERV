@@ -26,7 +26,7 @@ void	Response::handleGetMethod()
 void	Response::handleGetDirectory()
 {
 	// check if the directory path ends with a slash
-	if (this->fullPath[this->fullPath.length() - 1] != '/')
+	if (this->fullPath.at(this->fullPath.length() - 1) != '/')
 	{
 		this->statusCode = 301;
 		this->fullPath.append("/");
@@ -48,13 +48,16 @@ void	Response::handleGetDirectory()
 	while ((ent = readdir(dir)) != NULL)
 	{
 		// if the directory has the index file, append it to the full path
-		if (std::string(ent->d_name) == this->location.getIndex())
+		std::string fileName = ent->d_name;
+		if (fileName == this->location.getIndex())
 		{
-			this->fullPath.append(this->location.getIndex());
+			this->fullPath.append(fileName);
 			hasIndex = true;
 			break;
 		}
 	}
+
+	closedir(dir);
 
 	try
 	{
@@ -71,8 +74,6 @@ void	Response::handleGetDirectory()
 	{
 		throw;
 	}
-
-	closedir(dir);
 }
 
 void	Response::handleGetFile()
@@ -129,9 +130,11 @@ void	Response::handleGetAutoindex(DIR* dir)
 		struct dirent* ent;
 		while ((ent = readdir(dir)) != NULL)
 		{
-			if (std::string(ent->d_name) != "." && std::string(ent->d_name) != "..")
+			std::string fileName = ent->d_name;
+			if (fileName != "." && fileName != "..")
 			{
-				this->body.append("<a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a><br>" + "\n");
+				this->body.append(fileName);
+				this->body.append("\n");
 			}
 		}
 
