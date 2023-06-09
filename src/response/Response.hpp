@@ -48,19 +48,19 @@ class Response
         // ----------------------------- Methodes -----------------------------------
 
 		void	buildResponse();
+		void	buildResponseContent();
 		void	isLocationMatched();
 		void	isRedirectionExist();
 		void	isMethodAllowed();
 		void	isResourceExist();
-		void	buildResponseContent();
-	
+
 		// Get
 		void	handleGetMethod();
 		void	handleGetDirectory();
 		void	handleGetFile();
 		void	handleGetAutoindex(DIR*);
 		void	handleGetCGI();
-	
+
 		// Post
 		void	handlePostMethod();
 		void	handlePostDirectory();

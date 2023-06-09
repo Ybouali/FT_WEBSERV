@@ -88,6 +88,18 @@ void	Response::buildResponse()
 	}
 }
 
+void	Response::buildResponseContent()
+{
+	this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
+	this->responseContent.append("Content-Type: ");
+	this->responseContent.append(getContentType(this->fullPath));
+	this->responseContent.append("\r\n");
+	this->responseContent.append("Content-Length: ");
+	this->responseContent.append(std::to_string(this->body.length()));
+	this->responseContent.append("\r\n\r\n");
+	this->responseContent.append(this->body);
+}
+
 void	Response::isLocationMatched()
 {
 	std::vector<Location *>	locations = this->server.getLocationList();
@@ -169,16 +181,4 @@ void	Response::isResourceExist()
 		this->statusCode = 404;
 		throw std::exception();
 	}
-}
-
-void	Response::buildResponseContent()
-{
-	this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
-	this->responseContent.append("Content-Type: ");
-	this->responseContent.append(getContentType(this->fullPath));
-	this->responseContent.append("\r\n");
-	this->responseContent.append("Content-Length: ");
-	this->responseContent.append(std::to_string(this->body.length()));
-	this->responseContent.append("\r\n\r\n");
-	this->responseContent.append(this->body);
 }
