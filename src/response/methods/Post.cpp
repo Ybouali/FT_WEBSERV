@@ -64,21 +64,21 @@ void	Response::handlePostDirectory()
 		}
 	}
 
-	if (hasIndex)
+	try
 	{
-		try
+		if (hasIndex)
 		{
 			this->handlePostFile();
 		}
-		catch (const std::exception& e)
+		else
 		{
-			throw;
+			this->statusCode = 403;
+			throw std::exception();
 		}
 	}
-	else
+	catch (const std::exception& e)
 	{
-		this->statusCode = 403;
-		throw std::exception();
+		throw;
 	}
 
 	closedir(dir);
