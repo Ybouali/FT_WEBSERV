@@ -16,22 +16,21 @@ void	Response::handleGetMethod()
 	// check if the requested resource is a directory or a file
 	if (isDirectory(this->fullPath))
 	{
-		this->handleDirectory();
+		this->handleGetDirectory();
 	}
 	else
 	{
-		this->handleFile();
+		this->handleGetFile();
 	}
 }
 
-void	Response::handleDirectory()
+void	Response::handleGetDirectory()
 {
-	// check if the requested path has a "/" at the end
-	// still not sure about this redirection stuff ???
+	// check if the directory path ends with a slash
 	if (this->fullPath[this->fullPath.length() - 1] != '/')
 	{
 		this->statusCode = 301;
-		throw std::exception();
+		this->fullPath.append("/");
 	}
 
 	// open the directory and check if it's open
@@ -59,17 +58,17 @@ void	Response::handleDirectory()
 
 	if (hasIndex)
 	{
-		this->handleFile();
+		this->handleGetFile();
 	}
 	else
 	{
-		this->handleAutoindex(dir);
+		this->handleGetAutoindex(dir);
 	}
 
 	closedir(dir);
 }
 
-void	Response::handleFile()
+void	Response::handleGetFile()
 {
 	// check if the requested file type is supported
 	if (!isTypeSupported(this->fullPath))
@@ -86,7 +85,11 @@ void	Response::handleFile()
 	}
 
 	// check if the location has CGI
-	if (this->location.getCgi() == "off")
+	if (this->location.getCgi() == "on")
+	{
+		this->handleGetCGI();
+	}
+	else if (this->location.getCgi() == "off")
 	{
 		// open the file and check if it's open
 		std::ifstream file(this->fullPath.c_str());
@@ -96,6 +99,7 @@ void	Response::handleFile()
 			throw std::exception();
 		}
 
+		// TODO: if the requested file is too large
 		// read the file content and store it in the body
 		std::stringstream buffer;
 		buffer << file.rdbuf();
@@ -107,21 +111,12 @@ void	Response::handleFile()
 		this->statusCode = 200;
 		this->buildResponseContent();
 	}
-	else if (this->location.getCgi() == "on")
-	{
-		this->handleCGI();
-	}
 }
 
-void	Response::handleAutoindex(DIR* dir)
+void	Response::handleGetAutoindex(DIR* dir)
 {
 	// check if the directory has autoindex
-	if (this->location.getAutoindex() == "off")
-	{
-		this->statusCode = 403;
-		throw std::exception();
-	}
-	else if (this->location.getAutoindex() == "on")
+	if (this->location.getAutoindex() == "on")
 	{
 		// store the directory content in the body
 		struct dirent* ent;
@@ -138,9 +133,14 @@ void	Response::handleAutoindex(DIR* dir)
 		this->fullPath.append("index.html");
 		this->buildResponseContent();
 	}
+	else if (this->location.getAutoindex() == "off")
+	{
+		this->statusCode = 403;
+		throw std::exception();
+	}
 }
 
-void	Response::handleCGI()
+void	Response::handleGetCGI()
 {
 	// TODO: later
 }

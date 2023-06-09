@@ -55,13 +55,16 @@ class Response
 	
 		// Get
 		void	handleGetMethod();
-		void	handleDirectory();
-		void	handleFile();
-		void	handleAutoindex(DIR*);
-		void	handleCGI();
+		void	handleGetDirectory();
+		void	handleGetFile();
+		void	handleGetAutoindex(DIR*);
+		void	handleGetCGI();
 	
 		// Post
 		void	handlePostMethod();
+		void	handlePostDirectory();
+		void	handlePostFile();
+		void	handlePostCGI();
 
 		// Delete
 		void	handleDeleteMethod();
