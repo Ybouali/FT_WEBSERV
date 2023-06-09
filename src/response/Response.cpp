@@ -84,7 +84,17 @@ void	Response::buildResponse()
 	}
 	catch(const std::exception& e)
 	{
-		this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
+		if (this->statusCode == 301)
+		{
+			this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
+			this->responseContent.append("Location: ");
+			this->responseContent.append(this->fullPath);
+			this->responseContent.append("\r\n");
+		}
+		else
+		{
+			this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
+		}
 	}
 }
 
@@ -136,10 +146,10 @@ void	Response::isLocationMatched()
 void	Response::isRedirectionExist()
 {
 	// if the redirection exist, set the status code to 301
-	// still not sure about this redirection stuff ???
 	if (!location.getRedirection().empty())
 	{
 		this->statusCode = 301;
+		this->fullPath = location.getRedirection();
 		throw std::exception();
 	}
 }

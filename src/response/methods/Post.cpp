@@ -38,6 +38,7 @@ void	Response::handlePostDirectory()
 	{
 		this->statusCode = 301;
 		this->fullPath.append("/");
+		throw std::exception();
 	}
 
 	// open the directory and check if it's open
