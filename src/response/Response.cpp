@@ -145,7 +145,7 @@ void	Response::isLocationMatched()
 
 void	Response::isRedirectionExist()
 {
-	// if the redirection exist, set the status code to 301
+	// if the redirection exist, redirect the client to the redirection path
 	if (!location.getRedirection().empty())
 	{
 		this->statusCode = 301;

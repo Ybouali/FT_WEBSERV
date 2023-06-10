@@ -28,6 +28,7 @@ void	Response::handleGetDirectory()
 	// check if the directory path ends with a slash
 	if (this->fullPath.at(this->fullPath.length() - 1) != '/')
 	{
+		// if it doesn't, redirect the client to the same path with a slash at the end
 		this->statusCode = 301;
 		this->fullPath.append("/");
 		throw std::exception();
@@ -61,6 +62,7 @@ void	Response::handleGetDirectory()
 
 	try
 	{
+		// if the directory has the index file, handle it as a file, otherwise handle it as an autoindex
 		if (hasIndex)
 		{
 			this->handleGetFile();
@@ -126,7 +128,7 @@ void	Response::handleGetAutoindex(DIR* dir)
 	// check if the directory has autoindex
 	if (this->location.getAutoindex() == "on")
 	{
-		// store the directory content in the body
+		// loop through the directory content and append it to the body
 		struct dirent* ent;
 		while ((ent = readdir(dir)) != NULL)
 		{

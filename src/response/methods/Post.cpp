@@ -36,6 +36,7 @@ void	Response::handlePostDirectory()
 	// check if the directory path ends with a slash
 	if (this->fullPath.at(this->fullPath.length() - 1) != '/')
 	{
+		// if it doesn't, redirect the client to the same path with a slash at the end
 		this->statusCode = 301;
 		this->fullPath.append("/");
 		throw std::exception();
@@ -69,6 +70,7 @@ void	Response::handlePostDirectory()
 
 	try
 	{
+		// if the directory has the index file, handle it as a file, otherwise return 403
 		if (hasIndex)
 		{
 			this->handlePostFile();

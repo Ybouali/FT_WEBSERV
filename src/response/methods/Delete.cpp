@@ -71,6 +71,7 @@ void	Response::handleDeleteDirectory()
 
 			closedir(dir);
 
+			// if the directory has the index file, handle it using CGI, otherwise return 403
 			if (hasIndex)
 			{
 				this->handleDeleteCGI();
@@ -115,13 +116,13 @@ void	Response::handleDeleteDirectoryContent()
 			std::string fileName = ent->d_name;
 			if (fileName != "." && fileName != "..")
 			{
-				std::string filePath = this->fullPath + "/" + fileName;
-
 				// check if the entry is a directory or a file
 				if (ent->d_type == DT_DIR)
 				{
-					// recursively delete the directory content
-					this->fullPath = filePath;
+					// append the file name to the full path
+					this->fullPath.append(fileName + "/");
+
+					// recursively delete the subdirectory content
 					this->handleDeleteDirectory();
 
 					// delete the empty subdirectory
@@ -129,8 +130,10 @@ void	Response::handleDeleteDirectoryContent()
 				}
 				else
 				{
+					// append the file name to the full path
+					this->fullPath.append(fileName);
+
 					// delete the file
-					this->fullPath = filePath;
 					this->handleDeleteFile();
 				}
 			}
@@ -138,7 +141,7 @@ void	Response::handleDeleteDirectoryContent()
 
 		closedir(dir);
 
-		// delete the empty directory
+		// set the full path to the original path to delete the parent directory
 		this->fullPath = originalPath;
 		this->handleDeleteEmptyDirectory();
 	}
@@ -150,7 +153,7 @@ void	Response::handleDeleteDirectoryContent()
 
 void	Response::handleDeleteEmptyDirectory()
 {
-	// delete the empty directory
+	// check if the empty directory has been deleted successfully
 	if (rmdir(this->fullPath.c_str()) == 0)
 	{
 		this->statusCode = 204;
@@ -172,7 +175,7 @@ void	Response::handleDeleteEmptyDirectory()
 
 void	Response::handleDeleteFile()
 {
-	// delete the file
+	// check if the file has been deleted successfully
 	if (remove(this->fullPath.c_str()) == 0)
 	{
 		this->statusCode = 204;
