@@ -145,9 +145,10 @@ void	Response::isLocationMatched()
 
 void	Response::isRedirectionExist()
 {
-	// if the redirection exist, redirect the client to the redirection path
+	// check if the location has a redirection
 	if (!location.getRedirection().empty())
 	{
+		// if it does, redirect the client to the redirection path
 		this->statusCode = 301;
 		this->fullPath = location.getRedirection();
 		throw std::exception();
