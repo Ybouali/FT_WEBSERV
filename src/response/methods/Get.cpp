@@ -62,7 +62,7 @@ void	Response::handleGetDirectory()
 
 	try
 	{
-		// if the directory has the index file, handle it as a file, otherwise handle it as an autoindex
+		// if the directory has the index file, handle it as a file, otherwise check if it has autoindex
 		if (hasIndex)
 		{
 			this->handleGetFile();
