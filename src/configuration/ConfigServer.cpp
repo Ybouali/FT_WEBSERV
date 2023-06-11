@@ -9,7 +9,7 @@ ConfigServer::ConfigServer()
     this->locationList.push_back(local);
 }
 
-ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList, std::map<short, std::string> errorPages)
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList, std::map<short, std::string> errorPages, std::string clientMaxBodySize)
     : Port(), Host(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
 {
     this->setPort(port);
@@ -17,6 +17,7 @@ ConfigServer::ConfigServer(std::string port, std::string host, std::string Serve
     this->setServerName(ServerName);
     this->locationList = _locationList;
     this->errorPages = errorPages;
+    this->setClientMaxBodySize(clientMaxBodySize);
     this->setFd(0);
 }
 
@@ -44,7 +45,7 @@ ConfigServer::~ConfigServer() { clear(); }
 void        ConfigServer::clear()
 {
     this->Port = 0;
-    this->Host = 0;
+    this->Host.clear();
     this->serverName.clear();
     this->clientMaxBodySize = 0;
     this->errorPages.clear();
@@ -55,7 +56,7 @@ void        ConfigServer::clear()
 
 uint16_t                            ConfigServer::getPort() const { return this->Port; }
 
-in_addr_t                           ConfigServer::getHost() const { return this->Host; }
+std::string                         ConfigServer::getHost() const { return this->Host; }
 
 std::string                         ConfigServer::getServerName() const { return this->serverName; }
 
@@ -71,13 +72,21 @@ int                                 ConfigServer::getFd() const { return this->F
 
 void                ConfigServer::setPort(std::string port) { this->Port = static_cast<uint16_t>(std::stoul(port)); }
 
-void                ConfigServer::setHost(std::string host) { this->Host = inet_addr(host.c_str());/* ! If host == INADDR_NONE so this is an error (Failed to get the host for localhost) .*/ }
+void                ConfigServer::setHost(std::string host) { 
+    // TODO: Need a check for the host
+    this->Host = host;
+}
 
 void                ConfigServer::setServerName(std::string ServerName) { this->serverName = ServerName; }
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 
-void                ConfigServer::setClientMaxBodySize(std::string size) { this->clientMaxBodySize = std::stoul(size); }
+void                ConfigServer::setClientMaxBodySize(std::string size) { 
+    unsigned long _clientMaxBodySize = std::stoul(size);
+
+    if (!_clientMaxBodySize)
+        this->clientMaxBodySize = _clientMaxBodySize;
+}
 
 void                ConfigServer::setLocationList(std::vector<Location * > _locationList) { this->locationList = _locationList; }
 
@@ -109,7 +118,7 @@ void                                ConfigServer::setupServer()
     memset(&this->serverAddress, 0, sizeof(this->serverAddress));
     
     this->serverAddress.sin_family = AF_INET;
-    this->serverAddress.sin_addr.s_addr = this->getHost();
+    this->serverAddress.sin_addr.s_addr = inet_addr(this->getHost().c_str());
     this->serverAddress.sin_port = htons(this->getPort());
     
     // ! Here bind address with the port 

@@ -58,18 +58,19 @@ void                            ManageServers::setClient(std::map<int, Client> C
 //! Methods ----------------------------------------------------------------
 
 
-void                            ManageServers::acceptClientConnection(ConfigServer& server)
+void                            ManageServers::acceptClientConnection(int fd)
 {
     struct  sockaddr_in         clientAddress;
     long                        clientAddressSize = sizeof(clientAddress);
     int                         clientSock;
-    Client                      client(server);
+    Client                      client;
 
     // ! Accept the connection
-    clientSock = accept(server.getFd(), (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
+    clientSock = accept(fd, (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressSize);
     if (clientSock == -1)
     {
         std::cerr << "Failed to accept " << std::endl;
+        // 406
         return;
     }
     // ! Adding the client Socket to the readable list of Sets
@@ -133,7 +134,7 @@ void                            ManageServers::assignServerToClient(Client & cli
 {
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
-        if (client.server.getHost() == it->getHost() && client.server.getPort() == it->getPort() && client.request.getServerName() == it->getServerName())
+        if (client.request.getHost() == it->getHost() && client.request.getPort() == it->getPort())
         {
             client.server = *it;
             return ;
@@ -205,6 +206,7 @@ void                            ManageServers::timeoutCheck()
     {
         if (time(NULL) - it->second.getLastMsgTime() > TIMEOUT_CONNECTION)
         {
+            // TODO: need to send timeout connection
             std::cerr << "Client [" << it->first << "] Timeout Connection, Closing ..." << std::endl;
             this->closeConnectionClient(it->first);
             return ;
@@ -267,7 +269,7 @@ void                            ManageServers::startServers()
         {
             // ! Here checking if the fd is already accepted or not 
             if (FD_ISSET(i, &readCpy) && this->serversMap.count(i))
-                this->acceptClientConnection(this->serversMap.find(i)->second);
+                this->acceptClientConnection(i);
             else if (FD_ISSET(i, &readCpy) && this->clientsMap.count(i))
             {
                 // ! Here start reading the request client
@@ -341,15 +343,14 @@ std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerP
 {
     std::vector<ConfigServer> vecServers;
     ConfigServer              server;
+
     for (size_t i = 0; i < servers.size(); i++)
     {
-        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->get_locations(), servers[i]->getErrorPages());
-        server.setClientMaxBodySize(servers[i]->getClientMaxBodySize());
-
+        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->get_locations(), servers[i]->getErrorPages(), servers[i]->getClientMaxBodySize());
         vecServers.push_back(server);
-        // std::cout << "|||||||||||||||||||||||||||||||||||||||| START PRINTING SRVER NUMBER [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
-        // servers[i]->printTheServerInfo();
-        // std::cout << "|||||||||||||||||||||||||||||||||||||||| END PRINTING SRVER NUMBER   [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
+    //     // std::cout << "|||||||||||||||||||||||||||||||||||||||| START PRINTING SRVER NUMBER [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
+    //     // servers[i]->printTheServerInfo();
+    //     // std::cout << "|||||||||||||||||||||||||||||||||||||||| END PRINTING SRVER NUMBER   [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
     }
 
     return vecServers;

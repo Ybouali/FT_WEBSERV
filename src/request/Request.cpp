@@ -20,7 +20,8 @@ Request::Request()
       keyStorage(),
       methodIndex(1),
       verMajor(0),
-      serverName(),
+      Host(),
+      Port(),
       fieldsDoneFlag(false),
       bodyFlag(false),
       bodyDoneFlag(false),
@@ -59,7 +60,8 @@ void            Request::clear()
     this->methodIndex = 0;
     this->verMajor = 0;
     this->verMinor = 0;
-    this->serverName.clear();
+    this->Host.clear();
+    this->Port = 0;
     this->fieldsDoneFlag = false;
     this->bodyFlag = false;
     this->bodyDoneFlag = false;
@@ -90,7 +92,7 @@ std::string                                         Request::getMethodsString() 
 
 short                                               Request::getCodeError() { return this->errorCode; }
 
-std::string &                                       Request::getServerName() { return this->serverName; }
+std::string &                                       Request::getHost() { return this->Host; }
 
 bool                                                Request::getMultiformFlag() { return this->multiformFlag; }
 
@@ -98,19 +100,14 @@ state                                               Request::getState() { return
 
 bool                                                Request::getNeedBody() { return this->needBody; }
 
+uint16_t                                            Request::getPort() { return this->Port; }
+
 // ? ----------------------------- setters -----------------------------------
 
 void                                            Request::setHeader(std::string & key, std::string & value)
 {
     key = skipWhitespaceBeginAnd(key);
     this->requestHeaders[key] = value;
-}
-
-void                                            Request::setBody(std::string body)
-{
-    // this->Body.clear();
-    this->Body.insert(this->Body.begin(), body.begin(), body.end());
-    this->bodyString = body;
 }
 
 void                                            Request::setMethod(Methods & method) { this->Method = method; }
@@ -146,10 +143,14 @@ void                                   Request::handleHeaders()
             this->chunkedFlag = true;
         this->bodyFlag = true;
     }
+    // TODO: HERE NEED TO CHECK IF HOST HEADER IS NOT EXIST WE SHOULD SEND A CODE STATUS 
     if (this->requestHeaders.count("Host"))
     {
-        size_t position = this->requestHeaders["Host"].find_first_of(':');
-        this->serverName = this->requestHeaders["Host"].substr(0, position);
+        std::string _host = this->requestHeaders["Host"];
+
+        size_t position = _host.find_first_of(':');
+        this->Host = skipWhitespaceBeginAnd(_host.substr(0, position));
+        this->Port = std::stoul(_host.substr(position + 1, _host.length()));
     }
     if (this->requestHeaders.count("Content-Type") && this->requestHeaders["Content-Type"].find("multipart/form-data") != std::string::npos)
     {
@@ -174,6 +175,8 @@ void                                   Request::readBufferFromReq(char * buffer,
 {
     u_int8_t                        c;
     static std::stringstream        str;
+
+    // std::cout << "READ :: [" << readBytes << "]" << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {

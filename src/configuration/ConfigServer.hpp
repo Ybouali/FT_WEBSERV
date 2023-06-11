@@ -7,7 +7,7 @@ class Location;
 class ConfigServer {
     private :
         uint16_t						Port;
-	    in_addr_t						Host; 
+	    std::string						Host; 
 		std::string						serverName;
 		std::map<short, std::string>    errorPages;
 		unsigned long					clientMaxBodySize;
@@ -18,7 +18,7 @@ class ConfigServer {
     public : 
         ConfigServer();
         
-        ConfigServer(std::string , std::string , std::string , std::vector<Location * > , std::map<short, std::string>);
+        ConfigServer(std::string , std::string , std::string , std::vector<Location * > , std::map<short, std::string>, std::string );
 
         ConfigServer(const ConfigServer &);
 
@@ -32,7 +32,7 @@ class ConfigServer {
 
         uint16_t                            getPort() const;
         
-        in_addr_t                           getHost() const;
+        std::string                         getHost() const;
 
         std::string                         getServerName() const;
 

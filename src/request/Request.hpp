@@ -68,7 +68,8 @@ class Request {
         short                                   methodIndex;
         u_int8_t                                verMajor;
         u_int8_t                                verMinor;
-        std::string                             serverName;
+        std::string                             Host;
+        uint16_t                                Port;
         bool                                    fieldsDoneFlag;
         bool                                    bodyFlag;
         bool                                    bodyDoneFlag;
@@ -109,7 +110,7 @@ class Request {
 
         short                                               getCodeError();
 
-        std::string &                                       getServerName();
+        std::string &                                       getHost();
 
         bool                                                getMultiformFlag();
 
@@ -117,11 +118,11 @@ class Request {
 
         bool                                                getNeedBody();
 
+        uint16_t                                            getPort();
+
         // ? ----------------------------- setters -----------------------------------
 
         void        setHeader(std::string &, std::string &);
-
-        void        setBody(std::string body);
 
         void        setMethod(Methods &);
 
