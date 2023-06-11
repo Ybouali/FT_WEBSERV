@@ -69,7 +69,7 @@ void	Response::handleGetDirectory()
 		}
 		else
 		{
-			this->handleGetAutoindex(dir);
+			this->handleGetAutoindex();
 		}
 	}
 	catch (const std::exception& e)
@@ -123,11 +123,19 @@ void	Response::handleGetFile()
 	}
 }
 
-void	Response::handleGetAutoindex(DIR* dir)
+void	Response::handleGetAutoindex()
 {
 	// check if the directory has autoindex
 	if (this->location.getAutoindex() == "on")
 	{
+		// open the directory and check if it's open
+		DIR* dir = opendir(this->fullPath.c_str());
+		if (dir == NULL)
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
+
 		// loop through the directory content and append it to the body
 		struct dirent* ent;
 		while ((ent = readdir(dir)) != NULL)
@@ -139,6 +147,8 @@ void	Response::handleGetAutoindex(DIR* dir)
 				this->body.append("\n");
 			}
 		}
+
+		closedir(dir);
 
 		// set the status code to 200 and build the response content
 		this->statusCode = 200;

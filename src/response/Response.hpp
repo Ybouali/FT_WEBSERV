@@ -58,7 +58,7 @@ class Response
 		void	handleGetMethod();
 		void	handleGetDirectory();
 		void	handleGetFile();
-		void	handleGetAutoindex(DIR*);
+		void	handleGetAutoindex();
 		void	handleGetCGI();
 
 		// Post
