@@ -86,21 +86,21 @@ void	Response::buildResponse()
 	{
 		if (this->statusCode == 301)
 		{
-			this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second, false);
+			this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
 			this->responseContent.append("Location: ");
 			this->responseContent.append(this->fullPath);
 			this->responseContent.append("\r\n");
 		}
 		else
 		{
-			this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second, false);
+			this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
 		}
 	}
 }
 
 void	Response::buildResponseContent()
 {
-	this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second, false);
+	this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
 	this->responseContent.append("Content-Type: ");
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");

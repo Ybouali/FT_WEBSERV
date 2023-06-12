@@ -81,7 +81,7 @@ void	Response::handleGetDirectory()
 void	Response::handleGetFile()
 {
 	// check if the requested file type is supported
-	if (isTypeSupported(this->fullPath))
+	if (!isTypeSupported(this->fullPath))
 	{
 		this->statusCode = 415;
 		throw std::exception();

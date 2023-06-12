@@ -62,7 +62,7 @@ bool            	checkIsToken(u_int8_t);
 std::string     	statusCodeString(short);
 std::string     	getPageError(short);
 std::string			getDateFormat();
-std::string     	getResponsePage(short, bool, std::string, bool);
+std::string     	getResponsePage(short, bool, std::string);
 bool            	errorCharQuery(char);
 bool            	checkStringIsEmpty(std::string);
 std::string     	generateRandomFileName();

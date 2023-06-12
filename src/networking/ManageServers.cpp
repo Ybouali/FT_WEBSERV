@@ -302,8 +302,8 @@ void                            ManageServers::sendResponse(const int & i, Clien
     // if (!client.request.getCodeError())
     //     client.request.setCodeError(200);
 
-    if (client.request.getCodeError() || client.request.getChrome())
-        response = getResponsePage(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second, client.request.getChrome());
+    if (client.request.getCodeError())
+        response = getResponsePage(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);
     else
         response = client.response.getResponseContent();
 

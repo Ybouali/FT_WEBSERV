@@ -22,7 +22,6 @@ Request::Request()
       verMajor(0),
       Host(),
       Port(),
-      Chrome(false),
       fieldsDoneFlag(false),
       bodyFlag(false),
       bodyDoneFlag(false),
@@ -66,7 +65,6 @@ Request & Request::operator= (const Request & other)
         this->verMinor = other.verMinor;
         this->Host = other.Host;
         this->Port = other.Port;
-        this->Chrome = other.Chrome;
         this->fieldsDoneFlag = other.fieldsDoneFlag;
         this->bodyFlag = other.bodyFlag;
         this->bodyDoneFlag = other.bodyDoneFlag;
@@ -105,7 +103,6 @@ void            Request::clear()
     this->verMinor = 0;
     this->Host.clear();
     this->Port = 0;
-    this->Chrome = false;
     this->fieldsDoneFlag = false;
     this->bodyFlag = false;
     this->bodyDoneFlag = false;
@@ -146,8 +143,6 @@ bool                                                Request::getNeedBody() { ret
 
 uint16_t                                            Request::getPort() { return this->Port; }
 
-bool                                                Request::getChrome() { return this->Chrome; }
-
 // ? ----------------------------- setters -----------------------------------
 
 void                                            Request::setHeader(std::string & key, std::string & value)
@@ -174,13 +169,6 @@ void                                   Request::handleHeaders()
     
     if (this->getMethodsString() == "POST" && !this->requestHeaders.count("Content-Length") && !this->requestHeaders.count("Transfer-Encoding"))
         this->setCodeError(411);
-
-    if (this->requestHeaders.count("User-Agent") && this->getPath() == "/favicon.ico" )
-    {
-        // Support Chrome Browser 
-        if (this->requestHeaders["User-Agent"].find_first_of("Chrome/"))
-            this->Chrome = true;
-    }
 
     if (this->requestHeaders.count("Content-Length"))
     {
