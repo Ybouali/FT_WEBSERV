@@ -230,7 +230,7 @@ static std::string getIconBrowserResponse()
     return oss.str();
 }
 
-std::string getResponsePage(short codeStatus, bool needBody, std::string pathErrorFile, bool sendIconBrowser)
+std::string getResponsePage(short codeStatus, bool NoNeedBody, std::string pathErrorFile, bool sendIconBrowser)
 {
     std::string response;
     std::string body = getContentFileFromPathFile(pathErrorFile);
@@ -243,11 +243,7 @@ std::string getResponsePage(short codeStatus, bool needBody, std::string pathErr
         body.clear();
         body = getIconBrowserResponse();
     }
-
-
-
     
-
 	response.append("HTTP/1.1 ");
 	response.append(std::to_string(codeStatus));
 	response.append(" ");
@@ -260,7 +256,7 @@ std::string getResponsePage(short codeStatus, bool needBody, std::string pathErr
     response.append("Server: Small nginx\r\n");
 	response.append(getDateFormat());
 
-    if (!needBody)
+    if (!NoNeedBody)
     {
         if (sendIconBrowser)
         {
@@ -268,7 +264,10 @@ std::string getResponsePage(short codeStatus, bool needBody, std::string pathErr
             response.append("Cache-Control: public, max-age=3600\r\n");
         }
         else
-            response.append("Content-Type: text/html\r\n");
+        {
+            // response.append("Content-Type: text/html\r\n");
+            response.append("Content-Type: video/mp4\r\n");
+        }
         response.append("Content-Length: ");
         response.append(std::to_string(body.length()));
         response.append("\r\n\r\n");
@@ -328,10 +327,10 @@ bool    isDirectory(const std::string path)
 
 bool    isTypeSupported(const std::string path)
 {
-    std::string type = path.substr(path.find_last_of(".") + 1);
+    std::string type = path.substr(path.find_last_of("."));
     MimeTypes mimeTypes;
 
-    if (mimeTypes.getMimeType(type).empty())
+    if (!mimeTypes.getMimeType(type).empty())
         return false;
 
     return true;
@@ -339,7 +338,7 @@ bool    isTypeSupported(const std::string path)
 
 const std::string  getContentType(const std::string path)
 {
-    std::string type = path.substr(path.find_last_of(".") + 1);
+    std::string type = path.substr(path.find_last_of("."));
     MimeTypes mimeTypes;
 
     return mimeTypes.getMimeType(type);
