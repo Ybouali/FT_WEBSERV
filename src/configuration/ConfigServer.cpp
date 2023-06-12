@@ -129,3 +129,19 @@ void                                ConfigServer::setupServer()
         exit(EXIT_FAILURE);
     }
 }
+
+void                ConfigServer::printServerInfo()
+{
+    std::cout << "HOST (" << this->getHost() << ") \n";
+    std::cout << "PORT (" << this->getPort() << ") \n";
+    std::cout << "SERVER NAME (" << this->getServerName() << ")\n";
+    std::cout << "THE CLIENT MAX BODY SIZE (" << this->getClientMaxBodySize() << ") \n";
+    std::cout << "\n\n";
+    for (size_t i = 0; i < this->getLocationList().size(); i++)
+    {
+        std::cout << "|||||||||||||||| START PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||" << std::endl;
+        this->getLocationList()[i]->printLocationInfo();
+        std::cout << "|||||||||||||||| END PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||||" << std::endl;
+    }
+    std::cout << "\n";
+}

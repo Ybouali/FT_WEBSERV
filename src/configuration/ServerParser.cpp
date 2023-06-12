@@ -303,8 +303,6 @@ void    ServerParser::printTheServerInfo()
     std::cout << "HOST (" << this->getHost() << ") \n";
     std::cout << "PORT (" << this->getPort() << ") \n";
     std::cout << "SERVER NAME (" << this->getServerName() << ")\n";
-    // if (!this->getErrorPages().empty())
-    //     std::cout << "PATH TO THE ERROR PAGES  ("<< this->getErrorPages() << ") \n";
     if (!this->getClientMaxBodySize().empty())
         std::cout << "THE CLIENT MAX BODY SIZE (" << this->getClientMaxBodySize() << ") \n";
     std::cout << "\n\n";

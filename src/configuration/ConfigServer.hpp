@@ -63,4 +63,6 @@ class ConfigServer {
         // ! Methods ----------------------------------------------------------------
 
         void                                setupServer();
+
+        void                                printServerInfo();
 };

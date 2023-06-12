@@ -319,7 +319,6 @@ void                            ManageServers::sendResponse(const int & i, Clien
     }
     else if (sentBytes == 0 || (size_t) sentBytes == response.length())
     {
-        // TODO: here need to check for the cgi from the client response if exists
         if (client.request.keepAlive() == false || client.request.getCodeError() )
         {
             std::cerr << "Client [" << i << "] Connection Closed" << std::endl;
