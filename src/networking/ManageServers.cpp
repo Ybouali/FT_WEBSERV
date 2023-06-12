@@ -305,7 +305,10 @@ void                            ManageServers::sendResponse(const int & i, Clien
     if (client.request.getCodeError())
         response = getResponsePage(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);
     else
+    {
+        client.request.setCodeError(client.response.getStatusCode());
         response = client.response.getResponseContent();
+    }
 
     if (response.size() >= MSG_BUF)
         sentBytes = send(i, response.c_str(), MSG_BUF, 0);

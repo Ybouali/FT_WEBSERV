@@ -27,7 +27,7 @@ bool            errorPath(std::string path)
 
 bool            checkUriCharacters(u_int8_t c)
 {
-    const std::string forbiddenChars = "<>\"%{}|\\^~[]`();/?:@=&$,#";
+    const std::string forbiddenChars = "<>\"%{}|\\^~[]`();?:@=&$,#";
   
     return forbiddenChars.find(c) != std::string::npos;
 }
