@@ -278,7 +278,7 @@ void                            ManageServers::startServers()
                 // ! Here printing the request for the start working in the response
                 // ! Just if there is no error on the request parsing .
                 // if (!this->clientsMap[i].request.getCodeError())
-                //     this->clientsMap[i].request.printRequest(i);
+                    // this->clientsMap[i].request.printRequest();
             }
             else if (FD_ISSET(i, &writeCpy))
             {
@@ -298,12 +298,12 @@ void                            ManageServers::sendResponse(const int & i, Clien
     int sentBytes;
     std::string response;
 
-    // ! FOR TESTING ONLY
-    if (!client.request.getCodeError())
-        client.request.setCodeError(200);
+    // // ! FOR TESTING ONLY
+    // if (!client.request.getCodeError())
+    //     client.request.setCodeError(200);
 
-    if (client.request.getCodeError())
-        response = getResponsePage(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);
+    if (client.request.getCodeError() || client.request.getChrome())
+        response = getResponsePage(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second, client.request.getChrome());
     else
         response = client.response.getResponseContent();
 
@@ -335,7 +335,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
     else
     {
         client.updateTime();
-        // TODO: here need to remove from the response the sentBytes that already sends [headers, body ]
+        
     }
 }
 

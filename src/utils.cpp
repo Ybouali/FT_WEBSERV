@@ -214,13 +214,39 @@ static std::string getContentFileFromPathFile(std::string path)
     return content;
 }
 
-std::string getResponsePage(short codeStatus, bool needBody, std::string pathErrorFile)
+static std::string getIconBrowserResponse()
+{
+    std::ifstream file("./img/Icon.png", std::ios::binary);
+
+    std::ostringstream oss;
+    char c;
+
+    while (file.get(c)) {
+        oss << c ;
+    }
+
+    file.close();
+
+    return oss.str();
+}
+
+std::string getResponsePage(short codeStatus, bool needBody, std::string pathErrorFile, bool sendIconBrowser)
 {
     std::string response;
     std::string body = getContentFileFromPathFile(pathErrorFile);
 
     if (body.empty())
         body = getPageError(codeStatus);
+
+    if (sendIconBrowser)
+    {
+        body.clear();
+        body = getIconBrowserResponse();
+    }
+
+
+
+    
 
 	response.append("HTTP/1.1 ");
 	response.append(std::to_string(codeStatus));
@@ -236,7 +262,13 @@ std::string getResponsePage(short codeStatus, bool needBody, std::string pathErr
 
     if (!needBody)
     {
-        response.append("Content-Type: text/html\r\n");
+        if (sendIconBrowser)
+        {
+            response.append("Content-Type: image/png\r\n");
+            response.append("Cache-Control: public, max-age=3600\r\n");
+        }
+        else
+            response.append("Content-Type: text/html\r\n");
         response.append("Content-Length: ");
         response.append(std::to_string(body.length()));
         response.append("\r\n\r\n");

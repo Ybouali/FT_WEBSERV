@@ -70,6 +70,7 @@ class Request {
         u_int8_t                                verMinor;
         std::string                             Host;
         uint16_t                                Port;
+        bool                                    Chrome;
         bool                                    fieldsDoneFlag;
         bool                                    bodyFlag;
         bool                                    bodyDoneFlag;
@@ -88,6 +89,10 @@ class Request {
 
         ~Request();
 
+        Request (const Request & );
+
+        Request &operator= (const Request &);
+
         void                    clear();
 
         // ? ----------------------------- getters -----------------------------------
@@ -104,7 +109,7 @@ class Request {
 
         std::string  &                                      getBoundary();
 
-        Methods &                                           getMethod();
+        Methods                                             getMethod();
 
         std::string                                         getMethodsString();
 
@@ -119,6 +124,8 @@ class Request {
         bool                                                getNeedBody();
 
         uint16_t                                            getPort();
+
+        bool                                                getChrome();
 
         // ? ----------------------------- setters -----------------------------------
 
@@ -139,7 +146,7 @@ class Request {
         
         void        readBufferFromReq(char *, std::size_t);
 
-        void        printRequest(const int &);
+        void        printRequest();
 
         // ! upload file just for testing
         void                            uploadFile(std::string );

@@ -22,6 +22,7 @@ Request::Request()
       verMajor(0),
       Host(),
       Port(),
+      Chrome(false),
       fieldsDoneFlag(false),
       bodyFlag(false),
       bodyDoneFlag(false),
@@ -34,6 +35,48 @@ Request::Request()
     this->methodsString[::GET] = "GET";
     this->methodsString[::POST] = "POST";
     this->methodsString[::DELETE] = "DELETE";
+}
+
+Request::Request(const Request & other)
+{
+    *this = other;
+}
+
+Request & Request::operator= (const Request & other)
+{
+    if (this != &other)
+    {
+        this->Path = other.Path;
+        this->Query = other.Query;
+        this->requestHeaders = other.requestHeaders;
+        this->Body = other.Body;
+        this->bodyString = other.bodyString;
+        this->Boundary = other.Boundary;
+        this->methodsString = other.methodsString;
+        this->State = other.State;
+        this->Method = other.Method;
+        this->maxBodySize = other.maxBodySize;
+        this->bodySize = other.bodySize;
+        this->errorCode = other.errorCode;
+        this->chunkedLength = other.chunkedLength;
+        this->Storage = other.Storage;
+        this->keyStorage = other.keyStorage;
+        this->methodIndex = other.methodIndex;
+        this->verMajor = other.verMajor;
+        this->verMinor = other.verMinor;
+        this->Host = other.Host;
+        this->Port = other.Port;
+        this->Chrome = other.Chrome;
+        this->fieldsDoneFlag = other.fieldsDoneFlag;
+        this->bodyFlag = other.bodyFlag;
+        this->bodyDoneFlag = other.bodyDoneFlag;
+        this->completeFlag = other.completeFlag;
+        this->chunkedFlag = other.chunkedFlag;
+        this->multiformFlag = other.multiformFlag;
+        this->needBody = other.needBody;
+        this->filesInfo = other.filesInfo;
+    }   
+    return *this;
 }
 
 Request::~Request()
@@ -62,6 +105,7 @@ void            Request::clear()
     this->verMinor = 0;
     this->Host.clear();
     this->Port = 0;
+    this->Chrome = false;
     this->fieldsDoneFlag = false;
     this->bodyFlag = false;
     this->bodyDoneFlag = false;
@@ -86,7 +130,7 @@ std::string &                                       Request::getBody() { return 
 
 std::string &                                       Request::getBoundary() { return this->Boundary; }
 
-Methods &                                           Request::getMethod() { return this->Method; }
+Methods                                            Request::getMethod() { return this->Method; }
 
 std::string                                         Request::getMethodsString() { return this->methodsString[this->Method]; }
 
@@ -101,6 +145,8 @@ state                                               Request::getState() { return
 bool                                                Request::getNeedBody() { return this->needBody; }
 
 uint16_t                                            Request::getPort() { return this->Port; }
+
+bool                                                Request::getChrome() { return this->Chrome; }
 
 // ? ----------------------------- setters -----------------------------------
 
@@ -129,6 +175,13 @@ void                                   Request::handleHeaders()
     if (this->getMethodsString() == "POST" && !this->requestHeaders.count("Content-Length") && !this->requestHeaders.count("Transfer-Encoding"))
         this->setCodeError(411);
 
+    if (this->requestHeaders.count("User-Agent") && this->getPath() == "/favicon.ico" )
+    {
+        // Support Chrome Browser 
+        if (this->requestHeaders["User-Agent"].find_first_of("Chrome/"))
+            this->Chrome = true;
+    }
+
     if (this->requestHeaders.count("Content-Length"))
     {
         this->bodyFlag = true;
@@ -143,7 +196,10 @@ void                                   Request::handleHeaders()
             this->chunkedFlag = true;
         this->bodyFlag = true;
     }
-    // TODO: HERE NEED TO CHECK IF HOST HEADER IS NOT EXIST WE SHOULD SEND A CODE STATUS 
+
+    if (!this->requestHeaders.count("Host"))
+        this->setCodeError(400);
+
     if (this->requestHeaders.count("Host"))
     {
         std::string _host = this->requestHeaders["Host"];
@@ -175,8 +231,6 @@ void                                   Request::readBufferFromReq(char * buffer,
 {
     u_int8_t                        c;
     static std::stringstream        str;
-
-    // std::cout << "READ :: [" << readBytes << "]" << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {
@@ -635,9 +689,8 @@ void                                   Request::readBufferFromReq(char * buffer,
     //     this->errorCode = 400;
 }
 
-void                                   Request::printRequest(const int & i)
+void                                   Request::printRequest()
 {
-    std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  Client (" << i << ") SEND A REQUEST ! :::::::::::::" << "\n\n";
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  START PRINTING THE REQUEST  :::::::::::::" << "\n\n";
     std::cout << "METHOD    [" << this->methodsString[this->getMethod()] << "]" << std::endl;
     std::cout << "PATH      [" << this->getPath() << "]" << std::endl;

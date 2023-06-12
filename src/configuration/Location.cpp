@@ -90,6 +90,7 @@ Location& Location::operator=(const Location& other) {
         autoindex = other.autoindex;
         index = other.index;
         redirection = other.redirection;
+        cgi = other.cgi;
     }
     return *this;
 }
@@ -120,9 +121,8 @@ Location::~Location(){
 void Location::printLocationInfo(){
     std::cout << "LOCATION        (" << this->getLocation() << ") \n";
 
-    std::cout << "METHOD          (" << this->getMethod()[0] << ") \n";
-    std::cout << "METHOD          (" << this->getMethod()[1] << ") \n";
-    std::cout << "METHOD          (" << this->getMethod()[2] << ") \n";
+    for (size_t i = 0; i < this->getMethod().size(); i++)
+        std::cout << "METHOD          (" << this->getMethod()[i] << ") \n";
     
     std::cout << "ROOT            (" << this->getRoot() << ") \n";
     std::cout << "UPLOAD          (" << this->getUpload() << ")\n";

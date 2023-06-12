@@ -10,7 +10,7 @@ ConfigServer::ConfigServer()
 }
 
 ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList, std::map<short, std::string> errorPages, std::string clientMaxBodySize)
-    : Port(), Host(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
+    : Port(), Host(), serverName(), errorPages(), clientMaxBodySize(), locationList()
 {
     this->setPort(port);
     this->setHost(host);
@@ -21,7 +21,7 @@ ConfigServer::ConfigServer(std::string port, std::string host, std::string Serve
     this->setFd(0);
 }
 
-ConfigServer::ConfigServer(const ConfigServer & other) { *this = other; }
+ConfigServer::ConfigServer(const ConfigServer & other) {*this = other; }
 
 
 ConfigServer & ConfigServer::operator=(const ConfigServer & other)
