@@ -132,13 +132,25 @@ void                            ManageServers::readRequest(const int & i, Client
 
 void                            ManageServers::assignServerToClient(Client & client)
 {
+    client.server.clear();
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)
     {
-        if (client.request.getHost() == it->getHost() && client.request.getPort() == it->getPort())
+        if ( \
+            (client.request.getHost() == it->getHost() || \
+            (client.request.getHost() == "localhost" && it->getHost() == "127.0.0.1" )
+        ) && client.request.getPort() == it->getPort())
         {
             client.server = *it;
             return ;
         }
+    }
+
+    if (client.server.getHost().empty())
+    {
+        if (this->Servers.empty())
+            client.server = ConfigServer();
+        else
+            client.request.setCodeError(400);
     }
 }
 
@@ -206,7 +218,6 @@ void                            ManageServers::timeoutCheck()
     {
         if (time(NULL) - it->second.getLastMsgTime() > TIMEOUT_CONNECTION)
         {
-            // TODO: need to send timeout connection
             std::cerr << "Client [" << it->first << "] Timeout Connection, Closing ..." << std::endl;
             this->closeConnectionClient(it->first);
             return ;
@@ -320,7 +331,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
     }
-    else if (sentBytes == 0 || (size_t) sentBytes == response.length())
+    else if (sentBytes == 0 || (size_t) sentBytes == response.size())
     {
         if (client.request.keepAlive() == false || client.request.getCodeError() )
         {
@@ -335,10 +346,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
         }
     }
     else
-    {
         client.updateTime();
-        
-    }
 }
 
 std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerParser *> servers)

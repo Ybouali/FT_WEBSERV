@@ -82,10 +82,14 @@ void                ConfigServer::setServerName(std::string ServerName) { this->
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 
 void                ConfigServer::setClientMaxBodySize(std::string size) { 
-    unsigned long _clientMaxBodySize = std::stoul(size);
+    std::istringstream iss(size);
+    char* endPtr;
+    unsigned long _clientMaxBodySize = strtoul(iss.str().c_str(), &endPtr, 10);
 
     if (!_clientMaxBodySize)
         this->clientMaxBodySize = _clientMaxBodySize;
+    else
+        this->clientMaxBodySize = CLIENT_MAX_BODY_SIZE;
 }
 
 void                ConfigServer::setLocationList(std::vector<Location * > _locationList) { this->locationList = _locationList; }

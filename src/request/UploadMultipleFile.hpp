@@ -22,7 +22,7 @@ class UploadMultipleFile {
 
         void                                        setContentDisposition(const std::string & );
         void                                        setContentType(const std::string & );
-        void                                        setPathWithfilename(const std::string & , const std::vector<UploadMultipleFile> & );
+        void                                        setPathWithfilename(const std::string & );
         void                                        setBodyFile(const std::string &);
 
         const std::vector<UploadMultipleFile> &     parse_body(const std::string & , const std::string & , const std::string &);
@@ -30,9 +30,9 @@ class UploadMultipleFile {
     private :
         std::string                         contentDisposition;
         std::string                         contentType;
+        std::string                         curr_fileName;
         std::string                         fileName;
         std::string                         pathWithFilename;
         std::string                         bodyFile;
         std::vector<UploadMultipleFile>     vecFiles;
-
 };

@@ -166,7 +166,7 @@ void                                            Request::substrRequestBodyString
 void                                   Request::handleHeaders()
 {
     std::stringstream ss;
-    
+
     if (this->getMethodsString() == "POST" && !this->requestHeaders.count("Content-Length") && !this->requestHeaders.count("Transfer-Encoding"))
         this->setCodeError(411);
 
@@ -191,10 +191,23 @@ void                                   Request::handleHeaders()
     if (this->requestHeaders.count("Host"))
     {
         std::string _host = this->requestHeaders["Host"];
-
-        size_t position = _host.find_first_of(':');
-        this->Host = skipWhitespaceBeginAnd(_host.substr(0, position));
-        this->Port = std::stoul(_host.substr(position + 1, _host.length()));
+        
+        try
+        {
+            size_t position = _host.find_first_of(':');
+            this->Host = skipWhitespaceBeginAnd(_host.substr(0, position));
+            std::string host = _host.substr(position + 1, _host.length());
+            for (size_t i = 0; i < host.size(); i++)
+            {
+                if (!std::isdigit(host[i]))
+                    this->setCodeError(400);
+            }
+            this->Port = std::stoul(host);
+        }
+        catch(const std::exception)
+        {
+            this->setCodeError(400);
+        }
     }
     if (this->requestHeaders.count("Content-Type") && this->requestHeaders["Content-Type"].find("multipart/form-data") != std::string::npos)
     {
