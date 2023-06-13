@@ -19,7 +19,7 @@ void	Response::handleDeleteMethod()
 			{
 				this->handleDeleteCGI();
 			}
-			else if (this->location.getCgi() == "off")
+			else
 			{
 				this->handleDeleteFile();
 			}
@@ -82,7 +82,7 @@ void	Response::handleDeleteDirectory()
 				throw std::exception();
 			}
 		}
-		else if (this->location.getCgi() == "off")
+		else
 		{
 			this->handleDeleteDirectoryContent();
 		}

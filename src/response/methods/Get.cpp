@@ -99,7 +99,7 @@ void	Response::handleGetFile()
 	{
 		this->handleGetCGI();
 	}
-	else if (this->location.getCgi() == "off")
+	else
 	{
 		// open the file and check if it's open
 		std::ifstream file(this->fullPath.c_str());
@@ -155,7 +155,7 @@ void	Response::handleGetAutoindex()
 		this->fullPath.append("index.html");
 		this->buildResponseContent();
 	}
-	else if (this->location.getAutoindex() == "off")
+	else
 	{
 		this->statusCode = 403;
 		throw std::exception();

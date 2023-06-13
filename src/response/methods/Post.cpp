@@ -108,7 +108,7 @@ void	Response::handlePostFile()
 	{
 		this->handlePostCGI();
 	}
-	else if (this->location.getCgi() == "off")
+	else
 	{
 		this->statusCode = 403;
 		throw std::exception();
