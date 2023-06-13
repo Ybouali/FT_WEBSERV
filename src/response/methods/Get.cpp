@@ -28,8 +28,9 @@ void	Response::handleGetDirectory()
 	// check if the directory path ends with a slash
 	if (this->fullPath.at(this->fullPath.length() - 1) != '/')
 	{
-		// if it doesn't, redirect the client to the same path with a slash at the end
+		// if it doesn't, redirect the client to the same requested path with a slash at the end
 		this->statusCode = 301;
+		this->fullPath.replace(0, this->location.getRoot().length(), this->location.getLocation());
 		this->fullPath.append("/");
 		throw std::exception();
 	}
