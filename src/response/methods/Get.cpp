@@ -103,7 +103,7 @@ void	Response::handleGetFile()
 	else
 	{
 		static int fd;
-		char buffer[MSG_BUF];
+		char buffer[BUF_SIZE];
 
 		if (readBytes == 0)
 		{
@@ -135,7 +135,7 @@ void	Response::handleGetFile()
 			this->responseContent.clear();
 
 			// read the file content and check if it's read
-			readBytes = read(fd, buffer, MSG_BUF);
+			readBytes = read(fd, buffer, BUF_SIZE);
 
 			if (readBytes == -1)
 			{
@@ -145,7 +145,7 @@ void	Response::handleGetFile()
 			else if (readBytes > 0)
 			{
 				this->responseContent = std::string(buffer, readBytes);
-				memset(buffer, 0, MSG_BUF);
+				memset(buffer, 0, BUF_SIZE);
 			}
 			else
 			{

@@ -2,10 +2,6 @@
 
 Response::Response() : statusCode(0), readBytes(0), readStatus(false), connectionStatus(false), sendStatus(false)
 {
-	this->body = "";
-	this->responseContent = "";
-	this->method = "";
-	this->fullPath = "";
 }
 
 Response::~Response()
@@ -132,7 +128,12 @@ void	Response::buildResponse()
 
 void	Response::buildResponseContent()
 {
-	this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
+	// this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
+	this->responseContent.append("HTTP/1.1 ");
+	this->responseContent.append(std::to_string(this->statusCode));
+	this->responseContent.append(" ");
+	this->responseContent.append(statusCodeString(this->statusCode));
+	this->responseContent.append("\r\n");
 	this->responseContent.append("Content-Type: ");
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");
