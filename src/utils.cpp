@@ -296,7 +296,7 @@ bool    isDirectory(const std::string path)
 
 bool    isTypeSupported(const std::string path)
 {
-    std::string type = path.substr(path.find_last_of("."));
+    std::string type = path.substr(path.find_last_of(".") + 1);
     MimeTypes mimeTypes;
 
     if (!mimeTypes.getMimeType(type).empty())
@@ -307,7 +307,7 @@ bool    isTypeSupported(const std::string path)
 
 const std::string  getContentType(const std::string path)
 {
-    std::string type = path.substr(path.find_last_of("."));
+    std::string type = path.substr(path.find_last_of(".") + 1);
     MimeTypes mimeTypes;
 
     return mimeTypes.getMimeType(type);
