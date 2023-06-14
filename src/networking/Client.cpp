@@ -31,12 +31,9 @@ void                        Client::buildResponse()
     //         this->request.uploadFile("www/uploads/");
     // }
 
-    if (!this->request.getCodeError())
-    {
-        this->response.setConfigServer(this->server);
-        this->response.setRequest(this->request);
-        this->response.buildResponse();
-    }
+    this->response.setConfigServer(this->server);
+    this->response.setRequest(this->request);
+    this->response.buildResponse();
 }
 
 //! ----------------------------- getters -----------------------------------
@@ -61,7 +58,7 @@ void                    Client::updateTime() { this->setLastMsgTime(time(NULL));
 
 void                    Client::clear()
 {
+    this->server.clear();
     this->request.clear();
     this->response.clear();
 }
-

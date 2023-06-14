@@ -15,6 +15,10 @@ class Response
 		Location		location;
 		std::string		method;
 		std::string		fullPath;
+		int				readBytes;
+		bool			readStatus;
+		bool 			connectionStatus;
+		bool			sendStatus;
 
     public:
 		static MimeTypes mime_type;
@@ -33,6 +37,10 @@ class Response
 		const Location&		getLocation() const;
 		const std::string&	getMethod() const;
 		const std::string&	getFullPath() const;
+		int					getReadBytes() const;
+		bool				getReadStatus() const;
+		bool				getConnectionStatus() const;
+		bool				getSendStatus() const;
 
         // ----------------------------- Setters -----------------------------------
 
@@ -44,6 +52,10 @@ class Response
 		void	setLocation(const Location&);
 		void	setMethod(const std::string&);
 		void	setFullPath(const std::string&);
+		void	setReadBytes(const int);
+		void	setReadStatus(const bool);
+		void	setConnectionStatus(const bool);
+		void	setSendStatus(const bool);
 
         // ----------------------------- Methodes -----------------------------------
 

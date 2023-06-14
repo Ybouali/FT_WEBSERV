@@ -102,25 +102,58 @@ void	Response::handleGetFile()
 	}
 	else
 	{
-		// open the file and check if it's open
-		std::ifstream file(this->fullPath.c_str());
-		if (!file.is_open())
+		static int fd;
+		char buffer[MSG_BUF];
+
+		if (readBytes == 0)
 		{
-			this->statusCode = 500;
-			throw std::exception();
+			// open the requested file and check if it's open
+			fd = open(this->fullPath.c_str(), O_RDONLY);
+
+			if (fd == -1)
+			{
+				this->statusCode = 500;
+				throw std::exception();
+			}
 		}
 
-		// TODO: if the requested file is too large
-		// read the file content and store it in the body
-		std::stringstream buffer;
-		buffer << file.rdbuf();
-		this->body = buffer.str();
+		if (!this->readStatus)
+		{
+			// set the response headers
+			this->statusCode = 200;
+			this->buildResponseContent();
 
-		file.close();
+			// set the read status to true to read the file content
+			this->readStatus = true;
+		}
+		else
+		{
+			if (this->sendStatus)
+				return;
 
-		// set the status code to 200 and build the response content
-		this->statusCode = 200;
-		this->buildResponseContent();
+			// clear the response content that was sent in the previous loop
+			this->responseContent.clear();
+
+			// read the file content and check if it's read
+			readBytes = read(fd, buffer, MSG_BUF);
+
+			if (readBytes == -1)
+			{
+				this->statusCode = 500;
+				throw std::exception();
+			}
+			else if (readBytes > 0)
+			{
+				this->responseContent = std::string(buffer, readBytes);
+				memset(buffer, 0, MSG_BUF);
+			}
+			else
+			{
+				this->statusCode = 200;
+				this->connectionStatus = true;
+				close(fd);
+			}
+		}
 	}
 }
 

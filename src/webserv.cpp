@@ -8,6 +8,9 @@ int main(int ac, char **av)
     std::vector<ServerParser *>     servers;
     ManageServers master;
 
+    // ignore SIGPIPE signal
+    // (broken pipe) when trying to write to a socket that has been closed
+    signal(SIGPIPE, SIG_IGN);
 
     if (ac == 2)
     {

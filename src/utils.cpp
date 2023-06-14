@@ -206,23 +206,22 @@ static std::string getContentFileFromPathFile(std::string path)
 
     if (file.is_open())
     {
-        std::string line;
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        content = buffer.str();
 
-        while (std::getline(file, line))
-            content += line;
+        file.close();
     }
+
     return content;
 }
 
 std::string getResponsePage(short codeStatus, bool NoNeedBody, std::string pathErrorFile)
 {
     std::string response;
-    std::string body = getContentFileFromPathFile(pathErrorFile);
+    std::string body;
 
-    if (body.empty())
-        body = getPageError(codeStatus);
-    
-	response.append("HTTP/1.1 ");
+    response.append("HTTP/1.1 ");
 	response.append(std::to_string(codeStatus));
 	response.append(" ");
 	response.append(statusCodeString(codeStatus));
@@ -236,6 +235,10 @@ std::string getResponsePage(short codeStatus, bool NoNeedBody, std::string pathE
 
     if (!NoNeedBody)
     {
+        body = getContentFileFromPathFile(pathErrorFile);
+        if (body.empty())
+            body = getPageError(codeStatus);
+
         response.append("Content-Type: text/html\r\n");
         response.append("Content-Length: ");
         response.append(std::to_string(body.length()));
@@ -299,7 +302,7 @@ bool    isTypeSupported(const std::string path)
     std::string type = path.substr(path.find_last_of(".") + 1);
     MimeTypes mimeTypes;
 
-    if (!mimeTypes.getMimeType(type).empty())
+    if (mimeTypes.getMimeType(type).empty())
         return false;
 
     return true;

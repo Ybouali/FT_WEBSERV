@@ -121,10 +121,9 @@ void                            ManageServers::readRequest(const int & i, Client
         // ! We should assign the Server to the client
         this->assignServerToClient(client);
 
-        client.buildResponse();
-
-        // ! Remove fd from recv fd
+        // ! Remove fd from recv fd+
         this->removeFromSet(i, this->readFd);
+
         // ! And add it to the write fd to send response
         this->addToSet(i, this->writeFd);
     }
@@ -293,6 +292,9 @@ void                            ManageServers::startServers()
             }
             else if (FD_ISSET(i, &writeCpy))
             {
+                // ! Here building the response
+                this->clientsMap[i].buildResponse();
+
                 // ! Here sending the response
                 this->sendResponse(i, this->clientsMap[i]);
             }
@@ -306,34 +308,26 @@ void                            ManageServers::startServers()
 
 void                            ManageServers::sendResponse(const int & i, Client & client)
 {
-    int sentBytes;
-    std::string response;
+    std::string response = client.response.getResponseContent();
 
-    // // ! FOR TESTING ONLY
-    // if (!client.request.getCodeError())
-    //     client.request.setCodeError(200);
+    int sentBytes = send(i, response.c_str(), response.size(), 0);
 
-    if (client.request.getCodeError())
-        response = getResponsePage(client.request.getCodeError(), client.request.getNeedBody(), client.server.getErrorPages().find(client.request.getCodeError())->second);
-    else
+    client.response.setSendStatus(false);
+    if ((size_t)sentBytes != response.size())
     {
-        client.request.setCodeError(client.response.getStatusCode());
-        response = client.response.getResponseContent();
+        client.response.setSendStatus(true);
+        std::cout << sentBytes << std::endl;
+        std::cout << response.size() << std::endl;
     }
 
-    if (response.size() >= MSG_BUF)
-        sentBytes = send(i, response.c_str(), MSG_BUF, 0);
-    else
-        sentBytes = send(i, response.c_str(), response.size(), 0);
-
-    if (sentBytes < 0) 
+    if (sentBytes < 0)
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
     }
-    else if (sentBytes == 0 || (size_t) sentBytes == response.size())
+    else if (sentBytes == 0 || client.response.getConnectionStatus())
     {
-        if (client.request.keepAlive() == false || client.request.getCodeError() )
+        if (client.request.keepAlive() == false || client.response.getStatusCode())
         {
             std::cerr << "Client [" << i << "] Connection Closed" << std::endl;
             this->closeConnectionClient(i);

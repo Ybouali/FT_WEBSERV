@@ -1,7 +1,11 @@
 #include "Response.hpp"
 
-Response::Response() : statusCode(0)
+Response::Response() : statusCode(0), readBytes(0), readStatus(false), connectionStatus(false), sendStatus(false)
 {
+	this->body = "";
+	this->responseContent = "";
+	this->method = "";
+	this->fullPath = "";
 }
 
 Response::~Response()
@@ -19,6 +23,10 @@ void	Response::clear()
 	this->location.clear();
 	this->method.clear();
 	this->fullPath.clear();
+	this->readBytes = 0;
+	this->readStatus = false;
+	this->connectionStatus = false;
+	this->sendStatus = false;
 }
 
 // ----------------------------- Getters -----------------------------------
@@ -39,6 +47,14 @@ const std::string&	Response::getMethod() const { return this->method; }
 
 const std::string&	Response::getFullPath() const { return this->fullPath; }
 
+int					Response::getReadBytes() const { return this->readBytes; }
+
+bool				Response::getReadStatus() const { return this->readStatus; }
+
+bool				Response::getConnectionStatus() const { return this->connectionStatus; }
+
+bool				Response::getSendStatus() const { return this->sendStatus; }
+
 // ----------------------------- Setters -----------------------------------
 
 void	Response::setConfigServer(const ConfigServer& server) { this->server = server; }
@@ -57,12 +73,28 @@ void	Response::setMethod(const std::string& method) { this->method = method; }
 
 void	Response::setFullPath(const std::string& fullPath) { this->fullPath = fullPath; }
 
+void	Response::setReadBytes(const int readBytes) { this->readBytes = readBytes; }
+
+void	Response::setReadStatus(const bool readStatus) { this->readStatus = readStatus; }
+
+void	Response::setConnectionStatus(const bool connectionStatus) { this->connectionStatus = connectionStatus; }
+
+void	Response::setSendStatus(const bool sendStatus) { this->sendStatus = sendStatus; }
+
 // ----------------------------- Methodes -----------------------------------
 
 void	Response::buildResponse()
 {
 	try
 	{
+		// set the response status code based on the request code error
+		// if the request is valid, the code error will be 0
+		this->statusCode = this->request.getCodeError();
+		if (this->statusCode)
+		{
+			throw std::exception();
+		}
+
 		// check if the request is valid
 		this->isLocationMatched();
 		this->isRedirectionExist();
@@ -105,9 +137,24 @@ void	Response::buildResponseContent()
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");
 	this->responseContent.append("Content-Length: ");
-	this->responseContent.append(std::to_string(this->body.length()));
-	this->responseContent.append("\r\n\r\n");
-	this->responseContent.append(this->body);
+	if (!this->body.empty())
+	{
+		this->responseContent.append(std::to_string(this->body.length()));
+		this->responseContent.append("\r\n\r\n");
+		this->responseContent.append(this->body);
+	}
+	else
+	{
+		struct stat st;
+		const char *filename = this->fullPath.c_str();
+		stat(filename, &st);
+		off_t size = st.st_size;
+
+		this->responseContent.append(std::to_string(size));
+		this->responseContent.append("\r\n");
+		this->responseContent.append("Connection: keep-alive");
+		this->responseContent.append("\r\n\r\n");
+	}
 }
 
 void	Response::isLocationMatched()
