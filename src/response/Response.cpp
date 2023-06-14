@@ -134,6 +134,8 @@ void	Response::buildResponseContent()
 	this->responseContent.append(" ");
 	this->responseContent.append(statusCodeString(this->statusCode));
 	this->responseContent.append("\r\n");
+	this->responseContent.append("Server: Small nginx\r\n");
+	this->responseContent.append(getDateFormat());
 	this->responseContent.append("Content-Type: ");
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");
