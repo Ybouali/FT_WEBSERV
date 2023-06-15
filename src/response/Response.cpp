@@ -2,6 +2,10 @@
 
 Response::Response() : statusCode(0), readBytes(0), readStatus(false), connectionStatus(false), sendStatus(false)
 {
+	this->body = "";
+	this->responseContent = "";
+	this->method = "";
+	this->fullPath = "";
 }
 
 Response::~Response()
@@ -128,14 +132,7 @@ void	Response::buildResponse()
 
 void	Response::buildResponseContent()
 {
-	// this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
-	this->responseContent.append("HTTP/1.1 ");
-	this->responseContent.append(std::to_string(this->statusCode));
-	this->responseContent.append(" ");
-	this->responseContent.append(statusCodeString(this->statusCode));
-	this->responseContent.append("\r\n");
-	this->responseContent.append("Server: Small nginx\r\n");
-	this->responseContent.append(getDateFormat());
+	this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
 	this->responseContent.append("Content-Type: ");
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");
@@ -162,7 +159,7 @@ void	Response::buildResponseContent()
 
 void	Response::isLocationMatched()
 {
-	std::vector<Location *>	locations = this->server.getLocationList();
+	std::vector<Location >	locations = this->server.getLocationList();
 	std::string				requestedLocation = this->request.getPath();
 	bool					isMatched = false;
 
@@ -175,13 +172,13 @@ void	Response::isLocationMatched()
 	}
 
 	// check if the requested location is matched with a location in the server
-	for (std::vector<Location *>::iterator it = locations.begin(); it != locations.end(); it++)
+	for (std::vector<Location >::iterator it = locations.begin(); it != locations.end(); it++)
 	{
 		// if the requested location is matched, set it to the response location
-		if ((*it)->getLocation() == requestedLocation)
+		if (it->getLocation() == requestedLocation)
 		{
 			isMatched = true;
-			this->location = *(*it);
+			this->location = *it;
 		}
 	}
 

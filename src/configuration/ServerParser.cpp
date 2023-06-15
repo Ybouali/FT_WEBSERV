@@ -4,11 +4,7 @@ void ServerParser::setPort(const std::string& value) {
     for (size_t i = 0; i < value.size(); i++)
     {
         if (!std::isdigit(value[i]))
-        {
-            std::cerr << "[ERROR] :: the port must be a number [" << value << "]" << std::endl;
-            this->error = true;
-            exit (1);
-        }
+            parse_error("port");
     }
     port = value;
 }
@@ -18,9 +14,12 @@ const std::string& ServerParser::getHost() const {
 }
 
 void ServerParser::setHost(const std::string& value) {
+    
     std::regex ip_regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
-    if (!std::regex_match(value, ip_regex))
-        this->error = true;
+    
+    if (!std::regex_match(value, ip_regex) || value == "0.0.0.0")
+        parse_error("host");
+
     host = value;
 }
 
@@ -38,11 +37,40 @@ const std::map<short, std::string>& ServerParser::getErrorPages() const {
 
 std::string ServerParser::getPort() const { return port; }
 
-void ServerParser::setErrorPages(short codeStatus, const std::string& value) {
-    error_pages[codeStatus] = value;
+void ServerParser::setErrorPages(const std::string & codeStatus, const std::string& path) {
+
+    if (codeStatus.empty() || path.empty())
+        parse_error("page_error");
+
+    if (codeStatus.length() != 3)
+        parse_error("(error page) code status");
+
+    for (size_t i = 0; i < codeStatus.length(); i++)
+    {
+        if (!isdigit(codeStatus[i]))
+            parse_error("(error page) code status");
+    }
+    short code = std::stoi(codeStatus);
+    if (!isValidHTTPStatusCode(code))
+        parse_error("(error page) code status");
+    
+    try
+    {
+        std::string::size_type pos = path.find_last_of('.');
+        if (pos == std::string::npos)
+            throw std::exception();
+        std::string result = path.substr(pos, path.length());
+        if (result != ".html")
+            throw std::exception();
+    }
+    catch(const std::exception)
+    {
+        parse_error("(error page) code status"); 
+    }
+    error_pages[code] = path;
 }
 
-std::string ServerParser::getClientMaxBodySize() const {
+unsigned long ServerParser::getClientMaxBodySize() const {
     return client_max_body_size;
 }
 
@@ -50,19 +78,25 @@ void ServerParser::setClientMaxBodySize(const std::string& value) {
     for (size_t i = 0; i < value.size(); i++)
     {
         if (!std::isdigit(value[i]))
-        {
-            std::cerr << "[ERROR] :: the client max body size must be a number [" << value << "]" << std::endl;
-            this->error = true;
-        }
+            parse_error("client max body size");
     }
-    client_max_body_size = value;
+
+    try
+    {
+        client_max_body_size = std::stoul(value);
+    }
+    catch(const std::exception)
+    {
+        parse_error("client max body size");
+    }
+    
 }
 
-std::vector<Location*> ServerParser::get_locations() const {
+std::vector<Location> ServerParser::get_locations() const {
     return _location;
 }
 
-void ServerParser::set_locations(Location* new_locations) { _location.push_back(new_locations); }
+void ServerParser::set_locations(Location new_locations) { _location.push_back(new_locations); }
 
 ServerParser::ServerParser(const ServerParser& other)
 {
@@ -71,7 +105,6 @@ ServerParser::ServerParser(const ServerParser& other)
 
 ServerParser& ServerParser::operator=(const ServerParser& other) {
     if (this != &other) {
-        error = other.error;
         port = other.port;
         host = other.host;
         server_name = other.server_name;
@@ -85,17 +118,16 @@ ServerParser& ServerParser::operator=(const ServerParser& other) {
 
 void        ServerParser::clear()
 {
-    this->error = false;
     this->port.clear();
     this->host.clear();
     this->server_name.clear();
     this->error_pages.clear();
-    this->client_max_body_size.clear();
+    this->client_max_body_size = 0;
     this->_location.clear();
 }
 
 ServerParser::ServerParser()
-    : error(false), port(), host() , server_name(), error_pages() , client_max_body_size() , _location()
+    : port(), host() , server_name(), error_pages() , client_max_body_size() , _location()
 {
 
 }
@@ -103,13 +135,12 @@ ServerParser::~ServerParser(){
     this->clear();
 }
 
-std::vector<ServerParser*> ServerParser::get_server(std::string filename){
-    int codeP, codeH ,codeSer;
-    ServerParser *  s;
-    Location *      loc;
+std::vector<ServerParser> ServerParser::get_server(std::string filename){
+    ServerParser        s;
+    Location            loc;
 
     std::string key , value;
-    std::vector<ServerParser*>    vecServers;
+    std::vector<ServerParser>    vecServers;
 
 
     std::string line;
@@ -123,8 +154,7 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
         iss >> key >> value;
         if (key == "server" && value == "{")
         {
-            codeP = 0, codeH = 0, codeSer = 0; 
-            s = new ServerParser();
+            s = ServerParser();
             while (std::getline(infile, line))
             {
                 std::istringstream iss_loc(line);
@@ -136,144 +166,105 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
                 }  
                 else if (key == "port" && !value.empty())
                 {
-                    s->setPort(value);
-                    codeP++;
+                    s.setPort(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "host" && !value.empty())
                 {
-                    s->setHost(value);
-                    codeH++;
+                    s.setHost(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "server_name" && !value.empty())
                 {
-                    s->setServerName(value);
-                    codeSer++;
+                    s.setServerName(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "error_page" && !value.empty())
                 {
-                    short codeS = 1;
-                    std::string errorPath;
-                    std::string var;
+                    std::istringstream ss(line);
+                    std::string name, codeStatus, path;
 
-                    std::istringstream iss(line);
-                    while (std::getline(iss, var, ' '))
-                    {
-                        if (!var.empty() && var != "error_page")
-                        {
-                            if (var.size() == 3)
-                            {
-                                for (size_t i = 0; i < var.size(); i++)
-                                {
-                                    if (!std::isdigit(var[i]))
-                                        codeS = 0;
-                                }
-                                if (codeS)
-                                    codeS = std::stoi(var);
-                                else
-                                    std::cerr << "[WARNING] :: The code status of the page should be a number [" << var << "]" << std::endl;
-                            }
-                            else
-                                errorPath = var;
-                            if (!errorPath.empty() && codeS)
-                                s->setErrorPages(codeS, errorPath);
-                        }
-                    }
+                    ss >> name >> codeStatus >> path;
+                    s.setErrorPages(codeStatus, path);
+
+
+                    path.clear();
                     key.clear();
                     value.clear();
                 }
                 else if (key == "client_max_body_size" && !value.empty())
                 {
-                    s->setClientMaxBodySize(value);
+                    s.setClientMaxBodySize(value);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "}" && value.empty())
                 {
-                    if (!s->error)
-                        vecServers.push_back(s);
+                    vecServers.push_back(s);
                     key.clear();
                     value.clear();
                     break;
                 }
                 else if (key == "location" && !value.empty() && line[line.length() - 1] == '[')
                 {
-                    loc = new Location();
-                    loc->setLocation(value);
+                    loc = Location();
+                    loc.setLocation(value);
                     while (std::getline(infile, line))
                     {
                         std::istringstream iss_loc_key_val(line);
                         iss_loc_key_val >> key >> value;
                         if (key == "method" && !value.empty())
-                        {
-                            std::istringstream iss_p10(line);
-                            std::string token;
-                            std::vector<std::string> vecMethod;
-                            while (std::getline(iss_p10, token, ' ')) {
-                                if (!token.empty())
-                                {
-                                    vecMethod.push_back(token);
-                                }
-                            }
-                            loc->setMethod(vecMethod);
-                        }
+                            loc.setMethod(line);
                         else if (key == "root" && !value.empty())
                         {
-                            loc->setRoot(value);
+                            loc.setRoot(value);
                             key.clear();
                             value.clear();
                         }
                         else if (key == "cgi" && !value.empty())
                         {
-                            loc->setCgi(value);
+                            loc.setCgi(value);
                             key.clear();
                             value.clear();
                         }
                         else if (key == "upload" && !value.empty())
                         {
-                            loc->setUpload(value);
+                            loc.setUpload(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "autoindex" && !value.empty())
                         {
-                            loc->setAutoindex(value);
+                            loc.setAutoindex(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "index" && !value.empty())
                         {
-                            loc->setIndex(value);
+                            loc.setIndex(value);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "redirection" && !value.empty())
                         {
-                            loc->setRedirection(value);
+                            loc.setRedirection(value);
                             key.clear();
                             value.clear();
                         }
                         else if (key == "]")
                         {
-                            if (!loc->getError())
-                                s->set_locations(loc);
-                            else 
-                            {
-                                loc->clear();
-                                delete loc;
-                            }
+                            
+                            s.set_locations(loc);
+                            
                             break;
                         }
                         else
                         {
                             std::cerr << "ERROR LOC {" << key << "} value {" << value << "}" << std::endl;
-                            loc->clear();
-                            delete loc;
+                            loc.clear();
                             break;
                         }
                     }
@@ -281,19 +272,12 @@ std::vector<ServerParser*> ServerParser::get_server(std::string filename){
                     value.clear();
                 }
                 else if (!key.empty())
-                {
-                    std::cerr << "ERROR SER {" << key << "} value {" << value << "}" << std::endl;
-                    s->clear();
-                    delete s;
-                    break;
-                }
-            }
-            if (codeSer < 1 || codeP < 1 || codeH < 1){
-                std::cerr << "Missing element !" << std::endl;
-                exit(1);
+                    parse_error("config file");
             }
             
         }
+        else
+            parse_error("config file");
     }
     return vecServers;
 }
@@ -303,13 +287,13 @@ void    ServerParser::printTheServerInfo()
     std::cout << "HOST (" << this->getHost() << ") \n";
     std::cout << "PORT (" << this->getPort() << ") \n";
     std::cout << "SERVER NAME (" << this->getServerName() << ")\n";
-    if (!this->getClientMaxBodySize().empty())
+    if (this->getClientMaxBodySize() == 0)
         std::cout << "THE CLIENT MAX BODY SIZE (" << this->getClientMaxBodySize() << ") \n";
     std::cout << "\n\n";
     for (size_t i = 0; i < this->get_locations().size(); i++)
     {
         std::cout << "|||||||||||||||| START PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||" << std::endl;
-        this->get_locations()[i]->printLocationInfo();
+        this->get_locations()[i].printLocationInfo();
         std::cout << "|||||||||||||||| END PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||||" << std::endl;
     }
     std::cout << "\n";   

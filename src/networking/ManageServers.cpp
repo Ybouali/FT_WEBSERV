@@ -33,15 +33,15 @@ void ManageServers::clear()
 
 //! ----------------------------- getters -----------------------------------
 
-std::vector<ConfigServer>       ManageServers::getServers() const { return this->Servers; }
+const std::vector<ConfigServer>&    ManageServers::getServers() const { return this->Servers; }
 
-std::map<int, ConfigServer>     ManageServers::getServersMap() const { return this->serversMap; }
+const std::map<int, ConfigServer>&  ManageServers::getServersMap() const { return this->serversMap; }
 
-fd_set                          ManageServers::getreadFd() const { return this->readFd; }
+fd_set                              ManageServers::getreadFd() const { return this->readFd; }
 
-fd_set                          ManageServers::getWriteFd() const { return this->writeFd; }
+fd_set                              ManageServers::getWriteFd() const { return this->writeFd; }
 
-std::map<int, Client>           ManageServers::getClient() const { return this->clientsMap; }
+const std::map<int, Client>&        ManageServers::getClient() const { return this->clientsMap; }
 
 //! ----------------------------- setters -----------------------------------
 
@@ -343,18 +343,18 @@ void                            ManageServers::sendResponse(const int & i, Clien
         client.updateTime();
 }
 
-std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerParser *> servers)
+std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerParser > servers)
 {
     std::vector<ConfigServer> vecServers;
     ConfigServer              server;
 
     for (size_t i = 0; i < servers.size(); i++)
     {
-        server = ConfigServer(servers[i]->getPort(), servers[i]->getHost(), servers[i]->getServerName(), servers[i]->get_locations(), servers[i]->getErrorPages(), servers[i]->getClientMaxBodySize());
+        server = ConfigServer(servers[i].getPort(), servers[i].getHost(), servers[i].getServerName(), servers[i].get_locations(), servers[i].getErrorPages(), servers[i].getClientMaxBodySize());
         vecServers.push_back(server);
-    //     // std::cout << "|||||||||||||||||||||||||||||||||||||||| START PRINTING SRVER NUMBER [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
-    //     // servers[i]->printTheServerInfo();
-    //     // std::cout << "|||||||||||||||||||||||||||||||||||||||| END PRINTING SRVER NUMBER   [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
+        // // std::cout << "|||||||||||||||||||||||||||||||||||||||| START PRINTING SRVER NUMBER [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
+        // // servers[i].printTheServerInfo();
+        // // std::cout << "|||||||||||||||||||||||||||||||||||||||| END PRINTING SRVER NUMBER   [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
     }
 
     return vecServers;

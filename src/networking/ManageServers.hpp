@@ -22,15 +22,15 @@ class ManageServers {
 
         //! ----------------------------- getters -----------------------------------
 
-        std::vector<ConfigServer>           getServers() const;
+        const std::vector<ConfigServer>&            getServers() const;
 
-        std::map<int, ConfigServer>         getServersMap() const;
+        const std::map<int, ConfigServer>&          getServersMap() const;
 
-        fd_set                              getreadFd() const;
+        fd_set                                      getreadFd() const;
 
-        fd_set                              getWriteFd() const;
+        fd_set                                      getWriteFd() const;
 
-        std::map<int, Client>               getClient() const;
+        const std::map<int, Client>&                getClient() const;
 
         //! ----------------------------- setters -----------------------------------
 
@@ -46,27 +46,27 @@ class ManageServers {
 
         //! Methods  ----------------------------------------------------------------
         
-        void                            acceptClientConnection(int);
+        void                                acceptClientConnection(int);
 
-        void                            timeoutCheck();
+        void                                timeoutCheck();
 
-        void                            initSets();
+        void                                initSets();
 
-        void                            readRequest(const int &, Client &);
+        void                                readRequest(const int &, Client &);
 
-        void                            closeConnectionClient(const int );
+        void                                closeConnectionClient(const int );
 
-        void                            addToSet(const int , fd_set &);
+        void                                addToSet(const int , fd_set &);
 
-        void                            removeFromSet(const int , fd_set &);
+        void                                removeFromSet(const int , fd_set &);
         
-        void                            assignServerToClient(Client &);
+        void                                assignServerToClient(Client &);
 
-        std::vector<ConfigServer>       getInfoServer(std::vector<ServerParser *> );
+        std::vector<ConfigServer>           getInfoServer(std::vector<ServerParser > );
 
-        void                            setupServers(std::vector<ConfigServer>);
+        void                                setupServers(std::vector<ConfigServer> );
 
-        void                            startServers();
+        void                                startServers();
 
-        void                            sendResponse(const int &, Client &);
+        void                                sendResponse(const int &, Client &);
 };

@@ -5,7 +5,7 @@ int main(int ac, char **av)
 {
     std::string                     filename;
     ServerParser                    serversFromConfigFile;
-    std::vector<ServerParser *>     servers;
+    std::vector<ServerParser >     servers;
     ManageServers master;
 
     // ignore SIGPIPE signal

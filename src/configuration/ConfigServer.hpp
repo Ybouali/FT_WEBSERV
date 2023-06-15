@@ -11,14 +11,14 @@ class ConfigServer {
 		std::string						serverName;
 		std::map<short, std::string>    errorPages;
 		unsigned long					clientMaxBodySize;
-        std::vector<Location * >        locationList;
+        std::vector<Location >          locationList;
         int     						Fd;
         struct sockaddr_in 				serverAddress;
 
     public : 
         ConfigServer();
         
-        ConfigServer(std::string , std::string , std::string , std::vector<Location * > , std::map<short, std::string>, std::string );
+        ConfigServer(std::string , std::string , std::string , std::vector<Location > , std::map<short, std::string>, unsigned long );
 
         ConfigServer(const ConfigServer &);
 
@@ -40,7 +40,7 @@ class ConfigServer {
 
         unsigned long                       getClientMaxBodySize() const;
 
-		std::vector<Location * >			getLocationList() const;
+		std::vector<Location >			    getLocationList() const;
 
         int                                 getFd() const;
 
@@ -54,9 +54,9 @@ class ConfigServer {
 
         void                                setErrorPages(std::map<short, std::string>);
 
-        void                                setClientMaxBodySize(std::string);
+        void                                setClientMaxBodySize(unsigned long );
 
-		void                                setLocationList(std::vector<Location * >);
+		void                                setLocationList(std::vector<Location >);
 
         void                                setFd(int);
 

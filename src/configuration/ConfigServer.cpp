@@ -5,11 +5,11 @@ ConfigServer::ConfigServer()
 {
     this->setPort("8080");
     this->setHost("127.0.0.1");
-    Location *local = new Location();
+    Location local = Location();
     this->locationList.push_back(local);
 }
 
-ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location * > _locationList, std::map<short, std::string> errorPages, std::string clientMaxBodySize)
+ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location > _locationList, std::map<short, std::string> errorPages, unsigned long clientMaxBodySize)
     : Port(), Host(), serverName(), errorPages(), clientMaxBodySize(), locationList()
 {
     this->setPort(port);
@@ -17,7 +17,7 @@ ConfigServer::ConfigServer(std::string port, std::string host, std::string Serve
     this->setServerName(ServerName);
     this->locationList = _locationList;
     this->errorPages = errorPages;
-    this->setClientMaxBodySize(clientMaxBodySize);
+    this->clientMaxBodySize = clientMaxBodySize;
     this->setFd(0);
 }
 
@@ -64,7 +64,7 @@ std::map<short, std::string>        ConfigServer::getErrorPages() const { return
 
 unsigned long                       ConfigServer::getClientMaxBodySize() const { return this->clientMaxBodySize; }
 
-std::vector<Location * >            ConfigServer::getLocationList() const { return this->locationList; }
+std::vector<Location >              ConfigServer::getLocationList() const { return this->locationList; }
 
 int                                 ConfigServer::getFd() const { return this->Fd; }
 
@@ -73,7 +73,6 @@ int                                 ConfigServer::getFd() const { return this->F
 void                ConfigServer::setPort(std::string port) { this->Port = static_cast<uint16_t>(std::stoul(port)); }
 
 void                ConfigServer::setHost(std::string host) { 
-    // TODO: Need a check for the host
     this->Host = host;
 }
 
@@ -81,18 +80,15 @@ void                ConfigServer::setServerName(std::string ServerName) { this->
 
 void                ConfigServer::setErrorPages(std::map<short, std::string> ErrorPages) { this->errorPages = ErrorPages; }
 
-void                ConfigServer::setClientMaxBodySize(std::string size) { 
-    std::istringstream iss(size);
-    char* endPtr;
-    unsigned long _clientMaxBodySize = strtoul(iss.str().c_str(), &endPtr, 10);
+void                ConfigServer::setClientMaxBodySize(unsigned long size) { 
 
-    if (!_clientMaxBodySize)
-        this->clientMaxBodySize = _clientMaxBodySize;
+    if (!size)
+        this->clientMaxBodySize = size;
     else
         this->clientMaxBodySize = CLIENT_MAX_BODY_SIZE;
 }
 
-void                ConfigServer::setLocationList(std::vector<Location * > _locationList) { this->locationList = _locationList; }
+void                ConfigServer::setLocationList(std::vector<Location > _locationList) { this->locationList = _locationList; }
 
 void                ConfigServer::setFd(int fd) { this->Fd = fd; }
 
@@ -144,7 +140,7 @@ void                ConfigServer::printServerInfo()
     for (size_t i = 0; i < this->getLocationList().size(); i++)
     {
         std::cout << "|||||||||||||||| START PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||" << std::endl;
-        this->getLocationList()[i]->printLocationInfo();
+        this->getLocationList()[i].printLocationInfo();
         std::cout << "|||||||||||||||| END PRINTING LOCATION NUMBER [" << i + 1 <<  "] |||||||||||||||||||||" << std::endl;
     }
     std::cout << "\n";

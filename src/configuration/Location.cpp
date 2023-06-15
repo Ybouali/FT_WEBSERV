@@ -1,12 +1,61 @@
 #include "Location.hpp"
 
-const std::vector<std::string>& Location::getMethod() const {
-    return method;
+Location::Location()
+    : location_path(), method(), root(), upload(), autoindex(), index(), redirection()
+{ }
+
+Location::~Location() {
+    this->clear();
 }
 
-void Location::setMethod(std::vector<std::string>& value) {
-    value.erase(value.begin());
-    method = value;
+Location::Location(const Location& other)
+{
+    *this = other;
+}
+
+Location& Location::operator=(const Location& other) {
+    if (this != &other) {
+        this->location_path = other.location_path;
+        this->method = other.method;
+        this->root = other.root;
+        this->upload = other.upload;
+        this->autoindex = other.autoindex;
+        this->index = other.index;
+        this->redirection = other.redirection;
+        this->cgi = other.cgi;
+    }
+    return *this;
+}
+
+
+const std::vector<std::string>& Location::getMethod() const {
+    return this->method;
+}
+
+void Location::setMethod(std::string & line) {
+    std::istringstream iss(line);
+
+    std::string method, method1, method2, method3;
+    iss >> method >> method1 >> method2 >> method3;
+
+    if (!method1.empty())
+    {
+        if (method1 != "GET" && method1 != "POST" && method1 != "DELETE")
+            parse_error("method");
+        this->method.push_back(method1);
+    }
+    if (!method2.empty())
+    {
+        if (method2 != "GET" && method2 != "POST" && method2 != "DELETE")
+            parse_error("method");
+        this->method.push_back(method2);
+    }
+    if (!method3.empty())
+    {
+        if (method3 != "GET" && method3 != "POST" && method3 != "DELETE")
+            parse_error("method");
+        this->method.push_back(method3);
+    }
 }
 
 const std::string& Location::getRoot() const {
@@ -14,35 +63,35 @@ const std::string& Location::getRoot() const {
 }
 
 void Location::setRoot(const std::string& value) {
+    if (value[value.length() - 1] != '/')
+        parse_error("root");
     root = value;
 }
 
 const std::string& Location::getUpload() const {
-    return upload;
+    return this->upload;
 }
 
 void Location::setUpload(const std::string& value) {
-    upload = value;
+    if (value[value.length() - 1] != '/')
+        parse_error("upload");
+    this->upload = value;
 }
 
 const std::string& Location::getAutoindex() const {
-    return autoindex;
+    return this->autoindex;
 }
 
 void Location::setAutoindex(const std::string& value) {
-    if (value == "on" || value == "off"){
-        autoindex = value;
-    }
-    else
-        error = true;
+    if (value != "on" && value != "off")
+        parse_error("autoindex");
+    this->autoindex = value;
 }
 
-const std::string& Location::getIndex() const {
-    return index;
-}
+const std::string& Location::getIndex() const { return this->index; }
 
 void Location::setIndex(const std::string& value) {
-    index = value;
+    this->index = value;
 }
 
 void    Location::clear()
@@ -58,7 +107,7 @@ void    Location::clear()
 }
 
 const std::string& Location::getRedirection() const {
-    return redirection;
+    return this->redirection;
 }
 
 void Location::setRedirection(const std::string& value) {
@@ -66,57 +115,23 @@ void Location::setRedirection(const std::string& value) {
 }
 
 const std::string& Location::getLocation() const {
-    return location_path;
+    return this->location_path;
 }
 
 void Location::setLocation(const std::string& value){
-    location_path = value;
-}
-
-Location::Location(const Location& other)
-{
-    *this = other;
-}
-
-bool  Location::getError() const { return this->error; }
-
-Location& Location::operator=(const Location& other) {
-    if (this != &other) {
-        error = other.error;
-        location_path = other.location_path;
-        method = other.method;
-        root = other.root;
-        upload = other.upload;
-        autoindex = other.autoindex;
-        index = other.index;
-        redirection = other.redirection;
-        cgi = other.cgi;
-    }
-    return *this;
+    if (value[0] != '/')
+        parse_error("location");
+    this->location_path = value;
 }
 
 void    Location::setCgi(std::string & value)
 {
-    if (value == "on" || value == "off"){
-        cgi = value;
-    }
-    else
-        error = true;
+    if (value != "on" && value != "off")
+        parse_error("cgi");
+    this->cgi = value;
 }
 
-std::string    Location::getCgi() const { return this->cgi; }
-
-Location::Location()
-    : error(false) , location_path("/"), method(), root("www/"), upload(), autoindex("off"), index("index.html"), redirection()
-{
-    this->method.push_back("GET");
-    this->method.push_back("DELETE");
-
-}
-
-Location::~Location(){
-    this->clear();
-}
+const std::string&    Location::getCgi() const { return this->cgi; }
 
 void Location::printLocationInfo(){
     std::cout << "LOCATION        (" << this->getLocation() << ") \n";

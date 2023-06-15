@@ -27,10 +27,8 @@
 
 /* STL Containers */
 # include <map>
-# include <set>
 # include <vector>
 # include <algorithm>
-# include <iterator>
 
 /* System */
 # include <sys/types.h>
@@ -47,6 +45,7 @@
 # include <arpa/inet.h>
 
 #include <regex>
+#include <unordered_set>
 
 # include "response/MimeTypes.hpp"
 
@@ -71,3 +70,5 @@ bool            	checkFileExists(const std::string);
 bool            	isDirectory(const std::string);
 bool				isTypeSupported(const std::string);
 const std::string	getContentType(const std::string);
+void                parse_error(const std::string & );
+bool                isValidHTTPStatusCode(short );
