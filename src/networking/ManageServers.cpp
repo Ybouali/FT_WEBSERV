@@ -312,14 +312,6 @@ void                            ManageServers::sendResponse(const int & i, Clien
 
     int sentBytes = send(i, response.c_str(), response.size(), 0);
 
-    client.response.setSendStatus(false);
-    if ((size_t)sentBytes != response.size())
-    {
-        client.response.setSendStatus(true);
-        std::cout << sentBytes << std::endl;
-        std::cout << response.size() << std::endl;
-    }
-
     if (sentBytes < 0)
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
@@ -327,6 +319,8 @@ void                            ManageServers::sendResponse(const int & i, Clien
     }
     else if (sentBytes == 0 || client.response.getConnectionStatus())
     {
+        client.response.setConnectionStatus(false);
+
         if (client.request.keepAlive() == false || client.response.getStatusCode())
         {
             std::cerr << "Client [" << i << "] Connection Closed" << std::endl;

@@ -222,10 +222,9 @@ static std::string getContentFileFromPathFile(std::string path)
     return content;
 }
 
-std::string getResponsePage(short codeStatus, bool NoNeedBody, std::string pathErrorFile)
+std::string getResponsePage(short codeStatus, bool needBody, std::string pathErrorFile)
 {
     std::string response;
-    std::string body;
 
     response.append("HTTP/1.1 ");
 	response.append(std::to_string(codeStatus));
@@ -239,9 +238,9 @@ std::string getResponsePage(short codeStatus, bool NoNeedBody, std::string pathE
     response.append("Server: Small nginx\r\n");
 	response.append(getDateFormat());
 
-    if (!NoNeedBody)
+    if (needBody)
     {
-        body = getContentFileFromPathFile(pathErrorFile);
+        std::string body = getContentFileFromPathFile(pathErrorFile);
         if (body.empty())
             body = getPageError(codeStatus);
 

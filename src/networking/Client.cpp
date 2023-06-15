@@ -31,6 +31,17 @@ void                        Client::buildResponse()
     //         this->request.uploadFile("www/uploads/");
     // }
 
+    if (this->request.getCodeError())
+    {
+        std::string errorPage = this->server.getErrorPages().find(this->request.getCodeError())->second;
+        std::string responsePage = getResponsePage(this->request.getCodeError(), true, errorPage);
+
+        this->response.setResponseContent(responsePage);
+        this->response.setConnectionStatus(true);
+
+        return ;
+    }
+
     this->response.setConfigServer(this->server);
     this->response.setRequest(this->request);
     this->response.buildResponse();

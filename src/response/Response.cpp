@@ -1,6 +1,6 @@
 #include "Response.hpp"
 
-Response::Response() : statusCode(0), readBytes(0), readStatus(false), connectionStatus(false), sendStatus(false)
+Response::Response() : statusCode(0), readBytes(0), readStatus(false), connectionStatus(false)
 {
 	this->body = "";
 	this->responseContent = "";
@@ -26,7 +26,6 @@ void	Response::clear()
 	this->readBytes = 0;
 	this->readStatus = false;
 	this->connectionStatus = false;
-	this->sendStatus = false;
 }
 
 // ----------------------------- Getters -----------------------------------
@@ -53,8 +52,6 @@ bool				Response::getReadStatus() const { return this->readStatus; }
 
 bool				Response::getConnectionStatus() const { return this->connectionStatus; }
 
-bool				Response::getSendStatus() const { return this->sendStatus; }
-
 // ----------------------------- Setters -----------------------------------
 
 void	Response::setConfigServer(const ConfigServer& server) { this->server = server; }
@@ -79,22 +76,12 @@ void	Response::setReadStatus(const bool readStatus) { this->readStatus = readSta
 
 void	Response::setConnectionStatus(const bool connectionStatus) { this->connectionStatus = connectionStatus; }
 
-void	Response::setSendStatus(const bool sendStatus) { this->sendStatus = sendStatus; }
-
 // ----------------------------- Methodes -----------------------------------
 
 void	Response::buildResponse()
 {
 	try
 	{
-		// set the response status code based on the request code error
-		// if the request is valid, the code error will be 0
-		this->statusCode = this->request.getCodeError();
-		if (this->statusCode)
-		{
-			throw std::exception();
-		}
-
 		// check if the request is valid
 		this->isLocationMatched();
 		this->isRedirectionExist();
@@ -116,23 +103,26 @@ void	Response::buildResponse()
 	}
 	catch(const std::exception& e)
 	{
+		this->connectionStatus = true;
+
 		if (this->statusCode == 301)
 		{
-			this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
+			this->responseContent = getResponsePage(this->statusCode, false, "");
 			this->responseContent.append("Location: ");
 			this->responseContent.append(this->fullPath);
 			this->responseContent.append("\r\n");
 		}
 		else
 		{
-			this->responseContent = getResponsePage(this->statusCode, false, this->server.getErrorPages().find(this->statusCode)->second);
+			std::string errorPage = this->server.getErrorPages().find(this->statusCode)->second;
+			this->responseContent = getResponsePage(this->statusCode, true, errorPage);
 		}
 	}
 }
 
 void	Response::buildResponseContent()
 {
-	this->responseContent = getResponsePage(this->statusCode, true, this->server.getErrorPages().find(this->statusCode)->second);
+	this->responseContent = getResponsePage(this->statusCode, false, "");
 	this->responseContent.append("Content-Type: ");
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");

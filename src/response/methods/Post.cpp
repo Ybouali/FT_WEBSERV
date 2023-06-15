@@ -29,6 +29,8 @@ void	Response::handlePostMethod()
 	{
 		throw;
 	}
+
+	this->connectionStatus = true;
 }
 
 void	Response::handlePostDirectory()

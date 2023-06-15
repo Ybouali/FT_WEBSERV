@@ -108,9 +108,7 @@ void	Response::handleGetFile()
 		if (readBytes == 0)
 		{
 			// open the requested file and check if it's open
-			fd = open(this->fullPath.c_str(), O_RDONLY);
-
-			if (fd == -1)
+			if ((fd = open(this->fullPath.c_str(), O_RDONLY)) == -1)
 			{
 				this->statusCode = 500;
 				throw std::exception();
@@ -128,15 +126,13 @@ void	Response::handleGetFile()
 		}
 		else
 		{
-			if (this->sendStatus)
-				return;
-
 			// clear the response content that was sent in the previous loop
 			this->responseContent.clear();
 
-			// read the file content and check if it's read
+			// read the file content by BUF_SIZE bytes
 			readBytes = read(fd, buffer, BUF_SIZE);
 
+			// check if read bytes is -1, 0 or > 0
 			if (readBytes == -1)
 			{
 				this->statusCode = 500;
@@ -149,8 +145,8 @@ void	Response::handleGetFile()
 			}
 			else
 			{
-				this->statusCode = 200;
 				this->connectionStatus = true;
+				this->statusCode = 200;
 				close(fd);
 			}
 		}
@@ -185,6 +181,7 @@ void	Response::handleGetAutoindex()
 		closedir(dir);
 
 		// set the status code to 200 and build the response content
+		this->connectionStatus = true;
 		this->statusCode = 200;
 		this->fullPath.append("index.html");
 		this->buildResponseContent();

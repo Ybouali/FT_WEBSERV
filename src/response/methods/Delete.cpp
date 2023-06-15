@@ -29,6 +29,8 @@ void	Response::handleDeleteMethod()
 	{
 		throw;
 	}
+
+	this->connectionStatus = true;
 }
 
 void	Response::handleDeleteDirectory()

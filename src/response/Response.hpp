@@ -18,7 +18,6 @@ class Response
 		int				readBytes;
 		bool			readStatus;
 		bool 			connectionStatus;
-		bool			sendStatus;
 
     public:
 		static MimeTypes mime_type;
@@ -40,7 +39,6 @@ class Response
 		int					getReadBytes() const;
 		bool				getReadStatus() const;
 		bool				getConnectionStatus() const;
-		bool				getSendStatus() const;
 
         // ----------------------------- Setters -----------------------------------
 
@@ -55,7 +53,6 @@ class Response
 		void	setReadBytes(const int);
 		void	setReadStatus(const bool);
 		void	setConnectionStatus(const bool);
-		void	setSendStatus(const bool);
 
         // ----------------------------- Methodes -----------------------------------
 
