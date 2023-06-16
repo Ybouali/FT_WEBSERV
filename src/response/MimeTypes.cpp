@@ -125,3 +125,13 @@ const std::string MimeTypes::getMimeType(const std::string& exe)
         return this->mime_types[exe];
     return "";
 }
+
+const std::string MimeTypes::getExeFile(const std::string& ContentType)
+{
+    for (std::map<std::string, std::string>::iterator it = this->mime_types.begin(); it != this->mime_types.end(); ++it)
+    {
+        if (it->second == ContentType)
+            return it->first;
+    }
+    return "";
+}

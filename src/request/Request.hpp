@@ -54,8 +54,6 @@ class Request {
         std::string                             Query;
         std::map<std::string, std::string>      requestHeaders;
         std::vector<u_int8_t>                   Body;
-        std::string                             bodyString;
-        std::string                             Boundary;
         Methods                                 Method;
         std::map<u_int8_t, std::string>         methodsString;
         state                                   State;
@@ -70,15 +68,15 @@ class Request {
         u_int8_t                                verMinor;
         std::string                             Host;
         uint16_t                                Port;
-        bool                                    fieldsDoneFlag;
+        int                                     fdFileBody;
+        std::string                             nameFileBody;
         bool                                    bodyFlag;
-        bool                                    bodyDoneFlag;
-        bool                                    completeFlag;
         bool                                    chunkedFlag;
-        bool                                    multiformFlag;
         UploadMultipleFile                      filesInfo;
 
-        void                                   handleHeaders();
+        bool                                   handleHeaders();
+
+        bool                                   openFile();
 
     public :
         static MimeTypes mime;
@@ -103,10 +101,6 @@ class Request {
 
         const std::string   &                           getHeader(std::string );
 
-        const std::string &                             getBody() const;
-
-        const std::string  &                            getBoundary() const;
-
         Methods                                         getMethod() const;
 
         const std::string&                              getMethodsString();
@@ -117,9 +111,11 @@ class Request {
 
         state                                           getState() const;
 
-        bool                                            getNeedBody() const;
-
         uint16_t                                        getPort() const;
+
+        int                                             getFdFileBody() const;
+
+        const std::string &                             getNameFileBody() const;
 
         // ? ----------------------------- setters -----------------------------------
 
@@ -134,16 +130,14 @@ class Request {
 
         // ? Methods ---------------------------------------------------------------- 
 
-        void        substrRequestBodyString(int );
-
-        bool        keepAlive();
+        bool                            keepAlive();
         
-        void        readBufferFromReq(char *, std::size_t);
+        void                            readBufferFromReq(char *, std::size_t);
 
-        void        printRequest();
+        void                            printRequest();
 
-        // ! upload file just for testing
-        void                            uploadFile(std::string );
+        
+        short                           uploadFile(std::string , const ConfigServer &);
 
         std::string                     getNewFileName(std::string );
 };

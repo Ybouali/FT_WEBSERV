@@ -6,31 +6,19 @@ Client::Client()
 }
 
 Client::~Client()
-{ }
+{
+    this->clear();
+}
 
 Client::Client(const ConfigServer& server)
     : clientSocket(), lastMsgTime(time(NULL)), clientAddress(), request(), server()
 { 
     this->server = server;
-    this->request.setMaxBodySize(server.getClientMaxBodySize());
     this->lastMsgTime = time(NULL);
 }
 
 void                        Client::buildResponse()
 {
-    // // ! FOR TESTING
-    // if (this->request.getMethodsString() == "POST" && !this->request.getCodeError())
-    // {
-    //     if (this->request.getBody().size() > this->server.getClientMaxBodySize())
-    //     {
-    //         this->request.setCodeError(413);
-    //         return ;
-    //     }
-    //     // In the second argument of this function we can set the name file 
-    //     if (!this->request.getCodeError())
-    //         this->request.uploadFile("www/uploads/");
-    // }
-
     if (this->request.getCodeError())
     {
         std::string errorPage = this->server.getErrorPages().find(this->request.getCodeError())->second;

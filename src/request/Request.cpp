@@ -7,8 +7,6 @@ Request::Request()
       Query(),
       requestHeaders(),
       Body(),
-      bodyString(),
-      Boundary(),
       Method(),
       methodsString(),
       State(Request_Line),
@@ -22,12 +20,10 @@ Request::Request()
       verMajor(0),
       Host(),
       Port(),
-      fieldsDoneFlag(false),
+      fdFileBody(0),
+      nameFileBody(),
       bodyFlag(false),
-      bodyDoneFlag(false),
-      completeFlag(false),
       chunkedFlag(false),
-      multiformFlag(false),
       filesInfo()
 {
     this->methodsString[::GET] = "GET";
@@ -48,8 +44,6 @@ Request & Request::operator= (const Request & other)
         this->Query = other.Query;
         this->requestHeaders = other.requestHeaders;
         this->Body = other.Body;
-        this->bodyString = other.bodyString;
-        this->Boundary = other.Boundary;
         this->methodsString = other.methodsString;
         this->State = other.State;
         this->Method = other.Method;
@@ -60,16 +54,14 @@ Request & Request::operator= (const Request & other)
         this->Storage = other.Storage;
         this->keyStorage = other.keyStorage;
         this->methodIndex = other.methodIndex;
+        this->fdFileBody = other.fdFileBody;
+        this->nameFileBody = other.nameFileBody;
         this->verMajor = other.verMajor;
         this->verMinor = other.verMinor;
         this->Host = other.Host;
         this->Port = other.Port;
-        this->fieldsDoneFlag = other.fieldsDoneFlag;
         this->bodyFlag = other.bodyFlag;
-        this->bodyDoneFlag = other.bodyDoneFlag;
-        this->completeFlag = other.completeFlag;
         this->chunkedFlag = other.chunkedFlag;
-        this->multiformFlag = other.multiformFlag;
         this->filesInfo = other.filesInfo;
     }   
     return *this;
@@ -86,8 +78,6 @@ void            Request::clear()
     this->Query.clear();
     this->requestHeaders.clear();
     this->Body.clear();
-    this->bodyString.clear();
-    this->Boundary.clear();
     this->methodsString.clear();
     this->State = Request_Line;
     this->maxBodySize = 0;
@@ -100,13 +90,12 @@ void            Request::clear()
     this->verMajor = 0;
     this->verMinor = 0;
     this->Host.clear();
+    if (this->getFdFileBody() > 0)
+        close(this->fdFileBody);
+    this->nameFileBody.clear();
     this->Port = 0;
-    this->fieldsDoneFlag = false;
     this->bodyFlag = false;
-    this->bodyDoneFlag = false;
-    this->completeFlag = false;
     this->chunkedFlag = false;
-    this->multiformFlag = false;
     this->filesInfo.clear();
 }
 
@@ -120,10 +109,6 @@ const std::map<std::string, std::string>&       Request::getrequestHeaders() con
 
 const std::string &                             Request::getHeader(std::string key) { return this->requestHeaders[key]; }
 
-const std::string &                             Request::getBody() const { return this->bodyString; }
-
-const std::string &                             Request::getBoundary() const { return this->Boundary; }
-
 Methods                                         Request::getMethod() const { return this->Method; }
 
 const std::string&                              Request::getMethodsString() { return this->methodsString[this->Method]; }
@@ -135,6 +120,11 @@ const std::string &                             Request::getHost() const { retur
 state                                           Request::getState() const { return this->State; }
 
 uint16_t                                        Request::getPort() const { return this->Port; }
+
+int                                             Request::getFdFileBody() const { return this->fdFileBody; }
+
+const std::string &                             Request::getNameFileBody() const { return this->nameFileBody; }
+
 
 
 // ? ----------------------------- setters -----------------------------------
@@ -151,18 +141,37 @@ void                                            Request::setMaxBodySize(size_t s
 
 void                                            Request::setCodeError(short code) { this->errorCode = code; }
 
-// ? Public methods ---------------------------------------------------------------- 
+bool                                            Request::openFile()
+{
+    this->nameFileBody = "/tmp/" + generateRandomFileName();
 
-void                                            Request::substrRequestBodyString(int bytes) { this->bodyString = this->bodyString.substr(bytes); }
+    if (this->requestHeaders.count("Content-Type"))
+        this->nameFileBody += "." + mime.getExeFile(skipWhitespaceBeginAnd(this->requestHeaders["Content-Type"]));
+    
+    this->fdFileBody = open(this->nameFileBody.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
+    if (this->fdFileBody < 0)
+    {
+        this->setCodeError(500);
+        return false;
+    }
+    return true;
+}
 
-// ? Private methods ---------------------------------------------------------------- 
 
-void                                   Request::handleHeaders()
+bool                                            Request::handleHeaders()
 {
     std::stringstream ss;
-
+    
     if (this->getMethodsString() == "POST" && !this->requestHeaders.count("Content-Length") && !this->requestHeaders.count("Transfer-Encoding"))
+    {
         this->setCodeError(411);
+        return false;
+    }
+    if (this->getMethodsString() == "POST" && this->requestHeaders.count("Content-Length") && this->requestHeaders.count("Transfer-Encoding"))
+    {
+        this->setCodeError(400);
+        return false;
+    }
 
     if (this->requestHeaders.count("Content-Length"))
     {
@@ -170,17 +179,27 @@ void                                   Request::handleHeaders()
         ss << this->requestHeaders["Content-Length"];
         ss >> this->bodySize;
         if (this->bodySize == 0)
+        {
             this->setCodeError(204);
+            return false;
+        }
+        if (!this->openFile())
+            return false;
     }
     if (this->requestHeaders.count("Transfer-Encoding"))
     {
         if (this->requestHeaders["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
             this->chunkedFlag = true;
         this->bodyFlag = true;
+        if (!this->openFile())
+            return false;
     }
 
     if (!this->requestHeaders.count("Host"))
+    {
         this->setCodeError(400);
+        return false;
+    }
 
     if (this->requestHeaders.count("Host"))
     {
@@ -201,15 +220,11 @@ void                                   Request::handleHeaders()
         catch(const std::exception)
         {
             this->setCodeError(400);
+            return false;
         }
+
     }
-    if (this->requestHeaders.count("Content-Type") && this->requestHeaders["Content-Type"].find("multipart/form-data") != std::string::npos)
-    {
-        size_t position = this->requestHeaders["Content-Type"].find("boundary", 0);
-        if (position != std::string::npos)
-            this->Boundary = this->requestHeaders["Content-Type"].substr(position + 9, this->requestHeaders["Content-Type"].size());
-        this->multiformFlag = true;
-    }
+    return true;
 }
 
 bool                                   Request::keepAlive()
@@ -226,6 +241,8 @@ void                                   Request::readBufferFromReq(char * buffer,
 {
     u_int8_t                        c;
     static std::stringstream        str;
+
+    std::cout << "read " << readBytes << std::endl;
 
     for (size_t i = 0; i < readBytes; i++)
     {
@@ -473,8 +490,11 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (c == '\n')
                 {
                     this->Storage.clear();
-                    this->fieldsDoneFlag = true;
-                    this->handleHeaders();
+                    if (!this->handleHeaders())
+                    {
+                        std::cout << "ERROR: " << this->getCodeError() << std::endl;
+                        return ;
+                    }
                     if (this->bodyFlag == 1)
                     {
                         if (this->chunkedFlag == true)
@@ -652,7 +672,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->errorCode = 400;
                     return ;
                 }
-                this->bodyDoneFlag = true;
                 this->State = Parsing_Done;
                 continue ;
             }
@@ -661,10 +680,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                 if (this->Body.size() < this->bodySize )
                     this->Body.push_back(c);
                 if (this->Body.size() == this->bodySize )
-                {
-                    this->bodyDoneFlag = true;
                     this->State = Parsing_Done;
-                }
                 break ;
             }
             case Parsing_Done:
@@ -674,8 +690,13 @@ void                                   Request::readBufferFromReq(char * buffer,
         }
         this->Storage += c;
     }
+    
     if (this->State == Parsing_Done)
-        this->bodyString.append((char*)this->Body.data(), this->Body.size());
+    {
+        if (this->getMethodsString() == "POST" && this->fdFileBody > 0)
+            write(this->fdFileBody, (char*)this->Body.data(), this->Body.size());
+        this->Body.clear();
+    }
 }
 
 void                                   Request::printRequest()
@@ -689,29 +710,28 @@ void                                   Request::printRequest()
     for (std::map<std::string, std::string>::iterator it = this->requestHeaders.begin(); it != this->requestHeaders.end(); ++it)
         std::cout << "[" << it->first << "]:[" << it->second << "]" << std::endl;
     std::cout << "------------------------------------------------------------------------" << "\n\n";
-    if (!this->Body.empty() && this->methodsString[this->getMethod()] == "POST")
-    {
-        std::cout << "------------------------------ BODY ------------------------------------" << "\n";
-        for (std::vector<u_int8_t>::iterator it = this->Body.begin(); it != this->Body.end(); ++it)
-            std::cout << *it;
-        std::cout << "\n------------------------------------------------------------------------" << "\n\n";
-        std::cout << "( There is a body in the request ?    :: " << (this->bodyFlag ? "TRUE" : "FALSE") << ")\n";
-        std::cout << "( The body will need more read ?      :: " << (!this->bodyDoneFlag ? "TRUE" : "FALSE") << ") \n";
-        std::cout << "( Done reading body ?                 :: " << (this->fieldsDoneFlag ? "TRUE" : "FALSE") << ")\n";
-    }
+    // if (!this->Body.empty() && this->methodsString[this->getMethod()] == "POST")
+    // {
+    //     std::cout << "------------------------------ BODY ------------------------------------" << "\n";
+    //     for (std::vector<u_int8_t>::iterator it = this->Body.begin(); it != this->Body.end(); ++it)
+    //         std::cout << *it;
+    //     std::cout << "\n------------------------------------------------------------------------" << "\n\n";
+    // }
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  ::::::::::::::::::" << "\n\n";
 }
 
 std::string Request::getNewFileName(std::string path)
 {
     std::string file_name_never_exist = path;
-    std::string exe_flie = this->mime.getMimeType(skipWhitespaceBeginAnd(this->getHeader("Content-Type")));
+    std::string exe_flie = this->mime.getExeFile(skipWhitespaceBeginAnd(this->getHeader("Content-Type")));
     if (exe_flie.empty())
     {
         this->setCodeError(415);
         return "";
     }
+    
     file_name_never_exist.append(generateRandomFileName());
+    file_name_never_exist.append(".");
     file_name_never_exist.append(exe_flie);
     
     if (checkFileExists(file_name_never_exist))
@@ -720,56 +740,102 @@ std::string Request::getNewFileName(std::string path)
     return file_name_never_exist;
 }
 
-void                            Request::uploadFile(std::string path_to_upload_file)
+short                            Request::uploadFile(std::string path_to_upload_file, const ConfigServer & server)
 {
-    std::string path_joined;
+    size_t          pos;
+    std::string     tmp;
 
-    // ! Check if directory exists
-    if (!isDirectory(path_to_upload_file))
+    struct stat st;
+	const char *filename = this->nameFileBody.c_str();
+	stat(filename, &st);
+	off_t size = st.st_size;
+
+    // Request Entity Too Large
+    if ( (unsigned long) size > server.getClientMaxBodySize())
+        return 413;
+
+
+    // Check if the folder is exist
+    DIR *dir = opendir(path_to_upload_file.c_str());
+    if (!dir)
+        return 404;
+    closedir(dir);
+    
+    // Check if the file extension is supported
+    pos = this->nameFileBody.rfind('.');
+
+    if (pos != std::string::npos)
     {
-        std::cerr << "Path [" << path_to_upload_file << "] Not found" << std::endl;
-        this->setCodeError(404);
-        return;
-    }
-
-    if (path_to_upload_file.at(path_to_upload_file.size() - 1) != '/')
-        path_to_upload_file += "/";
-
-    if (this->getBoundary().empty())
-    {
-        path_joined = this->getNewFileName(path_to_upload_file);
-        if (path_joined.empty())
-            return;
-
-        std::ofstream file(path_joined.c_str(), std::ios::binary);
-
-        if (file.fail())
+        try
         {
-            this->setCodeError(404);
-            return ;
+            tmp = this->nameFileBody.substr(pos + 1, this->nameFileBody.length());
+
+            if (mime.getMimeType(tmp).empty())
+                return 415;
         }
-        file.write(this->getBody().c_str(), this->getBody().length());
+        catch(const std::exception& e)
+        {
+            return 415;
+        }   
     }
     else
-    {
-        std::vector<UploadMultipleFile> files = this->filesInfo.parse_body(this->bodyString, this->getBoundary(), path_to_upload_file);
+        return 415;
 
-        for (size_t i = 0; i < files.size(); i++)
-        {
-            if (files[i].codeStatus)
-            {
-                this->setCodeError(files[i].codeStatus);
-                return ;
-            }
-            std::ofstream file(files[i].getPathWithfilename().c_str(), std::ios::binary);
-            if (file.fail())
-            {
-                this->setCodeError(404);
-                return ;
-            }
-            file.write(files[i].getBodyFile().c_str(), files[i].getBodyFile().length());
-        }
-    }
-    this->setCodeError(201);
+    pos = this->nameFileBody.rfind('/');
+
+    if (pos == std::string::npos)
+        return 500;
+
+    tmp = this->nameFileBody.substr(pos, this->nameFileBody.length());
+
+    if (tmp.empty())
+        return 500;
+    
+    path_to_upload_file += tmp;
+
+    std::rename(this->nameFileBody.c_str(), path_to_upload_file.c_str());
+
+    close(this->fdFileBody);
+
+    return 201;
+
+    // if (this->getBoundary().empty())
+    // {
+    //     std::string path_joined = this->getNewFileName(path_to_upload_file);
+    //     if (path_joined.empty())
+    //         return ;
+
+    //     std::ofstream file(path_joined.c_str(), std::ios::binary);
+
+    //     if (file.fail())
+    //     {
+    //         this->setCodeError(404);
+    //         return ;
+    //     }
+    //     file.write(this->getBody().c_str(), this->getBody().length());
+    //     file.close();
+    // }
+    // else
+    // {
+    //     std::vector<UploadMultipleFile> files = this->filesInfo.parse_body(this->bodyString, this->getBoundary(), path_to_upload_file);
+
+    //     for (size_t i = 0; i < files.size(); i++)
+    //     {
+    //         if (files[i].codeStatus)
+    //         {
+    //             this->setCodeError(files[i].codeStatus);
+    //             return ;
+    //         }
+    //         std::ofstream file(files[i].getPathWithfilename().c_str(), std::ios::binary);
+    //         if (file.fail())
+    //         {
+    //             this->setCodeError(404);
+    //             return ;
+    //         }
+    //         file.write(files[i].getBodyFile().c_str(), files[i].getBodyFile().length());
+    //         file.close();
+    //     }
+    // }
+    // this->setCodeError(201);
     
 }

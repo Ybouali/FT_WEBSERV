@@ -6,7 +6,6 @@
 class ManageServers {
     private :
         std::vector<ConfigServer>           Servers;
-        // TODO: need more work here ?
         std::map<int, ConfigServer>         serversMap;
         fd_set                              readFd;
         fd_set                              writeFd;

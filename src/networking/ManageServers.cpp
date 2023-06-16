@@ -143,14 +143,6 @@ void                            ManageServers::assignServerToClient(Client & cli
             return ;
         }
     }
-
-    if (client.server.getHost().empty())
-    {
-        if (this->Servers.empty())
-            client.server = ConfigServer();
-        else
-            client.request.setCodeError(400);
-    }
 }
 
 void                            ManageServers::initSets()
@@ -284,6 +276,8 @@ void                            ManageServers::startServers()
             {
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
+
+                // this->clientsMap[i].request.printRequest();
             }
             else if (FD_ISSET(i, &writeCpy))
             {
@@ -311,6 +305,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
+        // client.clear();
     }
     else if (sentBytes == 0 || client.response.getConnectionStatus())
     {
@@ -325,7 +320,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
         {
             this->removeFromSet(i, this->writeFd);
             this->addToSet(i, this->readFd);
-            client.clear();
+            // client.clear();
         }
     }
     else

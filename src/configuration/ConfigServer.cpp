@@ -49,7 +49,9 @@ void        ConfigServer::clear()
     this->serverName.clear();
     this->clientMaxBodySize = 0;
     this->errorPages.clear();
-    this->locationList.clear();
+    for (size_t i = 0; i < this->locationList.size(); i++)
+        this->locationList[i].clear();
+    
 }
 
 //! ----------------------------- getters -----------------------------------
