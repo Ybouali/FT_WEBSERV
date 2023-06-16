@@ -76,7 +76,6 @@ class Request {
         bool                                    completeFlag;
         bool                                    chunkedFlag;
         bool                                    multiformFlag;
-        bool                                    needBody;
         UploadMultipleFile                      filesInfo;
 
         void                                   handleHeaders();
@@ -96,33 +95,31 @@ class Request {
 
         // ? ----------------------------- getters -----------------------------------
 
-        std::string &                                       getPath();
+        const std::string &                             getPath() const;
 
-        std::string &                                       getQuery();
+        const std::string &                             getQuery() const ;
 
-        const std::map<std::string, std::string>&           getrequestHeaders();
+        const std::map<std::string, std::string>&       getrequestHeaders() const;
 
-        std::string   &                                     getHeader(std::string );
+        const std::string   &                           getHeader(std::string );
 
-        std::string &                                       getBody();
+        const std::string &                             getBody() const;
 
-        std::string  &                                      getBoundary();
+        const std::string  &                            getBoundary() const;
 
-        Methods                                             getMethod();
+        Methods                                         getMethod() const;
 
-        std::string                                         getMethodsString();
+        const std::string&                              getMethodsString();
 
-        short                                               getCodeError();
+        short                                           getCodeError() const;
 
-        std::string &                                       getHost();
+        const std::string &                             getHost() const;
 
-        bool                                                getMultiformFlag();
+        state                                           getState() const;
 
-        state                                               getState();
+        bool                                            getNeedBody() const;
 
-        bool                                                getNeedBody();
-
-        uint16_t                                            getPort();
+        uint16_t                                        getPort() const;
 
         // ? ----------------------------- setters -----------------------------------
 

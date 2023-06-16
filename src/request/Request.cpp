@@ -28,7 +28,6 @@ Request::Request()
       completeFlag(false),
       chunkedFlag(false),
       multiformFlag(false),
-      needBody(false),
       filesInfo()
 {
     this->methodsString[::GET] = "GET";
@@ -71,7 +70,6 @@ Request & Request::operator= (const Request & other)
         this->completeFlag = other.completeFlag;
         this->chunkedFlag = other.chunkedFlag;
         this->multiformFlag = other.multiformFlag;
-        this->needBody = other.needBody;
         this->filesInfo = other.filesInfo;
     }   
     return *this;
@@ -95,7 +93,7 @@ void            Request::clear()
     this->maxBodySize = 0;
     this->bodySize = 0;
     this->errorCode = 0;
-    this->chunkedLength = 0x0;
+    this->chunkedLength = 0;
     this->Storage.clear();
     this->keyStorage.clear();
     this->methodIndex = 0;
@@ -109,39 +107,35 @@ void            Request::clear()
     this->completeFlag = false;
     this->chunkedFlag = false;
     this->multiformFlag = false;
-    this->needBody = false;
     this->filesInfo.clear();
 }
 
 // ? ----------------------------- getters -----------------------------------
 
-std::string &                                       Request::getPath() { return this->Path; }
+const std::string &                             Request::getPath() const { return this->Path; }
 
-std::string &                                       Request::getQuery() { return this->Query; }
+const std::string &                             Request::getQuery() const { return this->Query; }
 
-const std::map<std::string, std::string>&           Request::getrequestHeaders() { return this->requestHeaders; }
+const std::map<std::string, std::string>&       Request::getrequestHeaders() const { return this->requestHeaders; }
 
-std::string &                                       Request::getHeader(std::string key) { return this->requestHeaders[key]; }
+const std::string &                             Request::getHeader(std::string key) { return this->requestHeaders[key]; }
 
-std::string &                                       Request::getBody() { return this->bodyString; }
+const std::string &                             Request::getBody() const { return this->bodyString; }
 
-std::string &                                       Request::getBoundary() { return this->Boundary; }
+const std::string &                             Request::getBoundary() const { return this->Boundary; }
 
-Methods                                            Request::getMethod() { return this->Method; }
+Methods                                         Request::getMethod() const { return this->Method; }
 
-std::string                                         Request::getMethodsString() { return this->methodsString[this->Method]; }
+const std::string&                              Request::getMethodsString() { return this->methodsString[this->Method]; }
 
-short                                               Request::getCodeError() { return this->errorCode; }
+short                                           Request::getCodeError() const { return this->errorCode; }
 
-std::string &                                       Request::getHost() { return this->Host; }
+const std::string &                             Request::getHost() const { return this->Host; }
 
-bool                                                Request::getMultiformFlag() { return this->multiformFlag; }
+state                                           Request::getState() const { return this->State; }
 
-state                                               Request::getState() { return this->State; }
+uint16_t                                        Request::getPort() const { return this->Port; }
 
-bool                                                Request::getNeedBody() { return this->needBody; }
-
-uint16_t                                            Request::getPort() { return this->Port; }
 
 // ? ----------------------------- setters -----------------------------------
 
@@ -250,8 +244,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->Method = DELETE;
                 else 
                 {
-                    if (c == 'H')
-                        this->needBody = true;
                     this->errorCode = 501;
                     return;
                 }
@@ -684,10 +676,6 @@ void                                   Request::readBufferFromReq(char * buffer,
     }
     if (this->State == Parsing_Done)
         this->bodyString.append((char*)this->Body.data(), this->Body.size());
-    // ! HERE CHECK FOR THE HOST IS EXIST IN THE HEADERS ?
-    // std::string tmp = this->requestHeaders.find("Host")->second;
-    // if (tmp.empty())
-    //     this->errorCode = 400;
 }
 
 void                                   Request::printRequest()

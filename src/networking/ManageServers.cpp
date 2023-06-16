@@ -284,11 +284,6 @@ void                            ManageServers::startServers()
             {
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
-                
-                // ! Here printing the request for the start working in the response
-                // ! Just if there is no error on the request parsing .
-                // if (!this->clientsMap[i].request.getCodeError())
-                    // this->clientsMap[i].request.printRequest();
             }
             else if (FD_ISSET(i, &writeCpy))
             {
@@ -346,9 +341,6 @@ std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerP
     {
         server = ConfigServer(servers[i].getPort(), servers[i].getHost(), servers[i].getServerName(), servers[i].get_locations(), servers[i].getErrorPages(), servers[i].getClientMaxBodySize());
         vecServers.push_back(server);
-        // // std::cout << "|||||||||||||||||||||||||||||||||||||||| START PRINTING SRVER NUMBER [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
-        // // servers[i].printTheServerInfo();
-        // // std::cout << "|||||||||||||||||||||||||||||||||||||||| END PRINTING SRVER NUMBER   [" << i + 1 << "] ||||||||||||||||||||||||||||||" << std::endl;
     }
 
     return vecServers;
