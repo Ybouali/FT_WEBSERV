@@ -181,7 +181,7 @@ void                            ManageServers::initSets()
     this->biggestFd = this->Servers.back().getFd();
 }
 
-void                            ManageServers::setupServers(std::vector<ConfigServer> servers)
+void                            ManageServers::setupServers(const std::vector<ConfigServer>& servers)
 {
     bool            checkDoubleServers;
 
@@ -332,7 +332,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
         client.updateTime();
 }
 
-std::vector<ConfigServer>       ManageServers::getInfoServer(std::vector<ServerParser > servers)
+std::vector<ConfigServer>       ManageServers::getInfoServer(const std::vector<ServerParser >& servers)
 {
     std::vector<ConfigServer> vecServers;
     ConfigServer              server;
