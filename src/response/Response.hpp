@@ -68,21 +68,19 @@ class Response
 		void	handleGetDirectory();
 		void	handleGetFile();
 		void	handleGetAutoindex();
-		void	handleGetCGI();
 
 		// Post
 		void	handlePostMethod();
-		void	handlePostDirectory();
-		void	handlePostFile();
-		void	handlePostCGI();
 
 		// Delete
 		void	handleDeleteMethod();
-		void	handleDeleteDirectory();
+		void	handleDeleteDirectoryCGI();
 		void	handleDeleteDirectoryContent();
 		void	handleDeleteEmptyDirectory();
 		void	handleDeleteFile();
-		void	handleDeleteCGI();
+
+		// CGI
+		void	handleCGI();
 };
 
 #endif

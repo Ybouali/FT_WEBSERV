@@ -14,7 +14,22 @@ void	Response::handleGetMethod()
 		}
 		else
 		{
-			this->handleGetFile();
+			// check if the requested file has read permission
+			if (access(this->fullPath.c_str(), R_OK) == -1)
+			{
+				this->statusCode = 403;
+				throw std::exception();
+			}
+
+			// check if the location has CGI
+			if (this->location.getCgi() == "on")
+			{
+				this->handleCGI();
+			}
+			else
+			{
+				this->handleGetFile();
+			}
 		}
 	}
 	catch (const std::exception& e)
@@ -66,7 +81,22 @@ void	Response::handleGetDirectory()
 		// if the directory has the index file, handle it as a file, otherwise check if it has autoindex
 		if (hasIndex)
 		{
-			this->handleGetFile();
+			// check if the requested file has read permission
+			if (access(this->fullPath.c_str(), R_OK) == -1)
+			{
+				this->statusCode = 403;
+				throw std::exception();
+			}
+
+			// check if the location has CGI
+			if (this->location.getCgi() == "on")
+			{
+				this->handleCGI();
+			}
+			else
+			{
+				this->handleGetFile();
+			}
 		}
 		else
 		{
@@ -81,73 +111,51 @@ void	Response::handleGetDirectory()
 
 void	Response::handleGetFile()
 {
-	// check if the requested file type is supported
-	if (!isTypeSupported(this->fullPath))
+	static int fd;
+	char buffer[BUF_SIZE];
+
+	if (readBytes == 0)
 	{
-		this->statusCode = 415;
-		throw std::exception();
+		// open the requested file and check if it's open
+		if ((fd = open(this->fullPath.c_str(), O_RDONLY)) == -1)
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
 	}
 
-	// check if the requested file is readable
-	if (access(this->fullPath.c_str(), R_OK) == -1)
+	if (!this->readStatus)
 	{
-		this->statusCode = 403;
-		throw std::exception();
-	}
+		// set the response headers
+		this->statusCode = 200;
+		this->buildResponseContent();
 
-	// check if the location has CGI
-	if (this->location.getCgi() == "on")
-	{
-		this->handleGetCGI();
+		// set the read status to true to read the file content
+		this->readStatus = true;
 	}
 	else
 	{
-		static int fd;
-		char buffer[BUF_SIZE];
+		// clear the response content that was sent in the previous loop
+		this->responseContent.clear();
 
-		if (readBytes == 0)
+		// read the file content by BUF_SIZE bytes
+		readBytes = read(fd, buffer, BUF_SIZE);
+
+		// check if read bytes is -1, 0 or > 0
+		if (readBytes == -1)
 		{
-			// open the requested file and check if it's open
-			if ((fd = open(this->fullPath.c_str(), O_RDONLY)) == -1)
-			{
-				this->statusCode = 500;
-				throw std::exception();
-			}
+			this->statusCode = 500;
+			throw std::exception();
 		}
-
-		if (!this->readStatus)
+		else if (readBytes > 0)
 		{
-			// set the response headers
-			this->statusCode = 200;
-			this->buildResponseContent();
-
-			// set the read status to true to read the file content
-			this->readStatus = true;
+			this->responseContent = std::string(buffer, readBytes);
+			memset(buffer, 0, BUF_SIZE);
 		}
 		else
 		{
-			// clear the response content that was sent in the previous loop
-			this->responseContent.clear();
-
-			// read the file content by BUF_SIZE bytes
-			readBytes = read(fd, buffer, BUF_SIZE);
-
-			// check if read bytes is -1, 0 or > 0
-			if (readBytes == -1)
-			{
-				this->statusCode = 500;
-				throw std::exception();
-			}
-			else if (readBytes > 0)
-			{
-				this->responseContent = std::string(buffer, readBytes);
-				memset(buffer, 0, BUF_SIZE);
-			}
-			else
-			{
-				this->connectionStatus = true;
-				close(fd);
-			}
+			this->connectionStatus = true;
+			close(fd);
 		}
 	}
 }
@@ -202,9 +210,4 @@ void	Response::handleGetAutoindex()
 		this->statusCode = 403;
 		throw std::exception();
 	}
-}
-
-void	Response::handleGetCGI()
-{
-	// TODO: later
 }

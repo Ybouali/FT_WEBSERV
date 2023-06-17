@@ -10,14 +10,31 @@ void	Response::handleDeleteMethod()
 		// check if the requested resource is a directory or a file
 		if (isDirectory(this->fullPath))
 		{
-			this->handleDeleteDirectory();
+			// check if the directory path ends with a slash
+			if (this->fullPath.at(this->fullPath.length() - 1) != '/')
+			{
+				this->statusCode = 409;
+				throw std::exception();
+			}
+			else
+			{
+				// check if the location has CGI
+				if (this->location.getCgi() == "on")
+				{
+					this->handleDeleteDirectoryCGI();
+				}
+				else
+				{
+					this->handleDeleteDirectoryContent();
+				}
+			}
 		}
 		else
 		{
 			// check if the location has CGI
 			if (this->location.getCgi() == "on")
 			{
-				this->handleDeleteCGI();
+				this->handleCGI();
 			}
 			else
 			{
@@ -33,60 +50,45 @@ void	Response::handleDeleteMethod()
 	this->connectionStatus = true;
 }
 
-void	Response::handleDeleteDirectory()
+void	Response::handleDeleteDirectoryCGI()
 {
-	// check if the directory path ends with a slash
-	if (this->fullPath.at(this->fullPath.length() - 1) != '/')
+	// open the directory and check if it's open
+	DIR* dir = opendir(this->fullPath.c_str());
+	if (dir == NULL)
 	{
-		this->statusCode = 409;
+		this->statusCode = 500;
 		throw std::exception();
 	}
 
+	struct dirent* ent;
+	bool hasIndex = false;
+
+	// loop through the directory content and check if it has the index file
+	while ((ent = readdir(dir)) != NULL)
+	{
+		// if the directory has the index file, append it to the full path
+		std::string fileName = ent->d_name;
+		if (fileName == this->location.getIndex())
+		{
+			this->fullPath.append(fileName);
+			hasIndex = true;
+			break;
+		}
+	}
+
+	closedir(dir);
+
 	try
 	{
-		// check if the location has CGI
-		if (this->location.getCgi() == "on")
+		// if the directory has the index file, handle it using CGI, otherwise return 403
+		if (hasIndex)
 		{
-			// open the directory and check if it's open
-			DIR* dir = opendir(this->fullPath.c_str());
-			if (dir == NULL)
-			{
-				this->statusCode = 500;
-				throw std::exception();
-			}
-
-			struct dirent* ent;
-			bool hasIndex = false;
-
-			// loop through the directory content and check if it has the index file
-			while ((ent = readdir(dir)) != NULL)
-			{
-				// if the directory has the index file, append it to the full path
-				std::string fileName = ent->d_name;
-				if (fileName == this->location.getIndex())
-				{
-					this->fullPath.append(fileName);
-					hasIndex = true;
-					break;
-				}
-			}
-
-			closedir(dir);
-
-			// if the directory has the index file, handle it using CGI, otherwise return 403
-			if (hasIndex)
-			{
-				this->handleDeleteCGI();
-			}
-			else
-			{
-				this->statusCode = 403;
-				throw std::exception();
-			}
+			this->handleCGI();
 		}
 		else
 		{
-			this->handleDeleteDirectoryContent();
+			this->statusCode = 403;
+			throw std::exception();
 		}
 	}
 	catch (const std::exception& e)
@@ -125,7 +127,7 @@ void	Response::handleDeleteDirectoryContent()
 					this->fullPath.append(fileName + "/");
 
 					// recursively delete the subdirectory content
-					this->handleDeleteDirectory();
+					this->handleDeleteDirectoryContent();
 
 					// delete the empty subdirectory
 					this->handleDeleteEmptyDirectory();
@@ -143,7 +145,7 @@ void	Response::handleDeleteDirectoryContent()
 
 		closedir(dir);
 
-		// set the full path to the original path to delete the parent directory
+		// set the full path to the original path and delete the parent directory
 		this->fullPath = originalPath;
 		this->handleDeleteEmptyDirectory();
 	}
@@ -158,7 +160,7 @@ void	Response::handleDeleteEmptyDirectory()
 	// check if the directory has write and read permission
 	if (access(this->fullPath.c_str(), W_OK | R_OK) == 0)
 	{
-		// check if the empty directory has been deleted successfully
+		// check if the directory has been deleted successfully
 		if (rmdir(this->fullPath.c_str()) == 0)
 		{
 			this->statusCode = 204;
@@ -178,7 +180,7 @@ void	Response::handleDeleteEmptyDirectory()
 
 void	Response::handleDeleteFile()
 {
-	// check if the file has the write permission
+	// check if the file has write permission
 	if (access(this->fullPath.c_str(), W_OK) == 0)
 	{
 		// check if the file has been deleted successfully
@@ -197,9 +199,4 @@ void	Response::handleDeleteFile()
 		this->statusCode = 403;
 		throw std::exception();
 	}
-}
-
-void	Response::handleDeleteCGI()
-{
-	// TODO: later
 }

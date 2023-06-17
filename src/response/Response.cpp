@@ -82,6 +82,14 @@ void	Response::buildResponse()
 {
 	try
 	{
+		// check if the requested file is still being read from the previous loop
+		if (this->statusCode == 200)
+		{
+			this->handleGetFile();
+			return;
+		}
+
+		// check if the request was parsed successfully
 		if (this->request.getCodeError())
 		{
 			this->statusCode = this->request.getCodeError();
@@ -136,6 +144,7 @@ void	Response::buildResponseContent()
 	this->responseContent.append(getContentType(this->fullPath));
 	this->responseContent.append("\r\n");
 	this->responseContent.append("Content-Length: ");
+
 	if (!this->body.empty())
 	{
 		this->responseContent.append(std::to_string(this->body.length()));
@@ -189,19 +198,23 @@ void	Response::isLocationMatched()
 				this->fullPath.append("/");
 				throw std::exception();
 			}
+
+			break;
 		}
 	}
 
 	if (!isMatched)
 	{
-		// check if the requested location is matched with the root location '/'
+		// if no location is matched check if the root location '/' is matched
 		for (std::vector<Location >::iterator it = locations.begin(); it != locations.end(); it++)
 		{
-			// if the requested location is matched with the root location '/', set it to the response location
+			// if the root location '/' is matched, set it to the response location
 			if (it->getLocation() == "/")
 			{
 				isMatched = true;
 				this->location = *it;
+
+				break;
 			}
 		}
 	}
@@ -209,6 +222,7 @@ void	Response::isLocationMatched()
 	// if the requested location is not matched, set the status code to 404
 	if (!isMatched)
 	{
+		// TODO: set the default location
 		this->statusCode = 404;
 		throw std::exception();
 	}
@@ -263,4 +277,9 @@ void	Response::isResourceExist()
 		this->statusCode = 404;
 		throw std::exception();
 	}
+}
+
+void	Response::handleCGI()
+{
+	//TODO: handle CGI
 }

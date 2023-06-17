@@ -316,21 +316,14 @@ bool    isDirectory(const std::string path)
     return false;
 }
 
-bool    isTypeSupported(const std::string path)
-{
-    std::string type = path.substr(path.find_last_of(".") + 1);
-    MimeTypes mimeTypes;
-
-    if (mimeTypes.getMimeType(type).empty())
-        return false;
-
-    return true;
-}
-
 const std::string  getContentType(const std::string path)
 {
     std::string type = path.substr(path.find_last_of(".") + 1);
     MimeTypes mimeTypes;
 
-    return mimeTypes.getMimeType(type);
+    std::string contentType = mimeTypes.getMimeType(type);
+    if (contentType.empty())
+        contentType = "application/octet-stream";
+
+    return contentType;
 }

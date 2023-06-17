@@ -68,7 +68,6 @@ bool            	checkStringIsEmpty(std::string);
 std::string     	generateRandomFileName();
 bool            	checkFileExists(const std::string);
 bool            	isDirectory(const std::string);
-bool				isTypeSupported(const std::string);
 const std::string	getContentType(const std::string);
 void                parse_error(const std::string & );
 bool                isValidHTTPStatusCode(short );
