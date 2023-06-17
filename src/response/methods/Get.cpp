@@ -166,6 +166,13 @@ void	Response::handleGetAutoindex()
 			throw std::exception();
 		}
 
+		this->body.append("<html><head><title>Index of ");
+		this->body.append(this->request.getPath());
+		this->body.append("</title></head><body><h1>Index of ");
+		this->body.append(this->request.getPath());
+		this->body.append("</h1><hr><pre>");
+		this->body.append("<style> body { background-color: #f0f0f0; font-family: sans-serif;} </style>");
+
 		// loop through the directory content and append it to the body
 		struct dirent* ent;
 		while ((ent = readdir(dir)) != NULL)
@@ -173,14 +180,19 @@ void	Response::handleGetAutoindex()
 			std::string fileName = ent->d_name;
 			if (fileName != "." && fileName != "..")
 			{
+				this->body.append("<a href=\"");
 				this->body.append(fileName);
-				this->body.append("\n");
+				this->body.append("\">");
+				this->body.append(fileName);
+				this->body.append("</a><br>");
 			}
 		}
 
+		this->body.append("</pre><hr></body></html>");
+
 		closedir(dir);
 
-		// set the status code to 200 and build the response content
+		// build the response content
 		this->connectionStatus = true;
 		this->statusCode = 200;
 		this->fullPath.append("index.html");

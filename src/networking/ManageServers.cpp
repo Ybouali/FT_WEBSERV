@@ -305,7 +305,6 @@ void                            ManageServers::sendResponse(const int & i, Clien
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
-        // client.clear();
     }
     else if (sentBytes == 0 || client.response.getConnectionStatus())
     {
@@ -320,7 +319,6 @@ void                            ManageServers::sendResponse(const int & i, Clien
         {
             this->removeFromSet(i, this->writeFd);
             this->addToSet(i, this->readFd);
-            // client.clear();
         }
     }
     else

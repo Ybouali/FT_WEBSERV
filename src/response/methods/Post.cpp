@@ -7,9 +7,8 @@ void	Response::handlePostMethod()
 		// check if the location supports upload
 		if (!this->location.getUpload().empty())
 		{
-			this->setStatusCode(this->request.uploadFile(this->location.getUpload(), this->getConfigServer()));
-			std::string errorPage = this->server.getErrorPages().find(this->statusCode)->second;
-			this->responseContent = getResponsePage(this->statusCode, true, errorPage);
+			this->statusCode = this->request.uploadFile(this->location.getUpload(), this->getConfigServer());
+			throw std::exception();
 		}
 		else
 		{

@@ -82,6 +82,13 @@ void	Response::buildResponse()
 {
 	try
 	{
+		if (this->request.getCodeError())
+		{
+			this->statusCode = this->request.getCodeError();
+			this->request.setCodeError(0);
+			throw std::exception();
+		}
+
 		// check if the request is valid
 		this->isLocationMatched();
 		this->isRedirectionExist();
@@ -117,6 +124,8 @@ void	Response::buildResponse()
 			std::string errorPage = this->server.getErrorPages().find(this->statusCode)->second;
 			this->responseContent = getResponsePage(this->statusCode, true, errorPage);
 		}
+
+		// std::cout << this->responseContent << std::endl;
 	}
 }
 
@@ -145,6 +154,8 @@ void	Response::buildResponseContent()
 		this->responseContent.append("Connection: keep-alive");
 		this->responseContent.append("\r\n\r\n");
 	}
+
+	// std::cout << this->responseContent << std::endl;
 }
 
 void	Response::isLocationMatched()
@@ -161,6 +172,8 @@ void	Response::isLocationMatched()
 		requestedLocation.erase(pos);
 	}
 
+	// TODO: test 127.0.0.1:8080/index.html
+
 	// check if the requested location is matched with a location in the server
 	for (std::vector<Location >::iterator it = locations.begin(); it != locations.end(); it++)
 	{
@@ -169,6 +182,15 @@ void	Response::isLocationMatched()
 		{
 			isMatched = true;
 			this->location = *it;
+
+			// check if the requested location ends with a slash
+			if (pos == std::string::npos && this->location.getLocation() != "/")
+			{
+				this->statusCode = 301;
+				this->fullPath = this->location.getLocation();
+				this->fullPath.append("/");
+				throw std::exception();
+			}
 		}
 	}
 

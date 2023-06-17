@@ -155,36 +155,46 @@ void	Response::handleDeleteDirectoryContent()
 
 void	Response::handleDeleteEmptyDirectory()
 {
-	// check if the empty directory has been deleted successfully
-	if (rmdir(this->fullPath.c_str()) == 0)
+	// check if the directory has write and read permission
+	if (access(this->fullPath.c_str(), W_OK | R_OK) == 0)
 	{
-		this->statusCode = 204;
-	}
-	else
-	{
-		// check if the directory has write permission
-		if (access(this->fullPath.c_str(), W_OK) == 0)
+		// check if the empty directory has been deleted successfully
+		if (rmdir(this->fullPath.c_str()) == 0)
 		{
-			this->statusCode = 500;
+			this->statusCode = 204;
 		}
 		else
 		{
-			this->statusCode = 403;
+			this->statusCode = 500;
+			throw std::exception();
 		}
+	}
+	else
+	{
+		this->statusCode = 403;
 		throw std::exception();
 	}
 }
 
 void	Response::handleDeleteFile()
 {
-	// check if the file has been deleted successfully
-	if (remove(this->fullPath.c_str()) == 0)
+	// check if the file has the write permission
+	if (access(this->fullPath.c_str(), W_OK) == 0)
 	{
-		this->statusCode = 204;
+		// check if the file has been deleted successfully
+		if (unlink(this->fullPath.c_str()) == 0)
+		{
+			this->statusCode = 204;
+		}
+		else
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
 	}
 	else
 	{
-		this->statusCode = 500;
+		this->statusCode = 403;
 		throw std::exception();
 	}
 }
