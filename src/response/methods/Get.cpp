@@ -146,7 +146,6 @@ void	Response::handleGetFile()
 			else
 			{
 				this->connectionStatus = true;
-				this->statusCode = 200;
 				close(fd);
 			}
 		}
