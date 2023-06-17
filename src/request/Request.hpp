@@ -3,8 +3,6 @@
 #include "../webserv.hpp"
 class MimeTypes;
 
-# include "UploadMultipleFile.hpp"
-
 enum Methods {
     GET,
     POST,
@@ -72,7 +70,6 @@ class Request {
         std::string                             nameFileBody;
         bool                                    bodyFlag;
         bool                                    chunkedFlag;
-        UploadMultipleFile                      filesInfo;
 
         bool                                   handleHeaders();
 

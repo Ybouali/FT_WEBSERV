@@ -305,6 +305,7 @@ void                            ManageServers::sendResponse(const int & i, Clien
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
         this->closeConnectionClient(i);
+        this->clientsMap.erase(i);
     }
     else if (sentBytes == 0 || client.response.getConnectionStatus())
     {
@@ -314,11 +315,13 @@ void                            ManageServers::sendResponse(const int & i, Clien
         {
             std::cerr << "Client [" << i << "] Connection Closed" << std::endl;
             this->closeConnectionClient(i);
+            this->clientsMap.erase(i);
         }
         else
         {
             this->removeFromSet(i, this->writeFd);
             this->addToSet(i, this->readFd);
+            client.clear();
         }
     }
     else

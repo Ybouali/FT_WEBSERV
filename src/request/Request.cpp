@@ -23,8 +23,7 @@ Request::Request()
       fdFileBody(0),
       nameFileBody(),
       bodyFlag(false),
-      chunkedFlag(false),
-      filesInfo()
+      chunkedFlag(false)
 {
     this->methodsString[::GET] = "GET";
     this->methodsString[::POST] = "POST";
@@ -62,7 +61,6 @@ Request & Request::operator= (const Request & other)
         this->Port = other.Port;
         this->bodyFlag = other.bodyFlag;
         this->chunkedFlag = other.chunkedFlag;
-        this->filesInfo = other.filesInfo;
     }   
     return *this;
 }
@@ -96,7 +94,6 @@ void            Request::clear()
     this->Port = 0;
     this->bodyFlag = false;
     this->chunkedFlag = false;
-    this->filesInfo.clear();
 }
 
 // ? ----------------------------- getters -----------------------------------
@@ -489,11 +486,9 @@ void                                   Request::readBufferFromReq(char * buffer,
                 {
                     this->Storage.clear();
                     if (!this->handleHeaders())
-                    {
-                        std::cout << "ERROR: " << this->getCodeError() << std::endl;
-                        return ;
-                    }
-                    if (this->bodyFlag == 1)
+                        this->State = Parsing_Done;
+                    
+                    if (this->bodyFlag)
                     {
                         if (this->chunkedFlag == true)
                             this->State = Chunked_Length_Begin;
@@ -795,45 +790,5 @@ short                            Request::uploadFile(std::string path_to_upload_
 
     close(this->fdFileBody);
 
-    return 201;
-
-    // if (this->getBoundary().empty())
-    // {
-    //     std::string path_joined = this->getNewFileName(path_to_upload_file);
-    //     if (path_joined.empty())
-    //         return ;
-
-    //     std::ofstream file(path_joined.c_str(), std::ios::binary);
-
-    //     if (file.fail())
-    //     {
-    //         this->setCodeError(404);
-    //         return ;
-    //     }
-    //     file.write(this->getBody().c_str(), this->getBody().length());
-    //     file.close();
-    // }
-    // else
-    // {
-    //     std::vector<UploadMultipleFile> files = this->filesInfo.parse_body(this->bodyString, this->getBoundary(), path_to_upload_file);
-
-    //     for (size_t i = 0; i < files.size(); i++)
-    //     {
-    //         if (files[i].codeStatus)
-    //         {
-    //             this->setCodeError(files[i].codeStatus);
-    //             return ;
-    //         }
-    //         std::ofstream file(files[i].getPathWithfilename().c_str(), std::ios::binary);
-    //         if (file.fail())
-    //         {
-    //             this->setCodeError(404);
-    //             return ;
-    //         }
-    //         file.write(files[i].getBodyFile().c_str(), files[i].getBodyFile().length());
-    //         file.close();
-    //     }
-    // }
-    // this->setCodeError(201);
-    
+    return 201;    
 }
