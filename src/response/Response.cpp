@@ -172,8 +172,6 @@ void	Response::isLocationMatched()
 		requestedLocation.erase(pos);
 	}
 
-	// TODO: test 127.0.0.1:8080/index.html
-
 	// check if the requested location is matched with a location in the server
 	for (std::vector<Location >::iterator it = locations.begin(); it != locations.end(); it++)
 	{
@@ -190,6 +188,20 @@ void	Response::isLocationMatched()
 				this->fullPath = this->location.getLocation();
 				this->fullPath.append("/");
 				throw std::exception();
+			}
+		}
+	}
+
+	if (!isMatched)
+	{
+		// check if the requested location is matched with the root location '/'
+		for (std::vector<Location >::iterator it = locations.begin(); it != locations.end(); it++)
+		{
+			// if the requested location is matched with the root location '/', set it to the response location
+			if (it->getLocation() == "/")
+			{
+				isMatched = true;
+				this->location = *it;
 			}
 		}
 	}
