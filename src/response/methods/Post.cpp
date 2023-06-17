@@ -7,7 +7,36 @@ void	Response::handlePostMethod()
 		// check if the location supports upload
 		if (!this->location.getUpload().empty())
 		{
-			this->statusCode = this->request.uploadFile(this->location.getUpload(), this->getConfigServer());
+			// Check if the folder is exist
+			DIR *dir = opendir(this->location.getUpload().c_str());
+			if (!dir)
+			{
+				this->statusCode = 404;
+				throw std::exception();
+			}
+			closedir(dir);
+			
+
+			struct stat st;
+			const char *filename = this->request.getNameFileBody().c_str();
+			stat(filename, &st);
+			off_t size = st.st_size;
+
+			// Response :: Entity Too Large
+			if ( (unsigned long) size > this->server.getClientMaxBodySize())
+			{
+				this->statusCode = 404;
+				throw std::exception();
+			}
+
+			if (this->location.getCgi().empty() && this->location.getCgi() == "no")
+			{
+				// TODO: we need to run the cgi to upload file Or files ?
+				this->statusCode = 201;
+				throw std::exception();
+			}
+
+			this->statusCode = this->request.uploadFile(this->location.getUpload());
 			throw std::exception();
 		}
 		else

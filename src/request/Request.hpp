@@ -134,7 +134,7 @@ class Request {
         void                            printRequest();
 
         
-        short                           uploadFile(std::string , const ConfigServer &);
+        short                           uploadFile(std::string);
 
         std::string                     getNewFileName(std::string );
 };

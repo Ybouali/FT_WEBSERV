@@ -733,26 +733,10 @@ std::string Request::getNewFileName(std::string path)
     return file_name_never_exist;
 }
 
-short                            Request::uploadFile(std::string path_to_upload_file, const ConfigServer & server)
+short                            Request::uploadFile(std::string path_to_upload_file)
 {
     size_t          pos;
     std::string     tmp;
-
-    struct stat st;
-	const char *filename = this->nameFileBody.c_str();
-	stat(filename, &st);
-	off_t size = st.st_size;
-
-    // Request Entity Too Large
-    if ( (unsigned long) size > server.getClientMaxBodySize())
-        return 413;
-
-
-    // Check if the folder is exist
-    DIR *dir = opendir(path_to_upload_file.c_str());
-    if (!dir)
-        return 404;
-    closedir(dir);
     
     // Check if the file extension is supported
     pos = this->nameFileBody.rfind('.');
