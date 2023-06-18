@@ -49,6 +49,4 @@ void	Response::handlePostMethod()
 	{
 		throw;
 	}
-
-	this->connectionStatus = true;
 }

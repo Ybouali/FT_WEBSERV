@@ -74,9 +74,8 @@ class Response
 
 		// Delete
 		void	handleDeleteMethod();
-		void	handleDeleteDirectoryCGI();
 		void	handleDeleteDirectoryContent();
-		void	handleDeleteEmptyDirectory();
+		void	handleDeleteDirectory();
 		void	handleDeleteFile();
 
 		// CGI
