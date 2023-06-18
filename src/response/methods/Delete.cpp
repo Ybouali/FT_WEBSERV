@@ -166,11 +166,7 @@ void	Response::handleDeleteEmptyDirectory()
 	if (access(this->fullPath.c_str(), W_OK | R_OK) == 0)
 	{
 		// check if the directory has been deleted successfully
-		if (rmdir(this->fullPath.c_str()) == 0)
-		{
-			this->statusCode = 204;
-		}
-		else
+		if (rmdir(this->fullPath.c_str()) != 0)
 		{
 			this->statusCode = 500;
 			throw std::exception();
@@ -189,11 +185,7 @@ void	Response::handleDeleteFile()
 	if (access(this->fullPath.c_str(), W_OK) == 0)
 	{
 		// check if the file has been deleted successfully
-		if (unlink(this->fullPath.c_str()) == 0)
-		{
-			this->statusCode = 204;
-		}
-		else
+		if (unlink(this->fullPath.c_str()) != 0)
 		{
 			this->statusCode = 500;
 			throw std::exception();
