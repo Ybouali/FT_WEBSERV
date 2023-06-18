@@ -19,11 +19,9 @@ void	Response::handleDeleteMethod()
 				this->fullPath.append("/");
 				throw std::exception();
 			}
-			else
-			{
-				this->handleDeleteDirectoryContent();
-				this->handleDeleteDirectory();
-			}
+
+			this->handleDeleteDirectoryContent();
+			this->handleDeleteDirectory();
 		}
 		else
 		{
