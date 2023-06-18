@@ -48,6 +48,12 @@ void	Response::handleDeleteMethod()
 	}
 
 	this->connectionStatus = true;
+	this->statusCode = 204;
+
+	std::string errorPage = this->server.getErrorPages().find(this->statusCode)->second;
+	this->responseContent = getResponsePage(this->statusCode, true, errorPage);
+
+	// std::cout << this->responseContent << std::endl;
 }
 
 void	Response::handleDeleteDirectoryCGI()
@@ -141,13 +147,12 @@ void	Response::handleDeleteDirectoryContent()
 					this->handleDeleteFile();
 				}
 			}
+
+			// restore the original path
+			this->fullPath = originalPath;
 		}
 
 		closedir(dir);
-
-		// set the full path to the original path and delete the parent directory
-		this->fullPath = originalPath;
-		this->handleDeleteEmptyDirectory();
 	}
 	catch (const std::exception& e)
 	{
