@@ -111,21 +111,17 @@ void	Response::handleGetDirectory()
 
 void	Response::handleGetFile()
 {
-	static int fd;
 	char buffer[BUF_SIZE];
 
-	if (readBytes == 0)
+	if (!this->readStatus)
 	{
 		// open the requested file and check if it's open
-		if ((fd = open(this->fullPath.c_str(), O_RDONLY)) == -1)
+		if ((this->fd = open(this->fullPath.c_str(), O_RDONLY)) == -1)
 		{
 			this->statusCode = 500;
 			throw std::exception();
 		}
-	}
 
-	if (!this->readStatus)
-	{
 		// set the response headers
 		this->statusCode = 200;
 		this->buildResponseContent();
@@ -139,23 +135,20 @@ void	Response::handleGetFile()
 		this->responseContent.clear();
 
 		// read the file content by BUF_SIZE bytes
-		readBytes = read(fd, buffer, BUF_SIZE);
-
-		// check if read bytes is -1, 0 or > 0
-		if (readBytes == -1)
+		if ((readBytes = read(this->fd, buffer, BUF_SIZE)) == -1)
 		{
 			this->statusCode = 500;
 			throw std::exception();
 		}
-		else if (readBytes > 0)
+
+		if (readBytes > 0)
 		{
 			this->responseContent = std::string(buffer, readBytes);
-			memset(buffer, 0, BUF_SIZE);
 		}
 		else
 		{
 			this->connectionStatus = true;
-			close(fd);
+			close(this->fd);
 		}
 	}
 }

@@ -304,18 +304,17 @@ void                            ManageServers::sendResponse(const int & i, Clien
     if (sentBytes < 0)
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
+        close(client.response.getFd());
         this->closeConnectionClient(i);
-        this->clientsMap.erase(i);
+        return ;
     }
-    else if (sentBytes == 0 || client.response.getConnectionStatus())
-    {
-        client.response.setConnectionStatus(false);
 
+    if (client.response.getConnectionStatus())
+    {
         if (client.request.keepAlive() == false || client.response.getStatusCode())
         {
             std::cerr << "Client [" << i << "] Connection Closed" << std::endl;
             this->closeConnectionClient(i);
-            this->clientsMap.erase(i);
         }
         else
         {

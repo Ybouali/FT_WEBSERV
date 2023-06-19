@@ -15,6 +15,7 @@ class Response
 		Location		location;
 		std::string		method;
 		std::string		fullPath;
+		int				fd;
 		int				readBytes;
 		bool			readStatus;
 		bool 			connectionStatus;
@@ -36,6 +37,7 @@ class Response
 		const Location&		getLocation() const;
 		const std::string&	getMethod() const;
 		const std::string&	getFullPath() const;
+		int					getFd() const;
 		int					getReadBytes() const;
 		bool				getReadStatus() const;
 		bool				getConnectionStatus() const;
@@ -50,6 +52,7 @@ class Response
 		void	setLocation(const Location&);
 		void	setMethod(const std::string&);
 		void	setFullPath(const std::string&);
+		void	setFd(const int);
 		void	setReadBytes(const int);
 		void	setReadStatus(const bool);
 		void	setConnectionStatus(const bool);

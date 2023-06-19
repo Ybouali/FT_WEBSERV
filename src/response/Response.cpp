@@ -1,11 +1,16 @@
 #include "Response.hpp"
 
-Response::Response() : statusCode(0), readBytes(0), readStatus(false), connectionStatus(false)
+Response::Response() :
+	responseContent(""),
+	statusCode(0),
+	body(""),
+	method(""),
+	fullPath(""),
+	fd(0),
+	readBytes(0),
+	readStatus(false),
+	connectionStatus(false)
 {
-	this->body = "";
-	this->responseContent = "";
-	this->method = "";
-	this->fullPath = "";
 }
 
 Response::~Response()
@@ -23,6 +28,7 @@ void	Response::clear()
 	this->location.clear();
 	this->method.clear();
 	this->fullPath.clear();
+	this->fd = 0;
 	this->readBytes = 0;
 	this->readStatus = false;
 	this->connectionStatus = false;
@@ -45,6 +51,8 @@ const Location&		Response::getLocation() const { return this->location; }
 const std::string&	Response::getMethod() const { return this->method; }
 
 const std::string&	Response::getFullPath() const { return this->fullPath; }
+
+int					Response::getFd() const { return this->fd; }
 
 int					Response::getReadBytes() const { return this->readBytes; }
 
@@ -69,6 +77,8 @@ void	Response::setLocation(const Location& location) { this->location = location
 void	Response::setMethod(const std::string& method) { this->method = method; }
 
 void	Response::setFullPath(const std::string& fullPath) { this->fullPath = fullPath; }
+
+void	Response::setFd(const int fd) { this->fd = fd; }
 
 void	Response::setReadBytes(const int readBytes) { this->readBytes = readBytes; }
 
