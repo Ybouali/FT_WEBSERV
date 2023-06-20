@@ -70,6 +70,8 @@ class Request {
         std::string                             nameFileBody;
         bool                                    bodyFlag;
         bool                                    chunkedFlag;
+        short                                   indexBuffer;
+        u_int8_t                                c;
 
         bool                                   handleHeaders();
 
@@ -129,11 +131,10 @@ class Request {
 
         bool                            keepAlive();
         
-        void                            readBufferFromReq(char *, std::size_t);
+        void                            readBufferFromReq(char *, int);
 
         void                            printRequest();
 
-        
         short                           uploadFile(std::string);
 
         std::string                     getNewFileName(std::string );

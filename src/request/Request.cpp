@@ -23,7 +23,9 @@ Request::Request()
       fdFileBody(0),
       nameFileBody(),
       bodyFlag(false),
-      chunkedFlag(false)
+      chunkedFlag(false),
+      indexBuffer(0),
+      c(0)
 {
     this->methodsString[::GET] = "GET";
     this->methodsString[::POST] = "POST";
@@ -60,6 +62,8 @@ Request & Request::operator= (const Request & other)
         this->Host = other.Host;
         this->Port = other.Port;
         this->bodyFlag = other.bodyFlag;
+        this->indexBuffer = other.indexBuffer;
+        this->c = other.c;
         this->chunkedFlag = other.chunkedFlag;
     }   
     return *this;
@@ -88,6 +92,8 @@ void            Request::clear()
     this->verMajor = 0;
     this->verMinor = 0;
     this->Host.clear();
+    this->indexBuffer = 0;
+    this->c = 0;
     if (this->getFdFileBody() > 0)
         close(this->fdFileBody);
     this->nameFileBody.clear();
@@ -234,25 +240,24 @@ bool                                   Request::keepAlive()
     return true;
 }
 
-void                                   Request::readBufferFromReq(char * buffer, std::size_t readBytes)
+void                                   Request::readBufferFromReq(char * buffer, int readBytes)
 {
-    u_int8_t                        c;
     static std::stringstream        str;
-
-    for (size_t i = 0; i < readBytes; i++)
+ 
+    for (this->indexBuffer = 0; this->indexBuffer < readBytes; ++this->indexBuffer)
     {
-        c = buffer[i];
+        this->c = buffer[this->indexBuffer];
         if (this->getCodeError())
             return;
         switch (this->State)
         {
             case Request_Line:
             {
-                if (c == 'G')
+                if (this->c == 'G')
                     this->Method = GET;
-                else if (c == 'P')
+                else if (this->c == 'P')
                     this->Method = POST;
-                else if (c == 'D')
+                else if (this->c == 'D')
                     this->Method = DELETE;
                 else 
                 {
@@ -264,7 +269,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_Method: 
             {
-                if (c == this->methodsString[this->Method][this->methodIndex])
+                if (this->c == this->methodsString[this->Method][this->methodIndex])
                     this->methodIndex++;
                 else
                 {
@@ -277,7 +282,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_First_Space:
             {
-                if (c != ' ')
+                if (this->c != ' ')
                 {
                     this->errorCode = 400;
                     return ;
@@ -287,7 +292,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_URI_Path_Slash:
             {
-                if (c == '/')
+                if (this->c == '/')
                 {
                     this->State = Request_Line_URI_Path;
                     this->Storage.clear();
@@ -301,26 +306,38 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_URI_Path:
             {
-                if (c == ' ')
+                if (this->c == ' ')
                 {
                     this->State = Request_Line_Ver;
                     this->Path.append(this->Storage);
                     this->Storage.clear();
                     continue ;
                 }
-                else if (c == '?')
+                else if (this->c == '?')
                 {
                     this->State = Request_Line_URI_Query;
                     this->Path.append(this->Storage);
                     this->Storage.clear();
                     continue ;
                 }
+                else if (this->c == '%' && !hasPercentEncoded(buffer, this->indexBuffer, readBytes))
+                {
+                    std::string hex;
+                    hex = buffer[this->indexBuffer + 1];
+                    hex += buffer[this->indexBuffer + 2];
+
+                    this->Storage += decodePercentEncodedChar(hex);
+
+                    this->indexBuffer += 3;
+                    this->c = buffer[this->indexBuffer];
+                    break;
+                } 
                 else if (checkUriCharacters(c))
                 {
                     this->errorCode = 400;
                     return ;
                 }
-                else if ( i > MAX_URI_LENGTH)
+                else if (this->indexBuffer > MAX_URI_LENGTH)
                 {
                     this->errorCode = 414;
                     return ;
@@ -329,7 +346,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_URI_Query:
             {
-                if (c == ' ')
+                if (this->c == ' ')
                 {
                     this->State = Request_Line_Ver;
                     this->Query.append(this->Storage);
@@ -341,7 +358,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->errorCode = 400;
                     return ;
                 }
-                else if ( i > MAX_URI_LENGTH)
+                else if (this->indexBuffer > MAX_URI_LENGTH)
                 {
                     this->errorCode = 414;
                     return ;
@@ -355,7 +372,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->errorCode = 400;
                     return ;
                 }
-                if (c != 'H')
+                if (this->c != 'H')
                 {
                     this->errorCode = 400;
                     return ;
@@ -365,7 +382,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_HT:
             {
-                if (c != 'T')
+                if (this->c != 'T')
                 {
                     this->errorCode = 400;
                     return ;
@@ -375,7 +392,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_HTT:
             {
-                if (c != 'T')
+                if (this->c != 'T')
                 {
                     this->errorCode = 400;
                     return ;
@@ -386,7 +403,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_HTTP:
             {
-                if (c != 'P')
+                if (this->c != 'P')
                 {
                     this->errorCode = 400;
                     return ;
@@ -396,7 +413,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_HTTP_Slash:
             {
-                if (c != '/')
+                if (this->c != '/')
                 {
                     this->errorCode = 400;
                     return ;
@@ -421,7 +438,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_Dot:
             {
-                if (c != '.')
+                if (this->c != '.')
                 {
                     this->errorCode = 400;
                     return ;
@@ -448,7 +465,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_CR:
             {
-                if (c != '\r')
+                if (this->c != '\r')
                 {
                     this->errorCode = 400;
                     return ;
@@ -458,7 +475,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Request_Line_LF:
             {
-                if (c != '\n')
+                if (this->c != '\n')
                 {
                     this->errorCode = 400;
                     return ;
@@ -469,7 +486,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Field_Name_Start:
             {
-                if (c == '\r')
+                if (this->c == '\r')
                     this->State = Field_End;
                 else if (checkIsToken(c))
                     this->State = Field_Name;
@@ -482,7 +499,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Field_End:
             {
-                if (c == '\n')
+                if (this->c == '\n')
                 {
                     this->Storage.clear();
                     if (!this->handleHeaders())
@@ -508,7 +525,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Field_Name:
             {
-                if (c == ':')
+                if (this->c == ':')
                 {
                     this->keyStorage = this->Storage;
                     this->Storage.clear();
@@ -524,7 +541,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Field_Value:
             {
-                if ( c == '\r' )
+                if ( this->c == '\r' )
                 {
                     if (checkStringIsEmpty(this->keyStorage) || checkStringIsEmpty(this->Storage))
                         this->errorCode = 400;
@@ -538,7 +555,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Field_Value_End:
             {
-                if ( c == '\n' )
+                if ( this->c == '\n' )
                 {
                     this->State = Field_Name_Start;
                     continue ;
@@ -579,7 +596,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->chunkedLength *= 16;
                     this->chunkedLength += len;
                 }
-                else if (c == '\r')
+                else if (this->c == '\r')
                     this->State = Chunked_Length_LF;
                 else
                     this->State = Chunked_Ignore;
@@ -587,7 +604,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_Length_CR:
             {
-                if ( c == '\r')
+                if ( this->c == '\r')
                     this->State = Chunked_Length_LF;
                 else
                 {
@@ -598,7 +615,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_Length_LF:
             {
-                if ( c == '\n')
+                if ( this->c == '\n')
                 {
                     if (this->chunkedLength == 0)
                         this->State = Chunked_End_CR;
@@ -614,7 +631,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_Ignore:
             {
-                if (c == '\r')
+                if (this->c == '\r')
                     this->State = Chunked_Length_LF;
                 continue ;
             }
@@ -628,7 +645,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_Data_CR:
             {
-                if ( c == '\r')
+                if ( this->c == '\r')
                     this->State = Chunked_Data_LF;
                 else
                 {
@@ -639,7 +656,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_Data_LF:
             {
-                if ( c == '\n')
+                if ( this->c == '\n')
                     this->State = Chunked_Length_Begin;
                 else
                 {
@@ -650,7 +667,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_End_CR:
             {
-                if (c != '\r')
+                if (this->c != '\r')
                 {
                     this->errorCode = 400;
                     return ;
@@ -660,7 +677,7 @@ void                                   Request::readBufferFromReq(char * buffer,
             }
             case Chunked_End_LF:
             {
-                if (c != '\n')
+                if (this->c != '\n')
                 {
                     this->errorCode = 400;
                     return ;

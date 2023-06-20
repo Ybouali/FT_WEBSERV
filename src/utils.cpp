@@ -25,6 +25,34 @@ bool            errorPath(std::string path)
     return false;
 }
 
+bool hasPercentEncoded(char * buffer, int startIndex, int bufferSize) {
+
+    std::string input = "";
+
+    for (int i = startIndex; (i < bufferSize && i < (startIndex + 3) ); i++)
+        input += buffer[i];
+    
+    if (input.length() != 3 ) {
+        bool isValidHexDigit1 = isxdigit(static_cast<unsigned char>(input[1]));
+        bool isValidHexDigit2 = isxdigit(static_cast<unsigned char>(input[2]));
+        if (isValidHexDigit1 && isValidHexDigit2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+char decodePercentEncodedChar(const std::string& percentEncoded) {
+    
+    std::istringstream hexDigits(percentEncoded);
+    int hexValue = 0;
+    
+    hexDigits >> std::hex >> hexValue;
+
+    return static_cast<char>(hexValue);
+}
+
+
 void    parse_error(const std::string &message)
 {
     std::cerr << "[ERROR]: Invalid (" << message << ")" << std::endl;

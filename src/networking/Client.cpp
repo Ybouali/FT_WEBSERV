@@ -1,7 +1,7 @@
 # include "Client.hpp"
 
 Client::Client() 
-    : clientSocket(), lastMsgTime(time(NULL)), clientAddress(), request(), server()
+    : clientSocket(), lastMsgTime(time(NULL)), request(), server(), response()
 {
 }
 
@@ -11,7 +11,7 @@ Client::~Client()
 }
 
 Client::Client(const ConfigServer& server)
-    : clientSocket(), lastMsgTime(time(NULL)), clientAddress(), request(), server()
+    : clientSocket(), lastMsgTime(time(NULL)), request(), server(), response()
 { 
     this->server = server;
     this->lastMsgTime = time(NULL);
@@ -30,15 +30,11 @@ int                     Client::getClientSocket() const { return this->clientSoc
 
 time_t                  Client::getLastMsgTime() const { return this->lastMsgTime; }
 
-struct sockaddr_in      Client::getClientAddress() const { return this->clientAddress; }
-
 //! ----------------------------- setters -----------------------------------
 
 void                    Client::setClientSocket(int socket) { this->clientSocket = socket; }
 
 void                    Client::setLastMsgTime(time_t time) { this->lastMsgTime = time; }
-
-void                    Client::setClientAddress(struct sockaddr_in ClientAddress) { this->clientAddress = ClientAddress; }
 
 // ? Methodes ----------------------------------------------------------------
 
