@@ -148,7 +148,6 @@ void	Response::handleGetFile()
 		else
 		{
 			this->connectionStatus = true;
-			close(this->fd);
 		}
 	}
 }

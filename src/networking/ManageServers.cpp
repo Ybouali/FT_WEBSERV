@@ -277,7 +277,7 @@ void                            ManageServers::startServers()
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
 
-                // this->clientsMap[i].request.printRequest();
+                this->clientsMap[i].request.printRequest();
             }
             else if (FD_ISSET(i, &writeCpy))
             {
@@ -304,7 +304,6 @@ void                            ManageServers::sendResponse(const int & i, Clien
     if (sentBytes < 0)
     {
         std::cerr << "sendResponse(): error sending : " << strerror(errno) << std::endl;
-        close(client.response.getFd());
         this->closeConnectionClient(i);
         return ;
     }

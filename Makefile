@@ -18,6 +18,7 @@ SRCS = src/webserv.cpp \
 	   src/response/methods/Get.cpp \
 	   src/response/methods/Post.cpp \
 	   src/response/methods/Delete.cpp \
+	   src/response/Cgi.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

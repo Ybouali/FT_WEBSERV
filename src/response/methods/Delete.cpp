@@ -112,6 +112,13 @@ void	Response::handleDeleteDirectory()
 
 void	Response::handleDeleteFile()
 {
+	// // check if the location has CGI
+	// if (this->location.getCgi() == "on")
+	// {
+	// 	this->statusCode = 501;
+	// 	throw std::exception();
+	// }
+
 	// check if the file has write permission
 	if (access(this->fullPath.c_str(), W_OK) == 0)
 	{

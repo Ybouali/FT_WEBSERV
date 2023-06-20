@@ -28,6 +28,8 @@ void	Response::clear()
 	this->location.clear();
 	this->method.clear();
 	this->fullPath.clear();
+	if (this->fd > 0)
+		close(this->fd);
 	this->fd = 0;
 	this->readBytes = 0;
 	this->readStatus = false;
@@ -169,8 +171,8 @@ void	Response::buildResponseContent()
 		off_t size = st.st_size;
 
 		this->responseContent.append(std::to_string(size));
-		this->responseContent.append("\r\n");
-		this->responseContent.append("Connection: keep-alive");
+		// this->responseContent.append("\r\n");
+		// this->responseContent.append("Connection: keep-alive");
 		this->responseContent.append("\r\n\r\n");
 	}
 
@@ -232,7 +234,6 @@ void	Response::isLocationMatched()
 	// if the requested location is not matched, set the status code to 404
 	if (!isMatched)
 	{
-		// TODO: set the default location
 		this->statusCode = 404;
 		throw std::exception();
 	}
@@ -287,9 +288,4 @@ void	Response::isResourceExist()
 		this->statusCode = 404;
 		throw std::exception();
 	}
-}
-
-void	Response::handleCGI()
-{
-	//TODO: handle CGI
 }
