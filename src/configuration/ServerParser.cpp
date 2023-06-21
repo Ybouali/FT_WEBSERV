@@ -319,6 +319,10 @@ void    ServerParser::checkServersAndLocations(std::vector<ServerParser > vecSer
             parse_error("config file");
         if (vecServers[i].get_locations().empty())
             parse_error("config file");
+        for (size_t j = 0; j < vecServers[i].get_locations().size(); j++){
+            if (vecServers[i].get_locations()[j].getRoot().empty())
+                parse_error("config file");
+        }
     }
 }
 
