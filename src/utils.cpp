@@ -7,6 +7,22 @@ std::string     skipWhitespaceBeginAnd(std::string line)
     return line;
 }
 
+std::string skip(std::string value, std::string removeString) {
+    if (value[value.length() - 1] != ';')
+        parse_error(removeString);
+
+    value.erase(value.length() - 1);
+
+    value = skipWhitespaceBeginAnd(value);
+
+    value.erase(0 , removeString.length());
+
+
+    value = skipWhitespaceBeginAnd(value);
+
+    return value;
+}
+
 bool            errorPath(std::string path)
 {
     std::string     t(path);

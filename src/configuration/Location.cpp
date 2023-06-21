@@ -27,42 +27,45 @@ Location& Location::operator=(const Location& other) {
     return *this;
 }
 
-
 const std::vector<std::string>& Location::getMethod() const {
     return this->method;
 }
 
-void Location::setMethod(std::string & line) {
-    std::istringstream iss(line);
+void Location::setMethod(std::string & value) {
+    value = skip(value, "method");
+    size_t pos = value.find("GET");
+    if (pos != std::string::npos)
+    {
+        this->method.push_back("GET");
+        value.erase(pos, 3);
+    }
+    pos = value.find("POST");
+    if (pos != std::string::npos)
+    {
+        this->method.push_back("POST");
+        value.erase(pos, 4);
+    }
 
-    std::string method, method1, method2, method3;
-    iss >> method >> method1 >> method2 >> method3;
+    pos = value.find("DELETE");
+    if (pos != std::string::npos)
+    {
+        this->method.push_back("DELETE");
+        value.erase(pos, 6);
+    }
+    value = skipWhitespaceBeginAnd(value);
 
-    if (!method1.empty())
-    {
-        if (method1 != "GET" && method1 != "POST" && method1 != "DELETE")
-            parse_error("method");
-        this->method.push_back(method1);
-    }
-    if (!method2.empty())
-    {
-        if (method2 != "GET" && method2 != "POST" && method2 != "DELETE")
-            parse_error("method");
-        this->method.push_back(method2);
-    }
-    if (!method3.empty())
-    {
-        if (method3 != "GET" && method3 != "POST" && method3 != "DELETE")
-            parse_error("method");
-        this->method.push_back(method3);
-    }
+    if (!value.empty())
+        parse_error("method");
+    if (this->method.empty())
+        this->method.push_back("GET");
 }
 
 const std::string& Location::getRoot() const {
     return root;
 }
 
-void Location::setRoot(const std::string& value) {
+void Location::setRoot(std::string& value) {
+    value = skip(value, "root");
     if (value[value.length() - 1] != '/')
         parse_error("root");
     root = value;
@@ -72,7 +75,8 @@ const std::string& Location::getUpload() const {
     return this->upload;
 }
 
-void Location::setUpload(const std::string& value) {
+void Location::setUpload(std::string& value) {
+    value = skip(value, "upload");
     if (value[value.length() - 1] != '/')
         parse_error("upload");
     this->upload = value;
@@ -82,7 +86,8 @@ const std::string& Location::getAutoindex() const {
     return this->autoindex;
 }
 
-void Location::setAutoindex(const std::string& value) {
+void Location::setAutoindex(std::string& value) {
+    value = skip(value, "autoindex");
     if (value != "on" && value != "off")
         parse_error("autoindex");
     this->autoindex = value;
@@ -90,7 +95,8 @@ void Location::setAutoindex(const std::string& value) {
 
 const std::string& Location::getIndex() const { return this->index; }
 
-void Location::setIndex(const std::string& value) {
+void Location::setIndex(std::string& value) {
+    value = skip(value, "index");
     this->index = value;
 }
 
@@ -110,7 +116,7 @@ const std::string& Location::getRedirection() const {
     return this->redirection;
 }
 
-void Location::setRedirection(const std::string& value) {
+void Location::setRedirection(std::string& value) {
     redirection = value;
 }
 
@@ -118,7 +124,7 @@ const std::string& Location::getLocation() const {
     return this->location_path;
 }
 
-void Location::setLocation(const std::string& value){
+void Location::setLocation(std::string& value){
     if (value[0] != '/')
         parse_error("location");
     this->location_path = value;

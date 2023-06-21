@@ -23,12 +23,12 @@ class Location
 
         //setters
         void setMethod(std::string& );
-        void setRoot(const std::string& );
-        void setUpload(const std::string& );
-        void setIndex(const std::string& );
-        void setAutoindex(const std::string& );
-        void setRedirection(const std::string& );
-        void setLocation(const std::string& );
+        void setRoot(std::string& );
+        void setUpload(std::string& );
+        void setIndex(std::string& );
+        void setAutoindex(std::string& );
+        void setRedirection(std::string& );
+        void setLocation(std::string& );
         void setCgi(std::string & );
 
         void    clear();

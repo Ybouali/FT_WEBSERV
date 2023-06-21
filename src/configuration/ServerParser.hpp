@@ -31,16 +31,17 @@ class ServerParser
         std::vector<Location> get_locations() const;
         
         //setters
-        void setPort(const std::string& );
-        void setHost(const std::string& );
-        void setServerName(const std::string& );
-        void setErrorPages(const std::string & , const std::string& );
-        void setClientMaxBodySize(const std::string& );
+        void setPort(std::string& );
+        void setHost(std::string& );
+        void setServerName(std::string& );
+        void setErrorPages(std::string & );
+        void setClientMaxBodySize(std::string& );
         void set_locations(Location new_locations);
 
         //functions
-        void       printTheServerInfo();
-        std::vector<ServerParser > get_server(std::string filename);
+        void                            printTheServerInfo(void);
+        std::vector<ServerParser >      get_server(std::string filename);
+        void                            checkServersAndLocations(std::vector<ServerParser >);
 
         void        clear();
 };

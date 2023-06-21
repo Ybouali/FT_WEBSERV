@@ -73,3 +73,4 @@ void                parse_error(const std::string & );
 bool                isValidHTTPStatusCode(short );
 bool                hasPercentEncoded(char * , int , int );
 char                decodePercentEncodedChar(const std::string& );
+std::string         skip(std::string , std::string  );

@@ -1,7 +1,9 @@
 #include "ServerParser.hpp"
 
-void ServerParser::setPort(const std::string& value) {
-    for (size_t i = 0; i < value.size(); i++)
+void ServerParser::setPort(std::string& value) {
+    value = skip(value, "port");
+
+    for (size_t i = 0; i < value.length(); i++)
     {
         if (!std::isdigit(value[i]))
             parse_error("port");
@@ -13,21 +15,25 @@ const std::string& ServerParser::getHost() const {
     return host;
 }
 
-void ServerParser::setHost(const std::string& value) {
+void ServerParser::setHost(std::string& value) {
     
+    value = skip(value, "host");
+
     std::regex ip_regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
     
-    if (!std::regex_match(value, ip_regex) || value == "0.0.0.0")
+    if (!std::regex_match(value, ip_regex))
         parse_error("host");
 
-    host = value;
+    this->host = value;
 }
 
 const std::string& ServerParser::getServerName() const {
     return server_name;
 }
 
-void ServerParser::setServerName(const std::string& value) {
+void ServerParser::setServerName(std::string& value) {
+    value = skip(value, "server_name");
+
     server_name = value;
 }
 
@@ -37,13 +43,29 @@ const std::map<short, std::string>& ServerParser::getErrorPages() const {
 
 std::string ServerParser::getPort() const { return port; }
 
-void ServerParser::setErrorPages(const std::string & codeStatus, const std::string& path) {
+void ServerParser::setErrorPages(std::string & value) {
 
-    if (codeStatus.empty() || path.empty())
+    value = skip(value, "error_page");
+    std::string codeStatus;
+    
+    for (size_t i = 0; i < 3; i++)
+    {
+        codeStatus += value[i];
+    }
+
+    try
+    {
+        value.erase(0, 3);
+    }
+    catch(const std::exception& e)
+    {
+        parse_error("error page");
+    }
+    
+    value = skipWhitespaceBeginAnd(value);
+
+    if (codeStatus.empty() || value.empty())
         parse_error("page_error");
-
-    if (codeStatus.length() != 3)
-        parse_error("(error page) code status");
 
     for (size_t i = 0; i < codeStatus.length(); i++)
     {
@@ -56,10 +78,10 @@ void ServerParser::setErrorPages(const std::string & codeStatus, const std::stri
     
     try
     {
-        std::string::size_type pos = path.find_last_of('.');
+        std::string::size_type pos = value.find_last_of('.');
         if (pos == std::string::npos)
             throw std::exception();
-        std::string result = path.substr(pos, path.length());
+        std::string result = value.substr(pos, value.length());
         if (result != ".html")
             throw std::exception();
     }
@@ -67,14 +89,23 @@ void ServerParser::setErrorPages(const std::string & codeStatus, const std::stri
     {
         parse_error("(error page) code status"); 
     }
-    error_pages[code] = path;
+
+    int fd = open(value.c_str(), O_RDONLY);
+
+    if (fd < 0)
+        parse_error("error page");
+    close(fd);
+    error_pages[code] = value;
 }
 
 unsigned long ServerParser::getClientMaxBodySize() const {
     return client_max_body_size;
 }
 
-void ServerParser::setClientMaxBodySize(const std::string& value) {
+void ServerParser::setClientMaxBodySize(std::string& value) {
+
+    value = skip(value, "client_max_body_size");
+
     for (size_t i = 0; i < value.size(); i++)
     {
         if (!std::isdigit(value[i]))
@@ -152,52 +183,51 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
     {
         std::istringstream iss(line);
         iss >> key >> value;
-        if (key == "server" && value == "{")
+        if (!key.empty() && key[0] == '#')
+        {
+            key.clear();
+            value.clear();
+        }
+        else if (key == "server" && value == "{")
         {
             s = ServerParser();
             while (std::getline(infile, line))
             {
                 std::istringstream iss_loc(line);
                 iss_loc >> key >> value;
-                if (key == "#" || key[0] == '#')
+                if (!key.empty() && key[0] == '#')
                 {
                     key.clear();
                     value.clear();
-                }  
+                }
                 else if (key == "port" && !value.empty())
                 {
-                    s.setPort(value);
+                    s.setPort(line);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "host" && !value.empty())
                 {
-                    s.setHost(value);
+                    s.setHost(line);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "server_name" && !value.empty())
                 {
-                    s.setServerName(value);
+                    s.setServerName(line);
                     key.clear();
                     value.clear();
                 }
                 else if (key == "error_page" && !value.empty())
                 {
-                    std::istringstream ss(line);
-                    std::string name, codeStatus, path;
+                    s.setErrorPages(line);
 
-                    ss >> name >> codeStatus >> path;
-                    s.setErrorPages(codeStatus, path);
-
-
-                    path.clear();
                     key.clear();
                     value.clear();
                 }
                 else if (key == "client_max_body_size" && !value.empty())
                 {
-                    s.setClientMaxBodySize(value);
+                    s.setClientMaxBodySize(line);
                     key.clear();
                     value.clear();
                 }
@@ -208,65 +238,62 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
                     value.clear();
                     break;
                 }
-                else if (key == "location" && !value.empty() && line[line.length() - 1] == '[')
-                {
+                else if (key == "location" && !value.empty() && line[line.length() - 1] == '[') {
                     loc = Location();
                     loc.setLocation(value);
-                    while (std::getline(infile, line))
-                    {
+                    while (std::getline(infile, line)) {
                         std::istringstream iss_loc_key_val(line);
                         iss_loc_key_val >> key >> value;
-                        if (key == "method" && !value.empty())
+                        if (!key.empty() && key[0] == '#')
+                        {
+                            key.clear();
+                            value.clear();
+                        }
+                        else if (key == "method" && !value.empty())
                             loc.setMethod(line);
                         else if (key == "root" && !value.empty())
                         {
-                            loc.setRoot(value);
+                            loc.setRoot(line);
                             key.clear();
                             value.clear();
                         }
                         else if (key == "cgi" && !value.empty())
                         {
-                            loc.setCgi(value);
+                            loc.setCgi(line);
                             key.clear();
                             value.clear();
                         }
                         else if (key == "upload" && !value.empty())
                         {
-                            loc.setUpload(value);
+                            loc.setUpload(line);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "autoindex" && !value.empty())
                         {
-                            loc.setAutoindex(value);
+                            loc.setAutoindex(line);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "index" && !value.empty())
                         {
-                            loc.setIndex(value);
+                            loc.setIndex(line);
                             key.clear();
                             value.clear();
                         }   
                         else if (key == "redirection" && !value.empty())
                         {
-                            loc.setRedirection(value);
+                            loc.setRedirection(line);
                             key.clear();
                             value.clear();
                         }
                         else if (key == "]")
                         {
-                            
                             s.set_locations(loc);
-                            
                             break;
                         }
-                        else
-                        {
-                            std::cerr << "ERROR LOC {" << key << "} value {" << value << "}" << std::endl;
-                            loc.clear();
-                            break;
-                        }
+                        else if (!key.empty())
+                            parse_error("config file");
                     }
                     key.clear();
                     value.clear();
@@ -276,10 +303,23 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
             }
             
         }
-        else
+        else if (!key.empty())
             parse_error("config file");
     }
+    
+    checkServersAndLocations(vecServers);
+
     return vecServers;
+}
+
+void    ServerParser::checkServersAndLocations(std::vector<ServerParser > vecServers)
+{
+    for (size_t i = 0; i < vecServers.size(); i++){
+        if (vecServers[i].getPort().empty() || vecServers[i].getHost().empty() || vecServers[i].getServerName().empty())
+            parse_error("config file");
+        if (vecServers[i].get_locations().empty())
+            parse_error("config file");
+    }
 }
 
 void    ServerParser::printTheServerInfo()
