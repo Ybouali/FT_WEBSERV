@@ -31,33 +31,33 @@ const std::vector<std::string>& Location::getMethod() const {
     return this->method;
 }
 
-void Location::setMethod(std::string & value) {
-    value = skip(value, "method");
-    size_t pos = value.find("GET");
-    if (pos != std::string::npos)
+void Location::setMethod(std::string value, bool check) {
+    if  (check)
     {
-        this->method.push_back("GET");
-        value.erase(pos, 3);
-    }
-    pos = value.find("POST");
-    if (pos != std::string::npos)
-    {
-        this->method.push_back("POST");
-        value.erase(pos, 4);
-    }
+        value = skip(value, "method");
+        size_t pos = value.find("GET");
+        if (pos != std::string::npos)
+        {
+            this->method.push_back("GET");
+            value.erase(pos, 3);
+        }
+        pos = value.find("POST");
+        if (pos != std::string::npos)
+        {
+            this->method.push_back("POST");
+            value.erase(pos, 4);
+        }
 
-    pos = value.find("DELETE");
-    if (pos != std::string::npos)
-    {
-        this->method.push_back("DELETE");
-        value.erase(pos, 6);
+        pos = value.find("DELETE");
+        if (pos != std::string::npos)
+        {
+            this->method.push_back("DELETE");
+            value.erase(pos, 6);
+        }
+        value = skipWhitespaceBeginAnd(value);
     }
-    value = skipWhitespaceBeginAnd(value);
-
-    if (!value.empty())
-        parse_error("method");
-    if (this->method.empty())
-        this->method.push_back("GET");
+    else
+        this->method.push_back(value);
 }
 
 const std::string& Location::getRoot() const {

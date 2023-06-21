@@ -250,7 +250,7 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
                             value.clear();
                         }
                         else if (key == "method" && !value.empty())
-                            loc.setMethod(line);
+                            loc.setMethod(line, true);
                         else if (key == "root" && !value.empty())
                         {
                             loc.setRoot(line);
@@ -289,6 +289,10 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
                         }
                         else if (key == "]")
                         {
+                            if (loc.getMethod().empty())
+                                loc.setMethod("GET", false);
+                            if  (loc.getRoot().empty())
+                                parse_error("config file");
                             s.set_locations(loc);
                             break;
                         }

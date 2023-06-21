@@ -22,7 +22,7 @@ class Location
         const std::string&  getCgi() const;
 
         //setters
-        void setMethod(std::string& );
+        void setMethod(std::string , bool );
         void setRoot(std::string& );
         void setUpload(std::string& );
         void setIndex(std::string& );
