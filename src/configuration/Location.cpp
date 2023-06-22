@@ -132,6 +132,7 @@ void Location::setLocation(std::string& value){
 
 void    Location::setCgi(std::string & value)
 {
+    value = skip(value, "cgi");
     if (value != "on" && value != "off")
         parse_error("cgi");
     this->cgi = value;

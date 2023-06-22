@@ -221,7 +221,6 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
                 else if (key == "error_page" && !value.empty())
                 {
                     s.setErrorPages(line);
-
                     key.clear();
                     value.clear();
                 }

@@ -277,7 +277,7 @@ void                            ManageServers::startServers()
                 // ! Here start reading the request client
                 this->readRequest(i, this->clientsMap[i]);
 
-                this->clientsMap[i].request.printRequest();
+                // this->clientsMap[i].request.printRequest();
             }
             else if (FD_ISSET(i, &writeCpy))
             {

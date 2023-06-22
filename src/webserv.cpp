@@ -15,8 +15,8 @@ int main(int ac, char **av)
     filename = (ac == 2) ? av[1] : "config/default.conf";
     servers = serversFromConfigFile.get_server(filename);
 
-    // master.setupServers(master.getInfoServer(servers));
-    // master.startServers();
+    master.setupServers(master.getInfoServer(servers));
+    master.startServers();
    
     return 0;
 }
