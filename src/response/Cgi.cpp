@@ -107,7 +107,7 @@ void	Response::handleCGI()
 		sleep(1);
 	}
 
-	// kill the child process if it takes too long to finish
+	// kill the child process if it takes more that the specific time to finish
 	if (timeout == 0)
 	{
 		kill(pid, SIGKILL);
