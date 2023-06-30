@@ -39,30 +39,14 @@ void	Response::handleCGI()
 	env["PATH_TRANSLATED"] = this->fullPath;
 	env["SCRIPT_NAME"] = cgiFilePath;
 	env["REQUEST_METHOD"] = this->method;
-	if (this->method == "GET" && !this->request.getQuery().empty())
-		env["QUERY_STRING"] = this->request.getQuery();
-	env["CONTENT_TYPE"] = getContentType(this->fullPath);
+	env["QUERY_STRING"] = this->request.getQuery();
 	if (this->method == "POST")
+	{
+		env["CONTENT_TYPE"] = this->request.getHeader("Content-Type");
 		env["CONTENT_LENGTH"] = this->request.getHeader("Content-Length");
+	}
 
-	// // print environment variables
-	// for (std::map<std::string, std::string>::iterator it = env.begin(); it != env.end(); it++)
-	// {
-	// 	std::cout << it->first << ": " << it->second << std::endl;
-	// }
-
-	// // create the output file for the cgi
-	// std::string outputFilePath = "./cgi/" + generateRandomFileName() + ".html";
-	// int outputFileFd = open(outputFilePath.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0666);
-
-	// // check if the output file is open
-	// if (outputFileFd == -1)
-	// {
-	// 	this->statusCode = 500;
-	// 	throw std::exception();
-	// }
-
-	// create pipe for the cgi
+	// create pipe for the cgi output
 	int pipefd[2];
 	if (pipe(pipefd) == -1)
 	{
@@ -72,8 +56,6 @@ void	Response::handleCGI()
 
 	// fork the process to execute the cgi
 	pid_t pid = fork();
-
-	// check if the fork is successful
 	if (pid == -1)
 	{
 		this->statusCode = 500;
@@ -83,14 +65,11 @@ void	Response::handleCGI()
 	// if the process is the child process
 	if (pid == 0)
 	{
-		// redirect the output to the pipe
-		dup2(pipefd[1], STDOUT_FILENO);
-
 		// build the argv for the cgi
 		char** argv = new char*[3];
 		argv[0] = new char[cgiFilePath.length() + 1];
-		strcpy(argv[0], cgiFilePath.c_str());
 		argv[1] = new char[this->fullPath.length() + 1];
+		strcpy(argv[0], cgiFilePath.c_str());
 		strcpy(argv[1], this->fullPath.c_str());
 		argv[2] = NULL;
 
@@ -105,6 +84,13 @@ void	Response::handleCGI()
 		}
 		envp[i] = NULL;
 
+		// redirect the output to the write end of the pipe
+		dup2(pipefd[1], STDOUT_FILENO);
+
+		// close the read and write ends of the pipe
+		close(pipefd[0]);
+		close(pipefd[1]);
+
 		// exucute the cgi
 		if (execve(cgiFilePath.c_str(), argv, envp) == -1)
 		{
@@ -112,9 +98,22 @@ void	Response::handleCGI()
 		}
 	}
 
-	// wait for the child process to finish
+	// wiat for the child process to finish for a specific time
 	int status;
-	waitpid(pid, &status, O_NONBLOCK);
+	int timeout = 30;
+	while (waitpid(pid, &status, WNOHANG) == 0 && timeout > 0)
+	{
+		timeout--;
+		sleep(1);
+	}
+
+	// kill the child process if it takes too long to finish
+	if (timeout == 0)
+	{
+		kill(pid, SIGKILL);
+		this->statusCode = 500;
+		throw std::exception();
+	}
 
 	// check if the cgi has finished successfully
 	if (WEXITSTATUS(status) == EXIT_FAILURE)
@@ -123,33 +122,13 @@ void	Response::handleCGI()
 		throw std::exception();
 	}
 
+	// close the pipe write end and set the read end to the response fd
 	close(pipefd[1]);
+	this->fd = pipefd[0];
 
-	// read the output from the pipe
-	char buffer[BUF_SIZE];
-	int readBytes;
-
-	while ((readBytes = read(pipefd[0], buffer, BUF_SIZE)) > 0)
-	{
-		this->body.append(buffer, readBytes);
-	}
-
-	close(pipefd[0]);
-
+	this->readStatus = true;
 	this->statusCode = 200;
 
 	this->responseContent = getResponsePage(this->statusCode, false, "");
-	this->responseContent.append("Content-Type: text/html\r\n");
-	this->responseContent.append("Content-Length: ");
-	this->responseContent.append(std::to_string(this->body.length()));
-	this->responseContent.append("\r\n\r\n");
-	this->responseContent.append(this->body);
-
-	this->connectionStatus = true;
-
-	// this->fd = pipefd[0];
-	// this->readStatus = true;
-	// this->statusCode = 200;
-
-	// this->handleGetFile();
+	this->responseContent.append("Connection: keep-alive");
 }

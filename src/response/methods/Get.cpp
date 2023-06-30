@@ -135,15 +135,15 @@ void	Response::handleGetFile()
 		this->responseContent.clear();
 
 		// read the file content by BUF_SIZE bytes
-		if ((readBytes = read(this->fd, buffer, BUF_SIZE)) == -1)
+		if ((this->readBytes = read(this->fd, buffer, BUF_SIZE)) == -1)
 		{
 			this->statusCode = 500;
 			throw std::exception();
 		}
 
-		if (readBytes > 0)
+		if (this->readBytes > 0)
 		{
-			this->responseContent = std::string(buffer, readBytes);
+			this->responseContent = std::string(buffer, this->readBytes);
 		}
 		else
 		{

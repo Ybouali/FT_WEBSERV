@@ -171,8 +171,6 @@ void	Response::buildResponseContent()
 		off_t size = st.st_size;
 
 		this->responseContent.append(std::to_string(size));
-		// this->responseContent.append("\r\n");
-		// this->responseContent.append("Connection: keep-alive");
 		this->responseContent.append("\r\n\r\n");
 	}
 

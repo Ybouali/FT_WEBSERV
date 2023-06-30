@@ -7,6 +7,13 @@ void	Response::handleDeleteMethod()
 		// check if the requested resource exists
 		this->isResourceExist();
 
+		// check if the location has CGI
+		if (this->location.getCgi() == "on")
+		{
+			this->statusCode = 501;
+			throw std::exception();
+		}
+
 		// check if the requested resource is a directory or a file
 		if (isDirectory(this->fullPath))
 		{
@@ -112,13 +119,6 @@ void	Response::handleDeleteDirectory()
 
 void	Response::handleDeleteFile()
 {
-	// // check if the location has CGI
-	// if (this->location.getCgi() == "on")
-	// {
-	// 	this->statusCode = 501;
-	// 	throw std::exception();
-	// }
-
 	// check if the file has write permission
 	if (access(this->fullPath.c_str(), W_OK) == 0)
 	{
