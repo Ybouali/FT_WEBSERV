@@ -84,10 +84,23 @@ void	Response::handleCGI()
 		}
 		envp[i] = NULL;
 
-		// redirect the output to the write end of the pipe
-		dup2(pipefd[1], STDOUT_FILENO);
+		if (this->method == "POST")
+		{
+			// redirect the stdin to the file body fd
+			if (dup2(this->request.getFdFileBody(), STDIN_FILENO) == -1)
+			{
+				exit(EXIT_FAILURE);
+			}
 
-		// close the read and write ends of the pipe
+			close(this->request.getFdFileBody());
+		}
+
+		// redirect the stdout to the write end of the pipe
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+		{
+			exit(EXIT_FAILURE);
+		}
+
 		close(pipefd[0]);
 		close(pipefd[1]);
 
@@ -126,9 +139,16 @@ void	Response::handleCGI()
 	close(pipefd[1]);
 	this->fd = pipefd[0];
 
-	this->readStatus = true;
-	this->statusCode = 200;
-
-	this->responseContent = getResponsePage(this->statusCode, false, "");
-	this->responseContent.append("Connection: keep-alive");
+	if (this->method == "GET")
+	{
+		this->readStatus = true;
+		this->statusCode = 200;
+		this->responseContent = getResponsePage(this->statusCode, false, "");
+		this->responseContent.append("Connection: keep-alive");
+	}
+	else if (this->method == "POST")
+	{
+		this->statusCode = 201;
+		throw std::exception();
+	}
 }

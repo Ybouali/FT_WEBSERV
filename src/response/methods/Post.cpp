@@ -28,9 +28,9 @@ void	Response::handlePostMethod()
 				throw std::exception();
 			}
 
+			// check if the location has CGI
 			if (this->location.getCgi() == "on")
 			{
-				// TODO: we need to run the cgi to upload file Or files ?
 				this->handleCGI();
 			}
 			else

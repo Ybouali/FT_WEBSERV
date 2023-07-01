@@ -94,7 +94,7 @@ void            Request::clear()
     this->Host.clear();
     this->indexBuffer = 0;
     this->c = 0;
-    if (this->getFdFileBody() > 0)
+    if (this->fdFileBody > 0)
         close(this->fdFileBody);
     this->nameFileBody.clear();
     this->Port = 0;
@@ -789,7 +789,8 @@ short                            Request::uploadFile(std::string path_to_upload_
 
     std::rename(this->nameFileBody.c_str(), path_to_upload_file.c_str());
 
-    close(this->fdFileBody);
+    // already closed in the clear function ???
+    // close(this->fdFileBody);
 
     return 201;    
 }
