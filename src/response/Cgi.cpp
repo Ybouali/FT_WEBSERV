@@ -69,9 +69,9 @@ void	Response::handleCGI()
 		char** argv = new char*[3];
 		argv[0] = new char[cgiFilePath.length() + 1];
 		argv[1] = new char[this->fullPath.length() + 1];
+		argv[2] = NULL;
 		strcpy(argv[0], cgiFilePath.c_str());
 		strcpy(argv[1], this->fullPath.c_str());
-		argv[2] = NULL;
 
 		// convert the environment variables to char**
 		char** envp = new char*[env.size() + 1];
