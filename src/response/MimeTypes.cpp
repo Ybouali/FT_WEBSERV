@@ -81,16 +81,7 @@ MimeTypes::MimeTypes()
     this->mime_types["xhtml"] = "application/xhtml+xml";
     this->mime_types["xspf"] = "application/xspf+xml";
     this->mime_types["zip"] = "application/zip";
-    this->mime_types["bin"] = "application/octet-stream";
-    this->mime_types["exe"] = "application/octet-stream";
-    this->mime_types["dll"] = "application/octet-stream";
-    this->mime_types["deb"] = "application/octet-stream";
-    this->mime_types["iso"] = "application/octet-stream";
-    this->mime_types["dmg"] = "application/octet-stream";
-    this->mime_types["img"] = "application/octet-stream";
-    this->mime_types["msi"] = "application/octet-stream";
-    this->mime_types["msp"] = "application/octet-stream";
-    this->mime_types["msm"] = "application/octet-stream";
+    this->mime_types["py"] = "application/octet-stream";
     this->mime_types["mid"] = "audio/midi";
     this->mime_types["midi"] = "audio/midi";
     this->mime_types["kar"] = "audio/midi";
@@ -112,6 +103,7 @@ MimeTypes::MimeTypes()
     this->mime_types["asf"] = "video/x-ms-asf";
     this->mime_types["wmv"] = "video/x-ms-wmv";
     this->mime_types["avi"] = "video/x-msvideo";
+    this->mime_types["php"] = "application/x-httpd-php";
 }
 
 MimeTypes::~MimeTypes()

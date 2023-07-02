@@ -2,6 +2,13 @@
 
 void	Response::handleCGI()
 {
+	// if the requested method is POST, set the full path to the uploaded file path
+	if (this->method == "POST")
+	{
+		this->fullPath = this->request.getNameFileBody();
+		std::cout << "fullPath: " << this->fullPath << std::endl;
+	}
+
 	// get the file extension
 	std::string extension = this->fullPath.substr(this->fullPath.find_last_of(".") + 1);
 
@@ -111,44 +118,38 @@ void	Response::handleCGI()
 		}
 	}
 
-	// wiat for the child process to finish for a specific time
-	int status;
-	int timeout = 30;
-	while (waitpid(pid, &status, WNOHANG) == 0 && timeout > 0)
-	{
-		timeout--;
-		sleep(1);
-	}
-
-	// kill the child process if it takes more that the specific time to finish
-	if (timeout == 0)
-	{
-		kill(pid, SIGKILL);
-		this->statusCode = 500;
-		throw std::exception();
-	}
-
-	// check if the cgi has finished successfully
-	if (WEXITSTATUS(status) == EXIT_FAILURE)
-	{
-		this->statusCode = 500;
-		throw std::exception();
-	}
-
 	// close the pipe write end and set the read end to the response fd
 	close(pipefd[1]);
 	this->fd = pipefd[0];
 
-	if (this->method == "GET")
+	sleep(1);
+
+	// wait for the child process to finish
+	int status;
+	pid_t ret = waitpid(pid, &status, WNOHANG);
+	if (ret)
 	{
+		// check if the cgi has finished successfully
+		if (WEXITSTATUS(status) == EXIT_FAILURE)
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
+
 		this->readStatus = true;
 		this->statusCode = 200;
 		this->responseContent = getResponsePage(this->statusCode, false, "");
 		this->responseContent.append("Connection: keep-alive");
 	}
-	else if (this->method == "POST")
+	else if (ret == -1)
 	{
-		this->statusCode = 201;
+		this->statusCode = 500;
+		throw std::exception();
+	}
+	else
+	{
+		this->statusCode = 504;
+		kill(pid, SIGKILL);
 		throw std::exception();
 	}
 }

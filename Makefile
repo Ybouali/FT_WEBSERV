@@ -26,6 +26,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+	@mkdir -p www/uploads
 
 .cpp.o: ${SRCS}
 	@$(CC) $(FLAGS) -c $< -o $@

@@ -74,6 +74,7 @@ class Response
 
 		// Post
 		void	handlePostMethod();
+		void	handlePostFile();
 
 		// Delete
 		void	handleDeleteMethod();
