@@ -170,11 +170,6 @@ bool                                            Request::handleHeaders()
         this->setCodeError(411);
         return false;
     }
-    if (this->getMethodsString() == "POST" && this->requestHeaders.count("Content-Length") && this->requestHeaders.count("Transfer-Encoding"))
-    {
-        this->setCodeError(400);
-        return false;
-    }
 
     if (this->requestHeaders.count("Content-Length"))
     {

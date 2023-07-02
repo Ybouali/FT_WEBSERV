@@ -70,7 +70,7 @@ class Request {
         std::string                             nameFileBody;
         bool                                    bodyFlag;
         bool                                    chunkedFlag;
-        short                                   indexBuffer;
+        int                                     indexBuffer;
         u_int8_t                                c;
 
         bool                                   handleHeaders();
