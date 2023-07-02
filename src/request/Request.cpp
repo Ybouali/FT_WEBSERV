@@ -747,45 +747,25 @@ std::string Request::getNewFileName(std::string path)
 
 short                            Request::uploadFile(std::string path_to_upload_file)
 {
-    size_t          pos;
-    std::string     tmp;
-    
-    // Check if the file extension is supported
-    pos = this->nameFileBody.rfind('.');
-
-    if (pos != std::string::npos)
-    {
-        try
-        {
-            tmp = this->nameFileBody.substr(pos + 1, this->nameFileBody.length());
-
-            if (mime.getMimeType(tmp).empty())
-                return 415;
-        }
-        catch(const std::exception& e)
-        {
-            return 415;
-        }   
-    }
-    else
+    // Check for sepported file extension
+    if (mime.getExeFile(skipWhitespaceBeginAnd(this->getHeader("Content-Type"))).empty())
         return 415;
 
-    pos = this->nameFileBody.rfind('/');
+    // Get the start position of the file name
 
-    if (pos == std::string::npos)
-        return 500;
+    std::string::size_type pos = this->nameFileBody.rfind("/") + 1;
 
-    tmp = this->nameFileBody.substr(pos, this->nameFileBody.length());
+    // Join the file name with the upload path
+    path_to_upload_file += this->nameFileBody.substr(pos, this->nameFileBody.length());
 
-    if (tmp.empty())
-        return 500;
-    
-    path_to_upload_file += tmp;
+    // Copy the file to the upload path
+    std::ifstream in(this->nameFileBody, std::ios::in | std::ios::binary);
+    std::ofstream out(path_to_upload_file, std::ios::out | std::ios::binary);
 
-    std::rename(this->nameFileBody.c_str(), path_to_upload_file.c_str());
+    out << in.rdbuf();
 
-    // already closed in the clear function ???
-    // close(this->fdFileBody);
+    out.close();
+    in.close();
 
     return 201;    
 }
