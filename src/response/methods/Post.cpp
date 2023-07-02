@@ -24,7 +24,7 @@ void	Response::handlePostMethod()
 			// Response :: Entity Too Large
 			if ( (unsigned long) size > this->server.getClientMaxBodySize())
 			{
-				this->statusCode = 404;
+				this->statusCode = 413;
 				throw std::exception();
 			}
 
@@ -35,7 +35,33 @@ void	Response::handlePostMethod()
 			}
 			else
 			{
-				this->statusCode = this->request.uploadFile(this->location.getUpload());
+
+				std::string path_to_upload_file = this->location.getUpload();
+
+				// Check for sepported file extension
+				if (mime_type.getExeFile(skipWhitespaceBeginAnd(this->request.getHeader("Content-Type"))).empty())
+				{
+					this->setStatusCode(415);
+					throw std::exception();
+				}
+
+				// Get the start position of the file name
+				std::string::size_type pos =  this->request.getNameFileBody().rfind("/") + 1;
+
+				// Join the file name with the upload path
+				path_to_upload_file += this->request.getNameFileBody().substr(pos, this->request.getNameFileBody().length());
+
+				// Copy the file to the upload path
+				std::ifstream in(this->request.getNameFileBody(), std::ios::in | std::ios::binary);
+				std::ofstream out(path_to_upload_file, std::ios::out | std::ios::binary);
+
+				out << in.rdbuf();
+
+				out.close();
+				in.close();
+
+				this->setStatusCode(201);
+
 				throw std::exception();
 			}
 		}

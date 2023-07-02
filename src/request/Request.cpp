@@ -744,28 +744,3 @@ std::string Request::getNewFileName(std::string path)
 
     return file_name_never_exist;
 }
-
-short                            Request::uploadFile(std::string path_to_upload_file)
-{
-    // Check for sepported file extension
-    if (mime.getExeFile(skipWhitespaceBeginAnd(this->getHeader("Content-Type"))).empty())
-        return 415;
-
-    // Get the start position of the file name
-
-    std::string::size_type pos = this->nameFileBody.rfind("/") + 1;
-
-    // Join the file name with the upload path
-    path_to_upload_file += this->nameFileBody.substr(pos, this->nameFileBody.length());
-
-    // Copy the file to the upload path
-    std::ifstream in(this->nameFileBody, std::ios::in | std::ios::binary);
-    std::ofstream out(path_to_upload_file, std::ios::out | std::ios::binary);
-
-    out << in.rdbuf();
-
-    out.close();
-    in.close();
-
-    return 201;    
-}

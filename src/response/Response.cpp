@@ -1,5 +1,7 @@
 #include "Response.hpp"
 
+MimeTypes Response::mime_type;
+
 Response::Response() :
 	responseContent(""),
 	statusCode(0),

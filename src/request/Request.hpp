@@ -134,8 +134,6 @@ class Request {
         void                            readBufferFromReq(char *, int);
 
         void                            printRequest();
-
-        short                           uploadFile(std::string);
-
+        
         std::string                     getNewFileName(std::string );
 };
