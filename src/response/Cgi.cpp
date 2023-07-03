@@ -17,8 +17,8 @@ void	Response::handleCGI()
 	}
 	else
 	{
-		this->statusCode = 502;
-		throw std::exception();
+		this->handleGetFile();
+		return;
 	}
 
 	// check if the cgi has execute permission
