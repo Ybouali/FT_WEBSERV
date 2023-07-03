@@ -11,7 +11,10 @@ Response::Response() :
 	fd(0),
 	readBytes(0),
 	readStatus(false),
-	connectionStatus(false)
+	connectionStatus(false),
+	isExecuted(false),
+	pid(0),
+	status(0)
 {
 }
 
@@ -36,6 +39,9 @@ void	Response::clear()
 	this->readBytes = 0;
 	this->readStatus = false;
 	this->connectionStatus = false;
+	this->isExecuted = false;
+	this->pid = 0;
+	this->status = 0;
 }
 
 // ----------------------------- Getters -----------------------------------
@@ -64,6 +70,12 @@ bool				Response::getReadStatus() const { return this->readStatus; }
 
 bool				Response::getConnectionStatus() const { return this->connectionStatus; }
 
+bool				Response::getIsExecuted() const { return this->isExecuted; }
+
+pid_t				Response::getPid() const { return this->pid; }
+
+int					Response::getStatus() const { return this->status; }
+
 // ----------------------------- Setters -----------------------------------
 
 void	Response::setConfigServer(const ConfigServer& server) { this->server = server; }
@@ -89,6 +101,12 @@ void	Response::setReadBytes(const int readBytes) { this->readBytes = readBytes; 
 void	Response::setReadStatus(const bool readStatus) { this->readStatus = readStatus; }
 
 void	Response::setConnectionStatus(const bool connectionStatus) { this->connectionStatus = connectionStatus; }
+
+void	Response::setIsExecuted(const bool isExecuted) { this->isExecuted = isExecuted; }
+
+void	Response::setPid(const pid_t pid) { this->pid = pid; }
+
+void	Response::setStatus(const int status) { this->status = status; }
 
 // ----------------------------- Methodes -----------------------------------
 

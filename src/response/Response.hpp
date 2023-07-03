@@ -19,6 +19,9 @@ class Response
 		int				readBytes;
 		bool			readStatus;
 		bool 			connectionStatus;
+		bool			isExecuted;
+		pid_t			pid;
+		int				status;
 
     public:
 		static MimeTypes mime_type;
@@ -41,6 +44,9 @@ class Response
 		int					getReadBytes() const;
 		bool				getReadStatus() const;
 		bool				getConnectionStatus() const;
+		bool				getIsExecuted() const;
+		pid_t				getPid() const;
+		int					getStatus() const;
 
         // ----------------------------- Setters -----------------------------------
 
@@ -56,6 +62,9 @@ class Response
 		void	setReadBytes(const int);
 		void	setReadStatus(const bool);
 		void	setConnectionStatus(const bool);
+		void	setIsExecuted(const bool);
+		void	setPid(const pid_t);
+		void	setStatus(const int);
 
         // ----------------------------- Methodes -----------------------------------
 
