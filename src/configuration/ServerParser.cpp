@@ -177,7 +177,10 @@ std::vector<ServerParser> ServerParser::get_server(std::string filename){
     std::string line;
     std::ifstream infile(filename);
     if (!infile.is_open()) 
-        std::cerr << "Error : could not open config file " << std::endl;
+    {
+        std::cerr << "webserv  error : could not open config file " << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     while (std::getline(infile, line))
     {

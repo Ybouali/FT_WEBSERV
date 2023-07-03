@@ -197,6 +197,7 @@ void	Response::isLocationMatched()
 	for (std::vector<Location >::iterator it = locations.begin(); it != locations.end(); it++)
 	{
 		// if the requested location is matched, set it to the response location
+		std::cout << requestedLocation << std::endl;
 		if (it->getLocation() == requestedLocation)
 		{
 			isMatched = true;

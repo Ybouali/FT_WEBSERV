@@ -178,13 +178,6 @@ void                            ManageServers::setupServers(const std::vector<Co
     bool            checkDoubleServers;
 
     this->Servers = servers;
-    if (this->Servers.empty())
-    {
-        // ! Here if there is no server. the program will start immediately with a default server 
-        this->Servers.push_back(ConfigServer());
-        std::cout << "[INFO]: There is no server in the config file or there is no config file " << std::endl;
-        std::cout << "[INFO]: So the Host [127.0.0.1] and the post will be [" << this->Servers.at(0).getPort() << "]" << std::endl;
-    }
     // ! If there is two servers with the same port and the same host.
     // ! The program will use the first fd socket for the both theme
     for (std::vector<ConfigServer>::iterator it = this->Servers.begin(); it != this->Servers.end(); ++it)

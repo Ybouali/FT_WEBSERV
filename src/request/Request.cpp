@@ -201,19 +201,32 @@ bool                                            Request::handleHeaders()
 
     if (this->requestHeaders.count("Host"))
     {
-        std::string _host = this->requestHeaders["Host"];
+        std::string _host = skipWhitespaceBeginAnd(this->requestHeaders["Host"]);
+        std::string _port;
         
         try
         {
             size_t position = _host.find_first_of(':');
-            this->Host = skipWhitespaceBeginAnd(_host.substr(0, position));
-            std::string host = _host.substr(position + 1, _host.length());
-            for (size_t i = 0; i < host.size(); i++)
+            if (position != std::string::npos)
             {
-                if (!std::isdigit(host[i]))
-                    this->setCodeError(400);
+                this->Host = _host.substr(0, position);
+                _port = _host.substr(position + 1, _host.length());
+                if (!_port.empty())
+                {
+                    for (size_t i = 0; i < _port.size(); i++)
+                    {
+                        if (!std::isdigit(_port[i]))
+                            this->setCodeError(400);
+                    }
+                }
             }
-            this->Port = std::stoul(host);
+            else 
+            {
+                this->Host = _host;
+                this->Port = 80;
+            }
+            if (!this->Port)
+                this->Port = std::stoul(_port);
         }
         catch(const std::exception)
         {
@@ -529,6 +542,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                 }
                 else if (!checkIsToken(c))
                 {
+        
                     this->errorCode = 400;
                     return ;
                 }
@@ -619,6 +633,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                 }
                 else
                 {
+        
                     this->errorCode = 400;
                     return ;
                 }
@@ -644,6 +659,7 @@ void                                   Request::readBufferFromReq(char * buffer,
                     this->State = Chunked_Data_LF;
                 else
                 {
+        
                     this->errorCode = 400;
                     return ;
                 }
@@ -715,13 +731,8 @@ void                                   Request::printRequest()
     for (std::map<std::string, std::string>::iterator it = this->requestHeaders.begin(); it != this->requestHeaders.end(); ++it)
         std::cout << "[" << it->first << "]:[" << it->second << "]" << std::endl;
     std::cout << "------------------------------------------------------------------------" << "\n\n";
-    // if (!this->Body.empty() && this->methodsString[this->getMethod()] == "POST")
-    // {
-    //     std::cout << "------------------------------ BODY ------------------------------------" << "\n";
-    //     for (std::vector<u_int8_t>::iterator it = this->Body.begin(); it != this->Body.end(); ++it)
-    //         std::cout << *it;
-    //     std::cout << "\n------------------------------------------------------------------------" << "\n\n";
-    // }
+    if (this->methodsString[this->getMethod()] == "POST")
+        std::cout << "the path of the file of body is [" << this->nameFileBody << "]" << std::endl;
     std::cout << "::::::::::::::::::::::::::::::::::::::::::::::  DONE PRINTING REQUEST  ::::::::::::::::::" << "\n\n";
 }
 

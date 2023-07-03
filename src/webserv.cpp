@@ -12,7 +12,7 @@ int main(int ac, char **av)
     // (broken pipe) when trying to write to a socket that has been closed
     signal(SIGPIPE, SIG_IGN);
 
-    filename = (ac == 2) ? av[1] : "config/default.conf";
+    filename = (ac == 2) ? av[1] : "config/webserv.conf";
     servers = serversFromConfigFile.get_server(filename);
 
     master.setupServers(master.getInfoServer(servers));
