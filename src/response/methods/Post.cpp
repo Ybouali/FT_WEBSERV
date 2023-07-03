@@ -4,6 +4,9 @@ void	Response::handlePostMethod()
 {
 	try
 	{
+		// check if the requested resource exists
+		this->isResourceExist();
+
 		// check if the location supports upload
 		if (!this->location.getUpload().empty())
 		{

@@ -2,13 +2,6 @@
 
 void	Response::handleCGI()
 {
-	// if the requested method is POST, set the full path to the uploaded file path
-	if (this->method == "POST")
-	{
-		this->fullPath = this->request.getNameFileBody();
-		std::cout << "fullPath: " << this->fullPath << std::endl;
-	}
-
 	// get the file extension
 	std::string extension = this->fullPath.substr(this->fullPath.find_last_of(".") + 1);
 
@@ -44,13 +37,13 @@ void	Response::handleCGI()
 	env["SERVER_PORT"] = std::to_string(this->request.getPort());
 	env["PATH_INFO"] = this->request.getPath();
 	env["PATH_TRANSLATED"] = this->fullPath;
-	env["SCRIPT_NAME"] = cgiFilePath;
 	env["REQUEST_METHOD"] = this->method;
 	env["QUERY_STRING"] = this->request.getQuery();
+	env["HTTP_COOKIE"] = this->request.getHeader("Cookie");
 	if (this->method == "POST")
 	{
-		env["CONTENT_TYPE"] = this->request.getHeader("Content-Type");
-		env["CONTENT_LENGTH"] = this->request.getHeader("Content-Length");
+		env["CONTENT_TYPE"] = skipWhitespaceBeginAnd(this->request.getHeader("Content-Type"));
+		env["CONTENT_LENGTH"] = skipWhitespaceBeginAnd(this->request.getHeader("Content-Length"));
 	}
 
 	// create pipe for the cgi output
@@ -93,13 +86,20 @@ void	Response::handleCGI()
 
 		if (this->method == "POST")
 		{
-			// redirect the stdin to the file body fd
-			if (dup2(this->request.getFdFileBody(), STDIN_FILENO) == -1)
+			// open the file body fd
+			int infd = open(this->request.getNameFileBody().c_str(), O_RDONLY);
+			if (infd == -1)
 			{
 				exit(EXIT_FAILURE);
 			}
 
-			close(this->request.getFdFileBody());
+			// redirect the stdin to the file body fd
+			if (dup2(infd, STDIN_FILENO) == -1)
+			{
+				exit(EXIT_FAILURE);
+			}
+
+			close(infd);
 		}
 
 		// redirect the stdout to the write end of the pipe
@@ -118,7 +118,7 @@ void	Response::handleCGI()
 		}
 	}
 
-	// close the pipe write end and set the read end to the response fd
+	// close the pipe write end and set the response fd to the pipe read end
 	close(pipefd[1]);
 	this->fd = pipefd[0];
 
@@ -127,7 +127,7 @@ void	Response::handleCGI()
 	// wait for the child process to finish
 	int status;
 	pid_t ret = waitpid(pid, &status, WNOHANG);
-	if (ret)
+	if (ret > 0)
 	{
 		// check if the cgi has finished successfully
 		if (WEXITSTATUS(status) == EXIT_FAILURE)
@@ -146,7 +146,7 @@ void	Response::handleCGI()
 		this->statusCode = 500;
 		throw std::exception();
 	}
-	else
+	else if (ret == 0)
 	{
 		this->statusCode = 504;
 		kill(pid, SIGKILL);

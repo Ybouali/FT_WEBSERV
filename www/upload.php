@@ -1,6 +1,6 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+    
     // save $_FILES['avatar'] to a inside a folder
     $avatar = $_FILES['avatar'];
     $avatar_name = $avatar['name'];
@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     setcookie('email', '', time() - 3600);
     setcookie('avatar', '', time() - 3600);
 }
+
 ?>
 <!DOCTYPE html>
 <div>

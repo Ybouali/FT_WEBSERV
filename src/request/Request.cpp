@@ -222,7 +222,7 @@ bool                                            Request::handleHeaders()
             }
             else 
             {
-                this->Host = _host;
+                this->Host = "0.0.0.0";
                 this->Port = 80;
             }
             if (!this->Port)
