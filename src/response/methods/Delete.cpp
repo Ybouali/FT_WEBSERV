@@ -90,7 +90,11 @@ void	Response::handleDeleteDirectoryContent()
 			this->fullPath = originalPath;
 		}
 
-		closedir(dir);
+		if (closedir(dir) == -1)
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
 	}
 	catch (const std::exception& e)
 	{

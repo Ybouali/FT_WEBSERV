@@ -86,20 +86,23 @@ void	Response::handleCGI()
 
 		if (this->method == "POST")
 		{
-			// open the file body fd
+			// open the temporary file uploaded by the client
 			int infd = open(this->request.getNameFileBody().c_str(), O_RDONLY);
 			if (infd == -1)
 			{
 				exit(EXIT_FAILURE);
 			}
 
-			// redirect the stdin to the file body fd
+			// redirect the stdin to the temporary file
 			if (dup2(infd, STDIN_FILENO) == -1)
 			{
 				exit(EXIT_FAILURE);
 			}
 
-			close(infd);
+			if (close(infd) == -1)
+			{
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		// redirect the stdout to the write end of the pipe
@@ -108,8 +111,10 @@ void	Response::handleCGI()
 			exit(EXIT_FAILURE);
 		}
 
-		close(pipefd[0]);
-		close(pipefd[1]);
+		if (close(pipefd[0]) == -1 || close(pipefd[1]) == -1)
+		{
+			exit(EXIT_FAILURE);
+		}
 
 		// exucute the cgi
 		if (execve(cgiFilePath.c_str(), argv, envp) == -1)
@@ -118,9 +123,13 @@ void	Response::handleCGI()
 		}
 	}
 
-	// close the pipe write end and set the response fd to the pipe read end
-	close(pipefd[1]);
 	this->fd = pipefd[0];
+
+	if (close(pipefd[1]) == -1)
+	{
+		this->statusCode = 500;
+		throw std::exception();
+	}
 
 	sleep(1);
 

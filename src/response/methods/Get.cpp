@@ -74,7 +74,11 @@ void	Response::handleGetDirectory()
 		}
 	}
 
-	closedir(dir);
+	if (closedir(dir) == -1)
+	{
+		this->statusCode = 500;
+		throw std::exception();
+	}
 
 	try
 	{
@@ -189,7 +193,11 @@ void	Response::handleGetAutoindex()
 
 		this->body.append("</pre><hr></body></html>");
 
-		closedir(dir);
+		if (closedir(dir) == -1)
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
 
 		// build the response content
 		this->connectionStatus = true;

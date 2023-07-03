@@ -17,7 +17,12 @@ void	Response::handlePostMethod()
 				this->statusCode = 404;
 				throw std::exception();
 			}
-			closedir(dir);
+
+			if (closedir(dir) == -1)
+			{
+				this->statusCode = 500;
+				throw std::exception();
+			}
 
 			// get the file size
 			struct stat st;

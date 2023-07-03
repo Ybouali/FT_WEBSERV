@@ -146,8 +146,6 @@ void	Response::buildResponse()
 			std::string errorPage = this->server.getErrorPages().find(this->statusCode)->second;
 			this->responseContent = getResponsePage(this->statusCode, true, errorPage);
 		}
-
-		// std::cout << this->responseContent << std::endl;
 	}
 }
 
@@ -175,8 +173,6 @@ void	Response::buildResponseContent()
 		this->responseContent.append(std::to_string(size));
 		this->responseContent.append("\r\n\r\n");
 	}
-
-	// std::cout << this->responseContent << std::endl;
 }
 
 void	Response::isLocationMatched()
