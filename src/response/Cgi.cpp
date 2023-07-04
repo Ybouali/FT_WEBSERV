@@ -43,11 +43,17 @@ void	Response::handleCGI()
 		env["PATH_TRANSLATED"] = this->fullPath;
 		env["REQUEST_METHOD"] = this->method;
 		env["QUERY_STRING"] = this->request.getQuery();
-		env["HTTP_COOKIE"] = this->request.getHeader("Cookie");
+		env["HTTP_COOKIE"] = skipWhitespaceBeginAnd(this->request.getHeader("Cookie"));
 		if (this->method == "POST")
 		{
 			env["CONTENT_TYPE"] = skipWhitespaceBeginAnd(this->request.getHeader("Content-Type"));
 			env["CONTENT_LENGTH"] = skipWhitespaceBeginAnd(this->request.getHeader("Content-Length"));
+		}
+
+		// print the environment variables for debugging
+		for (std::map<std::string, std::string>::iterator it = env.begin(); it != env.end(); it++)
+		{
+			std::cout << it->first << "=" << it->second << std::endl;
 		}
 
 		// create pipe for the cgi output
