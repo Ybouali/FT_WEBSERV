@@ -139,14 +139,11 @@ void	Response::handleCGI()
 	// wait for the child process to finish
 	if (waitpid(this->pid, &this->status, WNOHANG))
 	{
-		if (WIFEXITED(status))
+		// check if the cgi has finished successfully
+		if (WEXITSTATUS(status) == EXIT_FAILURE)
 		{
-			// check if the cgi has finished successfully
-			if (WEXITSTATUS(status) == EXIT_FAILURE)
-			{
-				this->statusCode = 500;
-				throw std::exception();
-			}
+			this->statusCode = 500;
+			throw std::exception();
 		}
 
 		this->readStatus = true;
