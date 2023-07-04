@@ -13,11 +13,11 @@ void	Response::handleCGI()
 		std::string cgiFilePath;
 		if (extension == "php")
 		{
-			cgiFilePath = "./cgi/php-cgi";
+			cgiFilePath = "./cgi-bin/php-cgi";
 		}
 		else if (extension == "py")
 		{
-			cgiFilePath = "./cgi/python-cgi";
+			cgiFilePath = "./cgi-bin/python-cgi";
 		}
 		else
 		{
