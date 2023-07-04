@@ -36,6 +36,7 @@ clean:
 
 fclean: clean
 	@rm -f $(NAME)
+	@rm -rf www/uploads
 
 re: fclean all
 
