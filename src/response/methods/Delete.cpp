@@ -4,9 +4,6 @@ void	Response::handleDeleteMethod()
 {
 	try
 	{
-		// check if the requested resource exists
-		this->isResourceExist();
-
 		// check if the location has CGI
 		if (this->location.getCgi() == "on")
 		{

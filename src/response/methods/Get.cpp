@@ -4,9 +4,6 @@ void	Response::handleGetMethod()
 {
 	try
 	{
-		// check if the requested resource exists
-		this->isResourceExist();
-
 		// check if the requested resource is a directory or a file
 		if (isDirectory(this->fullPath))
 		{

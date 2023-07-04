@@ -129,10 +129,17 @@ void	Response::buildResponse()
 			throw std::exception();
 		}
 
-		// check if the request is valid
+		// check if the server has a location that matches the requested location
 		this->isLocationMatched();
+
+		// check if the location has a redirection
 		this->isRedirectionExist();
+
+		// check if the requested method is allowed in the matched location
 		this->isMethodAllowed();
+
+		// check if the requested resource exists
+		this->isResourceExist();
 
 		// handle the request based on the method type (GET, POST, DELETE)
 		if (this->method == "GET")
