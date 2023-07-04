@@ -50,12 +50,6 @@ void	Response::handleCGI()
 			env["CONTENT_LENGTH"] = skipWhitespaceBeginAnd(this->request.getHeader("Content-Length"));
 		}
 
-		// print the environment variables for debugging
-		for (std::map<std::string, std::string>::iterator it = env.begin(); it != env.end(); it++)
-		{
-			std::cout << it->first << "=" << it->second << std::endl;
-		}
-
 		// create pipe for the cgi output
 		int pipefd[2];
 		if (pipe(pipefd) == -1)
