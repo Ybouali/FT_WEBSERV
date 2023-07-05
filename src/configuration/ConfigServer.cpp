@@ -1,13 +1,8 @@
 #include "ConfigServer.hpp"
 
 ConfigServer::ConfigServer()
-    : Port(), Host(), serverName("exempl.com"), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
-{
-    this->setPort("8080");
-    this->setHost("127.0.0.1");
-    Location local = Location();
-    this->locationList.push_back(local);
-}
+    : Port(), Host(), serverName(), errorPages(), clientMaxBodySize(CLIENT_MAX_BODY_SIZE), locationList()
+{ }
 
 ConfigServer::ConfigServer(std::string port, std::string host, std::string ServerName, std::vector<Location > _locationList, std::map<short, std::string> errorPages, unsigned long clientMaxBodySize)
     : Port(), Host(), serverName(), errorPages(), clientMaxBodySize(), locationList()

@@ -95,7 +95,10 @@ void            Request::clear()
     this->indexBuffer = 0;
     this->c = 0;
     if (this->fdFileBody > 0)
+    {
         close(this->fdFileBody);
+        std::remove(this->nameFileBody.c_str());
+    }
     this->nameFileBody.clear();
     this->Port = 0;
     this->bodyFlag = false;
@@ -186,6 +189,9 @@ bool                                            Request::handleHeaders()
     }
     if (this->requestHeaders.count("Transfer-Encoding"))
     {
+        std::string encoding = skipWhitespaceBeginAnd(this->requestHeaders["Transfer-Encoding"]);
+        if (encoding == "chunked")
+            this->chunkedFlag = true;
         if (this->requestHeaders["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
             this->chunkedFlag = true;
         this->bodyFlag = true;
@@ -513,6 +519,12 @@ void                                   Request::readBufferFromReq(char * buffer,
                     if (!this->handleHeaders())
                         this->State = Parsing_Done;
                     
+                    if (this->getMethodsString() != "POST")
+                    {
+                        this->State = Parsing_Done;
+                        break;
+                    }
+
                     if (this->bodyFlag)
                     {
                         if (this->chunkedFlag == true)
@@ -633,7 +645,6 @@ void                                   Request::readBufferFromReq(char * buffer,
                 }
                 else
                 {
-        
                     this->errorCode = 400;
                     return ;
                 }
@@ -700,7 +711,8 @@ void                                   Request::readBufferFromReq(char * buffer,
             {
                 if (this->Body.size() < this->bodySize )
                     this->Body.push_back(c);
-                if (this->Body.size() == this->bodySize )
+                this->maxBodySize++;
+                if (this->maxBodySize == this->bodySize )
                     this->State = Parsing_Done;
                 break ;
             }
@@ -712,7 +724,7 @@ void                                   Request::readBufferFromReq(char * buffer,
         this->Storage += c;
     }
     
-    if (this->State == Parsing_Done)
+    if (this->State == Parsing_Done || this->State == Chunked_Data || this->State == Message_Body )
     {
         if (this->getMethodsString() == "POST" && this->fdFileBody > 0)
             write(this->fdFileBody, (char*)this->Body.data(), this->Body.size());

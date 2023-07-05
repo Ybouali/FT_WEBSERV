@@ -27,6 +27,12 @@ void	Response::handlePostMethod()
 			stat(filename, &st);
 			off_t size = st.st_size;
 
+			if (size == 0)
+			{
+				this->statusCode = 411;
+				throw std::exception();
+			}
+
 			// check if the file size is bigger than the max body size
 			if ((unsigned long)size > this->server.getClientMaxBodySize())
 			{
