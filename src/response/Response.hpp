@@ -93,6 +93,7 @@ class Response
 
 		// CGI
 		void	handleCGI();
+		void	handleCGIStatusCode();
 };
 
 #endif

@@ -216,11 +216,32 @@ std::string getPageError(short statusCode)
     std::string s_code = std::to_string(statusCode);
     std::string s_code_string = statusCodeString(statusCode);
 
-    page.append("<!DOCTYPE html>\r\n<html>\r\n<head><title> small nginx </title> \r\n <style>\r\nbody { \r\n width: 35em;\r\nmargin: 0 auto; \r\n color: #272727; background-color: #3366CC; \r\nfont-family: new century, schoolbook;\r\n }\r\n</style></head>\r\n <body>\r\n <center> \r\n <h1> WELCOM TO THE SMALL NGINX </h1> \r\n <h2>");
-    page.append(s_code);
-    page.append(" status code and the message is [");
-    page.append(s_code_string);
-    page.append("]</h2> </center>\r\n</body>\r\n </html>");
+    page.append("<!DOCTYPE html>\r\n<html>\r\n<head>\r\n<title>Jinx Nginx - Error Page</title>\r\n");
+    page.append("<style>\r\n");
+    page.append("body {\r\n");
+    page.append("  background-color: #1a1a1a;\r\n");
+    page.append("  color: #ffffff;\r\n");
+    page.append("  font-family: 'Arial', sans-serif;\r\n");
+    page.append("  margin: 0;\r\n");
+    page.append("  padding: 0;\r\n");
+    page.append("}\r\n");
+    page.append("h1, h2 {\r\n");
+    page.append("  text-align: center;\r\n");
+    page.append("}\r\n");
+    page.append(".container {\r\n");
+    page.append("  max-width: 35em;\r\n");
+    page.append("  margin: 0 auto;\r\n");
+    page.append("  padding: 2em;\r\n");
+    page.append("}\r\n");
+    page.append("</style>\r\n");
+    page.append("</head>\r\n");
+    page.append("<body>\r\n");
+    page.append("<div class='container'>\r\n");
+    page.append("<h1>Welcome to Jinx Nginx</h1>\r\n");
+    page.append("<h2>" + s_code + " - " + s_code_string + "</h2>\r\n");
+    page.append("</div>\r\n");
+    page.append("</body>\r\n");
+    page.append("</html>");
 
     return page;
 }
@@ -282,7 +303,7 @@ std::string getResponsePage(short codeStatus, bool needBody, std::string pathErr
     if (codeStatus == 101)
         response.append("Upgrade: HTTP/1.1\r\nConnection: Upgrade\r\n");
 
-    response.append("Server: Small nginx\r\n");
+    response.append("Server: Jinx Nginx\r\n");
 	response.append(getDateFormat());
 
     if (needBody)

@@ -155,7 +155,42 @@ void	Response::handleCGI()
 
 		this->readStatus = true;
 		this->statusCode = 200;
+
+		this->handleCGIStatusCode();
+
 		this->responseContent = getResponsePage(this->statusCode, false, "");
 		this->responseContent.append("Connection: keep-alive");
+	}
+}
+
+void	Response::handleCGIStatusCode()
+{
+	char c;
+	int readBytes = read(this->fd, &c, 1);
+	if (readBytes <= 0)
+	{
+		this->statusCode = 500;
+		throw std::exception();
+	}
+	if (c == 'S')
+	{
+		char buffer[10];
+		std::string line;
+
+		int readBytes = read(this->fd, buffer, 10);
+		if (readBytes <= 0)
+		{
+			this->statusCode = 500;
+			throw std::exception();
+		}
+
+		line = 'S';
+		line += std::string(buffer, readBytes);
+
+		std::string::size_type pos = line.find("Status: ");
+		if (pos != std::string::npos)
+		{
+			this->statusCode = std::atoi(line.substr(pos + 8, 3).c_str());
+		}
 	}
 }
