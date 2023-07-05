@@ -166,29 +166,54 @@ void	Response::handleGetAutoindex()
 			throw std::exception();
 		}
 
-		this->body.append("<html><head><title>Index of ");
-		this->body.append(this->request.getPath());
-		this->body.append("</title></head><body><h1>Index of ");
-		this->body.append(this->request.getPath());
-		this->body.append("</h1><hr><pre>");
-		this->body.append("<style> body { background-color: #f0f0f0; font-family: sans-serif;} </style>");
+		this->body = "<html><head><title>Index of " + this->request.getPath();
+		this->body += "</title></head><body><h1>Index of " + this->request.getPath() + "</h1>";
+		this->body += "<style>@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');\
+						*{box-sizing: border-box;font-family: 'Poppins', Arial, Helvetica, sans-serif;margin: 0;padding: 0;}\
+						body{padding: 3%;background: #222222;}\
+						table{background: #333333;max-width: 1366px;margin: 0 auto;border:none;border-collapse:collapse;table-layout: fixed;}\
+						table th {font-size: 18px;color: #fff;line-height: 1.4;text-transform: uppercase;background-color: #111111;padding-top: 24px;padding-bottom: 20px;padding-left: 20px;text-align: left;font-weight: 600;}\
+						table td {padding-top: 18px;padding-bottom: 14px;padding-left: 15px;}\
+						table tr:nth-child(even) {background-color: #444444;}\
+						h1{text-align: center;padding-bottom: 50px;color: #fff;margin-bottom: 0;}\
+						table a{color: #fff;font-size: 16px;text-decoration: none;}\
+						table a i{padding-right: 5px;}\
+						table tr:nth-child(even) a{color: #fff;}\
+						table a:hover, table tr:nth-child(even) a:hover{color: #ffcc66; font-weight: 500;}\
+						table a:hover i.fa, table a:hover i.fa:before{background-color: #ffcc66}\
+						table a:hover i.fa-file-o, table a:hover i.fa-file-o:before{background-color: #ffffff; border-color: #ffcc66}\
+						table tr:hover{background-color: #ffcc662e; cursor: pointer;}\
+						i.fa.fa-folder:before {content: '';width: 50%;height: 2px;border-radius: 0 10px 0 0;background-color: #fff;position: absolute;top: -2px;left: 0px;}\
+						i.fa.fa-folder {width: 20px;height: 14px;margin: 0 10px -2px 0;position: relative;background-color: #fff;border-radius: 0 3px 3px 3px;display: inline-block;}\
+						i.fa.fa-file-o {display: inline-block;width: 15px;height: 20px;background: #ffffff;border-radius: 2px;margin: 0 10px -4px 0;border-top-right-radius: 7px;border:1px solid #fff}\
+						</style>";
+		this->body += "<table style=\"width:100%\"> <tr> <th>Name</th> <th>Size</th> <th>Last Modified</th> </tr>";
 
-		// loop through the directory content and append it to the body
+		// loop through the directory content and build the response body
 		struct dirent* ent;
 		while ((ent = readdir(dir)) != NULL)
 		{
 			std::string fileName = ent->d_name;
 			if (fileName != "." && fileName != "..")
 			{
-				this->body.append("<a href=\"");
-				this->body.append(fileName);
-				this->body.append("\">");
-				this->body.append(fileName);
-				this->body.append("</a><br>");
+				std::string filePath = this->fullPath + fileName;
+				std::string icon;
+
+				if (isDirectory(filePath))
+				{
+					icon = "<i class=\"fa fa-folder\" aria-hidden=\"true\"></i>";
+				}
+				else
+				{
+					icon = "<i class=\"fa fa-file-o\" aria-hidden=\"true\"></i>";
+				}
+
+				std::string fileSize = getFileSize(filePath);
+				std::string lastModified = getLastModified(filePath);
+
+				this->body += "<tr> <td><a href=\"" + fileName + "\">" + icon + fileName + "</a></td> <td>" + fileSize + "</td> " + lastModified + "</tr>";
 			}
 		}
-
-		this->body.append("</pre><hr></body></html>");
 
 		if (closedir(dir) == -1)
 		{

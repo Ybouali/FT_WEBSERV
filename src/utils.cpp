@@ -1,33 +1,32 @@
 #include "webserv.hpp"
 
-std::string     skipWhitespaceBeginAnd(std::string line)
+std::string skipWhitespaceBeginAnd(std::string line)
 {
     line.erase(line.begin(), std::find_if_not(line.begin(), line.end(), isspace));
     line.erase(std::find_if_not(line.rbegin(), line.rend(), isspace).base(), line.end());
+
     return line;
 }
 
-std::string skip(std::string value, std::string removeString) {
+std::string skip(std::string value, std::string removeString)
+{
     if (value[value.length() - 1] != ';')
         parse_error(removeString);
 
     value.erase(value.length() - 1);
-
     value = skipWhitespaceBeginAnd(value);
-
     value.erase(0 , removeString.length());
-
-
     value = skipWhitespaceBeginAnd(value);
 
     return value;
 }
 
-bool            errorPath(std::string path)
+bool    errorPath(std::string path)
 {
-    std::string     t(path);
+    std::string t(path);
     char *r = strtok((char*)t.c_str(), "/");
     int p = 0;
+
     while (r != NULL)
     {
         if (!strcmp(r, ".."))
@@ -38,11 +37,12 @@ bool            errorPath(std::string path)
             return true;
         r = strtok(NULL, "/");
     }
+
     return false;
 }
 
-bool hasPercentEncoded(char * buffer, int startIndex, int bufferSize) {
-
+bool    hasPercentEncoded(char * buffer, int startIndex, int bufferSize)
+{
     std::string input = "";
 
     for (int i = startIndex; (i < bufferSize && i < (startIndex + 3) ); i++)
@@ -55,46 +55,47 @@ bool hasPercentEncoded(char * buffer, int startIndex, int bufferSize) {
             return true;
         }
     }
+
     return false;
 }
 
-char decodePercentEncodedChar(const std::string& percentEncoded) {
-    
+char    decodePercentEncodedChar(const std::string percentEncoded)
+{
     std::istringstream hexDigits(percentEncoded);
     int hexValue = 0;
-    
+
     hexDigits >> std::hex >> hexValue;
 
     return static_cast<char>(hexValue);
 }
 
-
-void    parse_error(const std::string &message)
+void    parse_error(const std::string message)
 {
     std::cerr << "[ERROR]: Invalid (" << message << ")" << std::endl;
     exit(EXIT_FAILURE);
 }
 
-bool            checkUriCharacters(u_int8_t c)
+bool    checkUriCharacters(u_int8_t c)
 {
     const std::string forbiddenChars = "<>\"%{}|\\^~[]`();?:@=&$,#";
-  
+
     return forbiddenChars.find(c) != std::string::npos;
 }
 
-bool            errorCharQuery(char c)
+bool    errorCharQuery(char c)
 {
     const std::string forbiddenChars = " \"<>{}|\\^~[]`();/?:@$,#";
-  
+
     return forbiddenChars.find(c) != std::string::npos;
 }
 
-bool           checkIsToken(u_int8_t c)
+bool    checkIsToken(u_int8_t c)
 {
     if (c == '!' || (c >= '#' && c <= '\'') || c == '*'|| c == '+' || c == '-'  || c == '.' || \
        (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= '^' && c <= '`') || \
        (c >= 'a' && c <= 'z') || c == '|')
         return (true);
+
     return (false);
 }
 
@@ -214,15 +215,17 @@ std::string getPageError(short statusCode)
     std::string page = "";
     std::string s_code = std::to_string(statusCode);
     std::string s_code_string = statusCodeString(statusCode);
+
     page.append("<!DOCTYPE html>\r\n<html>\r\n<head><title> small nginx </title> \r\n <style>\r\nbody { \r\n width: 35em;\r\nmargin: 0 auto; \r\n color: #272727; background-color: #3366CC; \r\nfont-family: new century, schoolbook;\r\n }\r\n</style></head>\r\n <body>\r\n <center> \r\n <h1> WELCOM TO THE SMALL NGINX </h1> \r\n <h2>");
     page.append(s_code);
     page.append(" status code and the message is [");
     page.append(s_code_string);
     page.append("]</h2> </center>\r\n</body>\r\n </html>");
+
     return page;
 }
 
-std::string	getDateFormat()
+std::string getDateFormat()
 {
 	time_t	currentTime = time(NULL);
 	tm*		utcTime = gmtime(&currentTime);
@@ -249,7 +252,7 @@ std::string	getDateFormat()
 	return (date);
 }
 
-static std::string getContentFileFromPathFile(std::string path)
+static std::string  getContentFileFromPathFile(std::string path)
 {
     std::ifstream   file(path);
     std::string     content;
@@ -298,7 +301,8 @@ std::string getResponsePage(short codeStatus, bool needBody, std::string pathErr
     return response;
 }
 
-bool isValidHTTPStatusCode(short statusCode) {
+bool    isValidHTTPStatusCode(short statusCode)
+{
     static const int validStatusCodesArr[] = {
         100, 101, 102, 103, 122,
         200, 201, 202, 203, 204, 205, 206, 207, 208, 226,
@@ -312,7 +316,7 @@ bool isValidHTTPStatusCode(short statusCode) {
     return validStatusCodes.count(statusCode) > 0;
 }
 
-bool checkStringIsEmpty(std::string str)
+bool    checkStringIsEmpty(std::string str)
 {
     if (str.empty())
         return true;
@@ -341,9 +345,10 @@ std::string generateRandomFileName()
     return randomName;
 }
 
-bool checkFileExists(const std::string path_filename)
+bool    checkFileExists(const std::string path_filename)
 {
     std::ifstream file(path_filename.c_str());
+
     return (file.good());
 }
 
@@ -360,7 +365,7 @@ bool    isDirectory(const std::string path)
     return false;
 }
 
-const std::string  getContentType(const std::string path)
+std::string getContentType(const std::string path)
 {
     std::string type = path.substr(path.find_last_of(".") + 1);
     MimeTypes mimeTypes;
@@ -370,4 +375,40 @@ const std::string  getContentType(const std::string path)
         contentType = "application/octet-stream";
 
     return contentType;
+}
+
+std::string getFileSize(const std::string path)
+{
+    struct stat st;
+    std::string size = "-";
+
+    stat(path.c_str(), &st);
+    if ((st.st_size / 1000000000) > 0)
+    {
+        size = std::to_string(st.st_size / 10000000000) + " Gb";
+    }
+    else if ((st.st_size / 1000000) > 0)
+    {
+        size = std::to_string(st.st_size / 1000000) + " Mb";
+    }
+    else if ((st.st_size / 1000) > 0)
+    {
+        size = std::to_string(st.st_size / 1000) + " Kb";
+    }
+    else
+    {
+        size = std::to_string(st.st_size) + " Bytes";
+    }
+
+    return size;
+}
+
+std::string getLastModified(const std::string path)
+{
+    struct stat st;
+
+    stat(path.c_str(), &st);
+    std::string lastModified = "<td>" + std::string(ctime(&st.st_mtime)) + "</td>";
+
+    return lastModified;
 }

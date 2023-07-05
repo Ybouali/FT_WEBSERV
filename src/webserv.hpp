@@ -44,8 +44,8 @@
 # include <sys/select.h>
 # include <arpa/inet.h>
 
-#include <regex>
-#include <unordered_set>
+# include <regex>
+# include <unordered_set>
 
 # include "response/MimeTypes.hpp"
 
@@ -53,24 +53,26 @@
 # include "configuration/ServerParser.hpp"
 # include "configuration/ConfigServer.hpp"
 
-// ? UTILS FUNCTIONS
+// UTILS FUNCTIONS
 
-std::string     	skipWhitespaceBeginAnd(std::string);
-bool            	errorPath(std::string);
-bool            	checkUriCharacters(u_int8_t);
-bool            	checkIsToken(u_int8_t);
-std::string     	statusCodeString(short);
-std::string     	getPageError(short);
-std::string			getDateFormat();
-std::string     	getResponsePage(short, bool, std::string);
-bool            	errorCharQuery(char);
-bool            	checkStringIsEmpty(std::string);
-std::string     	generateRandomFileName();
-bool            	checkFileExists(const std::string);
-bool            	isDirectory(const std::string);
-const std::string	getContentType(const std::string);
-void                parse_error(const std::string & );
-bool                isValidHTTPStatusCode(short );
-bool                hasPercentEncoded(char * , int , int );
-char                decodePercentEncodedChar(const std::string& );
-std::string         skip(std::string , std::string  );
+std::string		skipWhitespaceBeginAnd(std::string);
+std::string		skip(std::string, std::string);
+bool			errorPath(std::string);
+bool			checkUriCharacters(u_int8_t);
+bool			checkIsToken(u_int8_t);
+std::string		statusCodeString(short);
+std::string		getPageError(short);
+std::string		getDateFormat();
+std::string		getResponsePage(short, bool, std::string);
+bool			errorCharQuery(char);
+bool			checkStringIsEmpty(std::string);
+std::string		generateRandomFileName();
+bool			checkFileExists(const std::string);
+bool			isDirectory(const std::string);
+std::string		getContentType(const std::string);
+void			parse_error(const std::string);
+bool			isValidHTTPStatusCode(short);
+bool			hasPercentEncoded(char*, int, int);
+char			decodePercentEncodedChar(const std::string);
+std::string		getFileSize(const std::string);
+std::string		getLastModified(const std::string);
