@@ -149,7 +149,17 @@ void                                            Request::setCodeError(short code
 
 bool                                            Request::openFile()
 {
-    this->nameFileBody = "/tmp/" + generateRandomFileName();
+    std::string filename;
+
+    std::string::size_type pos = this->getPath().rfind("/") + 1;
+    
+    if (pos != std::string::npos)
+        filename =  this->getPath().substr(pos, this->getPath().length());
+    
+    if (filename.empty())
+        filename = generateRandomFileName();
+    
+    this->nameFileBody = "/tmp/" + filename;
 
     if (this->requestHeaders.count("Content-Type"))
         this->nameFileBody += "." + mime.getExeFile(skipWhitespaceBeginAnd(this->requestHeaders["Content-Type"]));
