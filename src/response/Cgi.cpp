@@ -21,7 +21,14 @@ void	Response::handleCGI()
 		}
 		else
 		{
-			this->handleGetFile();
+			if (this->method == "GET")
+			{
+				this->handleGetFile();
+			}
+			else if (this->method == "POST")
+			{
+				this->handlePostFile();
+			}
 			return;
 		}
 
