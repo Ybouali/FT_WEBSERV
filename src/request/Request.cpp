@@ -148,18 +148,8 @@ void                                            Request::setMaxBodySize(size_t s
 void                                            Request::setCodeError(short code) { this->errorCode = code; }
 
 bool                                            Request::openFile()
-{
-    std::string filename;
-
-    std::string::size_type pos = this->getPath().rfind("/") + 1;
-    
-    if (pos != std::string::npos)
-        filename =  this->getPath().substr(pos, this->getPath().length());
-    
-    if (filename.empty())
-        filename = generateRandomFileName();
-    
-    this->nameFileBody = "/tmp/" + filename;
+{   
+    this->nameFileBody = "/tmp/" + generateRandomFileName();
 
     if (this->requestHeaders.count("Content-Type"))
         this->nameFileBody += "." + mime.getExeFile(skipWhitespaceBeginAnd(this->requestHeaders["Content-Type"]));
@@ -202,8 +192,11 @@ bool                                            Request::handleHeaders()
         std::string encoding = skipWhitespaceBeginAnd(this->requestHeaders["Transfer-Encoding"]);
         if (encoding == "chunked")
             this->chunkedFlag = true;
-        if (this->requestHeaders["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
-            this->chunkedFlag = true;
+        else
+        {
+            this->setCodeError(411);
+            return false;
+        }
         this->bodyFlag = true;
         if (!this->openFile())
             return false;
