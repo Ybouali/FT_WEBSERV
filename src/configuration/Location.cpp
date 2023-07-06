@@ -117,7 +117,8 @@ const std::string& Location::getRedirection() const {
 }
 
 void Location::setRedirection(std::string& value) {
-    redirection = value;
+    value = skip(value, "redirection");
+    this->redirection = value;
 }
 
 const std::string& Location::getLocation() const {
