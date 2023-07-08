@@ -144,4 +144,4 @@ Here are additional features you can add:
 * Handling multiple `CGI`.
 
 > The bonus part will only be evaluated if the required part is "EXCELLENT". Perfect means that the required part has been fully completed and is running smoothly. If you have not met ALL of the mandatory requirements, your bonus portion will not be evaluated at all.
-</details>
+</details>x
